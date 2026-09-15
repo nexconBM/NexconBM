@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House and Land: Nexcon Building Management</title>
+<meta name="description" content="Fixed-price house and land packages from Nexcon Building Management, paired with trusted land partners across Melbourne and regional Victoria.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css?v=19">
+</head>
+<body>
+
+<a class="skip-link" href="#main" data-i18n="skip_link">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="../#top" class="logo">
+      <img src="../nexcon-logo-horizontal.png" alt="Nexcon Building Management" class="logo-img">
+    </a>
+    <nav class="site-nav" id="siteNav">
+      <a href="../build-specialist/" data-i18n="nav_services">Build specialist</a>
+      <a href="../house-and-land/" class="is-active" data-i18n="nav_house_land">House &amp; land</a>
+      <a href="../house-inspections/" data-i18n="nav_inspections">House inspections</a>
+      <a href="../about/" data-i18n="nav_about">About Us</a>
+      <a href="../#contact" data-i18n="nav_contact">Contact</a>
+      <button id="langToggle" class="lang-toggle" type="button" aria-label="切換至中文">中文</button>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false" aria-controls="siteNav"><span></span></button>
+  </div>
+</header>
+
+
+<main id="main">
+
+  <div class="page-intro">
+    <div class="page-intro-inner">
+      <h1 class="heading heading-on-dark" data-i18n="hal_divider_h2">House and land</h1>
+      <p class="lede lede-on-dark" data-i18n="hal_divider_lede">Whatever it is, the way you buy house and land can make all the difference to your lifestyle.</p>
+    </div>
+  </div>
+
+  <div class="content-block reveal">
+    <div class="wrap content-grid">
+      <div class="content-side">
+        <p class="eyebrow" data-i18n="hal_eyebrow">House and land package</p>
+        <h3 class="heading" data-i18n="hal_h3">Not just a package, a promise.</h3>
+        <p class="lede" data-i18n="hal_lede">Every house and land package we offer is fixed price. What you're quoted is what you pay, full stop. Paired with trusted land partners across Melbourne and regional Victoria, so you're not gambling on location or the builder.</p>
+      </div>
+      <div class="service-list">
+        <div class="service-item">
+          <p class="detail-label" data-i18n="hal_trusted_label">Trusted land partners</p>
+          <p class="body-copy" data-i18n="hal_trusted_body">We work closely with reputable land development partners across Melbourne and regional Victoria, so you can be confident of finding the right location and home design for your needs.</p>
+        </div>
+        <div class="service-item">
+          <p class="detail-label" data-i18n="hal_fixed_label">Fixed price</p>
+          <p class="body-copy" data-i18n="hal_fixed_body">Every one of our house and land packages is fixed price, so what you're quoted is what you pay.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap reveal" style="margin-top:2.5rem;">
+      <p class="lede" data-i18n="hal_cta_lede">Ready to talk about a house and land package that suits you?</p>
+      <a href="../#contact" class="pill pill-primary" data-i18n="hal_cta_btn">Get in touch</a>
+    </div>
+  </div>
+
+</main>
+
+<footer id="footer-contact">
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="../nexcon-logo-horizontal-light.png" alt="Nexcon Building Management" class="logo-img">
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h4 data-i18n="footer_address_label">Address</h4>
+          <p>Unit 8, 197-199 Springvale Road<br>Nunawading, VIC 3131</p>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_contact_label">Contact</h4>
+          <p class="footer-contact-name">Kevin Chan 陳嘉文</p>
+          <a href="tel:+61411330962">+61 411 330 962</a>
+          <a href="mailto:kevin@nexcongroup.com.au">kevin@nexcongroup.com.au</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_explore_label">Explore</h4>
+          <a href="../build-specialist/" data-i18n="nav_services">Build specialist</a>
+          <a href="../house-and-land/" data-i18n="nav_house_land">House &amp; land</a>
+          <a href="../house-inspections/" data-i18n="nav_inspections">House inspections</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; <span id="year"></span> Nexcon Building Management Pty Ltd</div>
+  </div>
+</footer>
+
+<script src="../translations.js"></script>
+<script src="../i18n.js"></script>
+<script>
+  const navToggle = document.getElementById('navToggle');
+  const siteNav = document.getElementById('siteNav');
+  navToggle.addEventListener('click', () => {
+    const open = siteNav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', String(open));
+  });
+  siteNav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      siteNav.classList.remove('is-open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && revealEls.length) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+    revealEls.forEach(el => revealObserver.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('is-visible'));
+  }
+</script>
+
+
+</body>
+</html>

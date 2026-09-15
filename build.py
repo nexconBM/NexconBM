@@ -9,22 +9,23 @@ in place.
 Folder layout it expects (matches your project):
 
   styles.css
+  index.html           <- home page, lives at the site root (so GitHub
+                          Pages etc. serve it by default instead of 404).
+                          Should contain <!-- HEADER --> and <!-- FOOTER -->
+                          where those pieces belong.
   partial/
-    header.html      <- shared <header> (with {{HOME}} / {{ABOUT_ACTIVE}} tokens)
+    header.html      <- shared <header> (with {{ROOT}} / {{ABOUT_ACTIVE}} tokens)
     footer.html       <- shared <footer> + the nav-toggle/year script
-  home/
-    index.html        <- home page. Should contain <!-- HEADER --> and
-                          <!-- FOOTER --> where those pieces belong.
   about/
-    index.html         <- about page. Same deal.
+    index.html         <- about page, one folder deep. Same deal.
 
 How the tokens work:
   <!-- HEADER -->   in a page gets replaced with partial/header.html
   <!-- FOOTER -->   in a page gets replaced with partial/footer.html
-  {{HOME}}          inside header/footer becomes "" on the home page itself
-                    (so links stay instant same-page anchors like "#services"),
-                    and "../home/" on every other page (so the link actually
-                    navigates back to the homepage's section).
+  {{ROOT}}          inside header/footer becomes "" on the home page itself
+                    (so links stay relative, e.g. "about/", "#contact"),
+                    and "../" on every other page (so the link actually
+                    navigates back up to the site root).
   {{ABOUT_ACTIVE}}  becomes ' class="is-active"' on the About page's own nav
                     link, and "" everywhere else.
 
@@ -48,8 +49,11 @@ PARTIALS = ROOT / "partial"
 
 # Each page: (path to its index.html, is this the homepage?)
 PAGES = [
-    ("home/index.html", True),
+    ("index.html", True),
     ("about/index.html", False),
+    ("build-specialist/index.html", False),
+    ("house-and-land/index.html", False),
+    ("house-inspections/index.html", False),
 ]
 
 
@@ -59,12 +63,12 @@ def build_page(page_path: str, is_home: bool) -> None:
     header_html = (PARTIALS / "header.html").read_text(encoding="utf-8")
     footer_html = (PARTIALS / "footer.html").read_text(encoding="utf-8")
 
-    home_prefix = "" if is_home else "../home/"
+    root_prefix = "" if is_home else "../"
     about_active = "" if is_home else ' class="is-active"'
 
-    header_html = header_html.replace("{{HOME}}", home_prefix)
+    header_html = header_html.replace("{{ROOT}}", root_prefix)
     header_html = header_html.replace("{{ABOUT_ACTIVE}}", about_active)
-    footer_html = footer_html.replace("{{HOME}}", home_prefix)
+    footer_html = footer_html.replace("{{ROOT}}", root_prefix)
 
     final_html = page_html.replace("<!-- HEADER -->", header_html)
     final_html = final_html.replace("<!-- FOOTER -->", footer_html)
@@ -76,4 +80,4 @@ def build_page(page_path: str, is_home: bool) -> None:
 if __name__ == "__main__":
     for page_path, is_home in PAGES:
         build_page(page_path, is_home)
-    print("Done. Upload styles.css, the images at the site root, and the home/ and about/ folders.")
+    print("Done. Upload styles.css, the images at the site root, and the index.html and about/ folders.")

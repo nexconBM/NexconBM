@@ -2,7 +2,7 @@
   <div class="wrap">
     <div class="footer-inner">
       <div class="footer-logo">
-        <img src="../nexcon-logo-horizontal-light.png" alt="Nexcon Building Management" class="logo-img">
+        <img src="{{ROOT}}nexcon-logo-horizontal-light.png" alt="Nexcon Building Management" class="logo-img">
       </div>
       <div class="footer-cols">
         <div class="footer-col">
@@ -17,9 +17,9 @@
         </div>
         <div class="footer-col">
           <h4 data-i18n="footer_explore_label">Explore</h4>
-          <a href="{{HOME}}#services" data-i18n="nav_services">Build specialist</a>
-          <a href="{{HOME}}#house-and-land" data-i18n="nav_house_land">House &amp; land</a>
-          <a href="{{HOME}}#inspection" data-i18n="nav_inspections">House inspections</a>
+          <a href="{{ROOT}}build-specialist/" data-i18n="nav_services">Build specialist</a>
+          <a href="{{ROOT}}house-and-land/" data-i18n="nav_house_land">House &amp; land</a>
+          <a href="{{ROOT}}house-inspections/" data-i18n="nav_inspections">House inspections</a>
         </div>
       </div>
     </div>
@@ -27,8 +27,8 @@
   </div>
 </footer>
 
-<script src="../translations.js"></script>
-<script src="../i18n.js"></script>
+<script src="{{ROOT}}translations.js"></script>
+<script src="{{ROOT}}i18n.js"></script>
 <script>
   const navToggle = document.getElementById('navToggle');
   const siteNav = document.getElementById('siteNav');

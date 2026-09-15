@@ -74,11 +74,33 @@ svg{display:block;}
 .hero-motif svg{width:100%; height:auto;}
 @media (max-width:900px){ .hero-inner{grid-template-columns:1fr;} .hero-motif{order:-1; max-width:340px; margin:0 auto;} }
 
+/* ---------- entrance motion ---------- */
+@keyframes fadeInUp{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+.hero-copy .heading{opacity:0; animation:fadeInUp 0.9s cubic-bezier(.22,.61,.36,1) 0.1s forwards;}
+.hero-copy .lede{opacity:0; animation:fadeInUp 0.9s cubic-bezier(.22,.61,.36,1) 0.28s forwards;}
+.hero-motif{opacity:0; animation:fadeInUp 1s cubic-bezier(.22,.61,.36,1) 0.42s forwards;}
+
+.reveal{opacity:0; transform:translateY(28px); transition:opacity 0.8s cubic-bezier(.22,.61,.36,1), transform 0.8s cubic-bezier(.22,.61,.36,1);}
+.reveal.is-visible{opacity:1; transform:translateY(0);}
+
+@media (prefers-reduced-motion: reduce){
+  .hero-copy .heading, .hero-copy .lede, .hero-motif{animation:none; opacity:1;}
+  .reveal{opacity:1; transform:none; transition:none;}
+}
+
 /* ---------- page intro (used on non-home pages, same visual language as homepage dividers) ---------- */
 .page-intro{background-color:var(--bordeaux); color:var(--blush); position:relative;}
 .page-intro-inner{max-width:var(--max); margin:0 auto; padding:clamp(2.6rem,6vw,4rem) clamp(1.25rem,4vw,3rem); position:relative; z-index:1;}
 .page-intro h1{font-size:clamp(1.9rem,4vw,2.8rem); max-width:16ch;}
 .page-intro .lede{max-width:52ch; margin-top:0.6rem;}
+.page-intro-inner .heading{opacity:0; animation:fadeInUp 0.9s cubic-bezier(.22,.61,.36,1) 0.1s forwards;}
+.page-intro-inner .lede{opacity:0; animation:fadeInUp 0.9s cubic-bezier(.22,.61,.36,1) 0.28s forwards;}
+@media (prefers-reduced-motion: reduce){
+  .page-intro-inner .heading, .page-intro-inner .lede{animation:none; opacity:1;}
+}
 
 /* ---------- trust strip ---------- */
 .trust-strip{background:var(--mahogany);}
@@ -171,6 +193,7 @@ svg{display:block;}
 .team-photo-placeholder{background:var(--bordeaux); color:var(--sandstone); font-family:var(--ex); font-weight:700; font-size:1.8rem; display:flex; align-items:center; justify-content:center;}
 .team-name{font-family:var(--sans); font-weight:700; font-size:1.2rem; color:var(--mahogany); margin:0 0 0.2em;}
 .team-role{font-family:var(--ex); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; font-size:0.75rem; color:var(--rosewood); margin:0 0 0.8em;}
+.team-credentials{font-family:var(--sans); font-size:0.85rem; color:var(--rosewood); margin:-0.6em 0 0.8em;}
 @media (max-width:600px){
   .team-member{grid-template-columns:1fr;}
   .team-photo{width:100%; height:220px;}

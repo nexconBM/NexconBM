@@ -20,7 +20,7 @@
     try {
       localStorage.setItem(STORAGE_KEY, lang);
     } catch (e) {
-      /* storage unavailable — the toggle still works for this page view via memoryLang */
+      /* storage unavailable: the toggle still works for this page view via memoryLang */
     }
   }
 
