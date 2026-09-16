@@ -13,7 +13,7 @@
           <h4 data-i18n="footer_contact_label">Contact</h4>
           <p class="footer-contact-name">Kevin Chan 陳嘉文</p>
           <a href="tel:+61411330962">+61 411 330 962</a>
-          <a href="mailto:kevin@nexcongroup.com.au">kevin@nexcongroup.com.au</a>
+          <a href="mailto:kevin@nexconbm.com.au">kevin@nexconbm.com.au</a>
         </div>
         <div class="footer-col">
           <h4 data-i18n="footer_explore_label">Explore</h4>
@@ -44,4 +44,19 @@
   });
 
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  const revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window && revealEls.length) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
+    revealEls.forEach(el => revealObserver.observe(el));
+  } else {
+    revealEls.forEach(el => el.classList.add('is-visible'));
+  }
 </script>

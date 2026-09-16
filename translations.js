@@ -106,7 +106,7 @@ const translations = {
     about_page_lede: "A team that treats every project like it's their own home going up.",
     about_eyebrow: "Who we are",
     about_h2: "The people who actually pick up the phone.",
-    about_lede: "Kevin Chan and Mark Cheung aren't a call centre. They're the two people who'll actually manage your project, answer your questions, and stand behind the work. Fixed pricing, honest timelines, and craftsmanship that holds up long after the scaffolding comes down.",
+    about_lede: "Kevin Chan and Bob Lok aren't a call centre. They're the two people who'll actually manage your project, answer your questions, and stand behind the work. Fixed pricing, honest timelines, and craftsmanship that holds up long after the scaffolding comes down.",
     about_body: "From a straightforward renovation to a full knockdown rebuild or multi-unit development, we run every project the same way: fixed pricing so there are no surprises, our own inspection team checking every stage, and one point of contact who actually picks up the phone.",
 
     values_eyebrow: "Our values",
@@ -126,7 +126,7 @@ const translations = {
     kevin_credentials: "BEng (Civil), MIEAust, RPE (Civil)",
     kevin_body: "Kevin specialises in house and land packages and new house builds, and also looks after project management, building inspections, and multi unit developments.",
     mark_role: "Inspector",
-    mark_body: "Mark works across house and land and established home projects, including knockdown rebuilds, and also handles property leasing management, building inspections, dispute advisory, and project management.",
+    mark_body: "Bob works across house and land and established home projects, including knockdown rebuilds, and also handles property leasing management, building inspections, dispute advisory, and project management.",
 
 
     buildspecialist_page_h1: "Build specialist",
@@ -237,7 +237,7 @@ const translations = {
     about_page_lede: "一個視每個項目如己出的團隊。",
     about_eyebrow: "我們是誰",
     about_h2: "真正會接聽您電話的人。",
-    about_lede: "陳嘉文（Kevin）和張國泰（Mark）不是客服中心的員工。他們是真正會管理您項目、回答您問題，並對工程品質負責的兩個人。固定價格、誠實的時間表，以及即使棚架拆除後依然屹立不倒的工藝。",
+    about_lede: "陳嘉文（Kevin）和 Bob Lok 不是客服中心的員工。他們是真正會管理您項目、回答您問題，並對工程品質負責的兩個人。固定價格、誠實的時間表，以及即使棚架拆除後依然屹立不倒的工藝。",
     about_body: "由簡單裝修，到全面拆卸重建或多單位發展，我們對待每個項目的方式始終如一：固定價格，絕無驚喜；由我們自家驗樓團隊把關每個階段；並提供一個真正會接聽您電話的單一聯絡人。",
 
     values_eyebrow: "我們的信念",
@@ -257,7 +257,7 @@ const translations = {
     kevin_credentials: "土木工程學士，澳洲工程師學會會員，註冊專業工程師（土木）",
     kevin_body: "Kevin專責屋地套餐及新屋建造，同時負責項目管理、樓宇檢驗及多單位發展相關事宜。",
     mark_role: "驗樓師",
-    mark_body: "Mark負責屋地套餐及現有住宅項目，包括拆卸重建，同時處理物業租賃管理、樓宇檢驗、糾紛諮詢及項目管理等事務。",
+    mark_body: "Bob負責屋地套餐及現有住宅項目，包括拆卸重建，同時處理物業租賃管理、樓宇檢驗、糾紛諮詢及項目管理等事務。",
 
 
     buildspecialist_page_h1: "建築服務",
