@@ -3,67 +3,94 @@ Build script for the Nexcon site.
 
 Instead of copy-pasting the header and footer into every page by hand,
 this script keeps ONE copy of each (in partial/header.html and
-partial/footer.html) and stitches them into your actual page files,
-in place.
+partial/footer.html) and writes them into every page listed in PAGES.
 
-Folder layout it expects (matches your project):
+Every page has a marked header block and a marked footer block:
 
-  styles.css
-  index.html           <- home page, lives at the site root (so GitHub
-                          Pages etc. serve it by default instead of 404).
-                          Should contain <!-- HEADER --> and <!-- FOOTER -->
-                          where those pieces belong.
-  partial/
-    header.html      <- shared <header> (with {{ROOT}} / {{NAV_*_ACTIVE}} tokens)
-    footer.html       <- shared <footer> + the nav-toggle/year/reveal script
-  about/
-    index.html         <- about page, one folder deep. Same deal.
+  <!-- HEADER:START -->  ...generated, don't edit by hand...  <!-- HEADER:END -->
+  <!-- FOOTER:START -->  ...generated, don't edit by hand...  <!-- FOOTER:END -->
 
-How the tokens work:
-  <!-- HEADER -->          in a page gets replaced with partial/header.html
-  <!-- FOOTER -->          in a page gets replaced with partial/footer.html
-  {{ROOT}}                 inside header/footer becomes "" on the home page
-                           itself (so links stay relative, e.g. "about/",
-                           "#contact"), and "../" on every other page (so
-                           the link actually navigates back up to the site
-                           root).
-  {{NAV_SERVICES_ACTIVE}}  each becomes ' class="is-active"' on that page's
-  {{NAV_HOUSE_LAND_ACTIVE}} own nav link (so the current page's nav item is
-  {{NAV_INSPECTIONS_ACTIVE}} highlighted), and "" everywhere else. Which one
-  {{NAV_ABOUT_ACTIVE}}     is active for a page comes from PAGES below.
+Each run REPLACES whatever is between the markers, so you can edit
+partial/header.html or partial/footer.html, run this script, and every page
+is updated. A brand new page can start with a bare <!-- HEADER --> and
+<!-- FOOTER --> placeholder; the first run turns those into marked blocks.
 
-Safe to run more than once: if a page has already been built (no
-<!-- HEADER --> / <!-- FOOTER --> left in it), running this again just
-leaves it unchanged.
+Tokens used inside the partials:
+  {{ROOT}}   "" on the home page (index.html), "../" on every other page,
+             so links work from any folder depth.
+  {{NAV_HOME_ACTIVE}}, {{NAV_CUSTOM_HOMES_ACTIVE}}, {{NAV_KNOCKDOWN_ACTIVE}},
+  {{NAV_HOUSE_LAND_ACTIVE}}, {{NAV_RENOVATIONS_ACTIVE}}, {{NAV_MULTI_UNIT_ACTIVE}},
+  {{NAV_PROJECT_MGMT_ACTIVE}}, {{NAV_INSPECTIONS_ACTIVE}}, {{NAV_PROJECTS_ACTIVE}}, {{NAV_ABOUT_ACTIVE}},
+  {{NAV_CONTACT_ACTIVE}}
+             become ' class="is-active"' on the nav link of the page being
+             built (chosen per page in PAGES below) and "" everywhere else.
+  {{NAV_GROUP_BUILD_ACTIVE}}, {{NAV_GROUP_MGMT_ACTIVE}}
+             become " is-active" on a dropdown's button when the current page
+             is one of that dropdown's pages (see NAV_GROUPS below).
 
-To add a new page later (e.g. "contact"):
-  1. Create contact/index.html with <!-- HEADER --> / <!-- FOOTER --> in it.
-  2. Add an entry to the PAGES list below.
-  3. Run this script again.
+To add a new page (e.g. "contact"):
+  1. Create contact/index.html containing <!-- HEADER --> and <!-- FOOTER -->.
+  2. Add it to PAGES below (and a NAV_KEYS entry + nav link in
+     partial/header.html if it should appear in the menu).
+  3. Run: python build.py
 
 Usage:
-    python3 build.py
+    python build.py
 """
 
+import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).parent
 PARTIALS = ROOT / "partial"
 
-NAV_KEYS = ["services", "house_land", "inspections", "about"]
+NAV_KEYS = [
+    "home", "custom_homes", "knockdown", "house_land", "renovations", "multi_unit",
+    "project_mgmt", "inspections", "projects", "about", "contact",
+]
+
+# Which pages live under each dropdown in the nav (so its button is highlighted).
+NAV_GROUPS = {
+    "BUILD": {"custom_homes", "knockdown", "house_land", "renovations", "multi_unit"},
+    "MGMT": {"project_mgmt", "inspections"},
+}
 
 # Each page: (path to its index.html, is this the homepage?, which nav
-# item should be highlighted as active -- one of NAV_KEYS, or None)
+# item is active on it -- one of NAV_KEYS, or None)
 PAGES = [
-    ("index.html", True, None),
+    ("index.html", True, "home"),
     ("about/index.html", False, "about"),
-    ("build-specialist/index.html", False, "services"),
+    ("contact/index.html", False, "contact"),
+    ("custom-homes/index.html", False, "custom_homes"),
+    ("faq/index.html", False, None),
     ("house-and-land/index.html", False, "house_land"),
-    ("house-inspections/index.html", False, "inspections"),
+    ("building-inspections/index.html", False, "inspections"),
+    ("knockdown-rebuild/index.html", False, "knockdown"),
+    ("multi-unit-development/index.html", False, "multi_unit"),
+    ("projects/index.html", False, "projects"),
+    ("project-management/index.html", False, "project_mgmt"),
+    ("renovations-extensions/index.html", False, "renovations"),
 ]
 
 
-def build_page(page_path: str, is_home: bool, active_key: str | None) -> None:
+def stitch(html: str, name: str, content: str, page_path: str) -> str:
+    start = f"<!-- {name}:START -->"
+    end = f"<!-- {name}:END -->"
+    block = f"{start}\n{content.rstrip()}\n{end}"
+
+    marked = re.compile(re.escape(start) + r".*?" + re.escape(end), re.S)
+    if marked.search(html):
+        return marked.sub(lambda m: block, html)
+
+    placeholder = f"<!-- {name} -->"
+    if placeholder in html:
+        return html.replace(placeholder, block)
+
+    sys.exit(f"ERROR: {page_path} has no {start} block or {placeholder} placeholder.")
+
+
+def build_page(page_path: str, is_home: bool, active_key) -> None:
     path = ROOT / page_path
     page_html = path.read_text(encoding="utf-8")
     header_html = (PARTIALS / "header.html").read_text(encoding="utf-8")
@@ -78,14 +105,26 @@ def build_page(page_path: str, is_home: bool, active_key: str | None) -> None:
         value = ' class="is-active"' if key == active_key else ""
         header_html = header_html.replace(token, value)
 
-    final_html = page_html.replace("<!-- HEADER -->", header_html)
-    final_html = final_html.replace("<!-- FOOTER -->", footer_html)
+    for group, members in NAV_GROUPS.items():
+        token = "{{NAV_GROUP_" + group + "_ACTIVE}}"
+        value = " is-active" if active_key in members else ""
+        header_html = header_html.replace(token, value)
 
-    path.write_text(final_html, encoding="utf-8")
-    print(f"Built {page_path}")
+    for label, text in (("header", header_html), ("footer", footer_html)):
+        if "{{" in text:
+            sys.exit(f"ERROR: unresolved {{{{token}}}} left in partial/{label}.html")
+
+    final_html = stitch(page_html, "HEADER", header_html, page_path)
+    final_html = stitch(final_html, "FOOTER", footer_html, page_path)
+
+    if final_html != page_html:
+        path.write_text(final_html, encoding="utf-8")
+        print(f"Updated {page_path}")
+    else:
+        print(f"Unchanged {page_path}")
 
 
 if __name__ == "__main__":
     for page_path, is_home, active_key in PAGES:
         build_page(page_path, is_home, active_key)
-    print("Done. Upload styles.css, the images at the site root, and the index.html and about/ folders.")
+    print("Done.")

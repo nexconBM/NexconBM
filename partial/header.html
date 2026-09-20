@@ -7,12 +7,32 @@
     </a>
 
     <nav class="site-nav" id="siteNav">
-      <a href="{{ROOT}}build-specialist/"{{NAV_SERVICES_ACTIVE}} data-i18n="nav_services">Build specialist</a>
-      <a href="{{ROOT}}house-and-land/"{{NAV_HOUSE_LAND_ACTIVE}} data-i18n="nav_house_land">House &amp; land</a>
-      <a href="{{ROOT}}house-inspections/"{{NAV_INSPECTIONS_ACTIVE}} data-i18n="nav_inspections">House inspections</a>
-      <a href="{{ROOT}}about/"{{NAV_ABOUT_ACTIVE}} data-i18n="nav_about">About Us</a>
-      <a href="{{ROOT}}#contact" data-i18n="nav_contact">Contact</a>
+      <a href="{{ROOT}}#top"{{NAV_HOME_ACTIVE}} data-i18n="nav_home">Home</a>
 
+      <div class="nav-group">
+        <button class="nav-group-toggle{{NAV_GROUP_BUILD_ACTIVE}}" type="button" aria-expanded="false" aria-controls="menu-build"><span data-i18n="nav_group_build">Build with us</span></button>
+        <div class="nav-menu" id="menu-build">
+          <a href="{{ROOT}}custom-homes/"{{NAV_CUSTOM_HOMES_ACTIVE}} data-i18n="nav_custom_homes">Custom homes</a>
+          <a href="{{ROOT}}knockdown-rebuild/"{{NAV_KNOCKDOWN_ACTIVE}} data-i18n="nav_knockdown">Knockdown rebuild</a>
+          <a href="{{ROOT}}house-and-land/"{{NAV_HOUSE_LAND_ACTIVE}} data-i18n="nav_house_land">House &amp; land</a>
+          <a href="{{ROOT}}renovations-extensions/"{{NAV_RENOVATIONS_ACTIVE}} data-i18n="nav_renovations">Renovations &amp; extensions</a>
+          <a href="{{ROOT}}multi-unit-development/"{{NAV_MULTI_UNIT_ACTIVE}} data-i18n="nav_multi_unit">Multi-unit development</a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button class="nav-group-toggle{{NAV_GROUP_MGMT_ACTIVE}}" type="button" aria-expanded="false" aria-controls="menu-mgmt"><span data-i18n="nav_group_mgmt">Building management</span></button>
+        <div class="nav-menu" id="menu-mgmt">
+          <a href="{{ROOT}}project-management/"{{NAV_PROJECT_MGMT_ACTIVE}} data-i18n="nav_project_mgmt">Project management</a>
+          <a href="{{ROOT}}building-inspections/"{{NAV_INSPECTIONS_ACTIVE}} data-i18n="nav_inspections">Building inspections</a>
+        </div>
+      </div>
+
+      <a href="{{ROOT}}projects/"{{NAV_PROJECTS_ACTIVE}} data-i18n="nav_projects">Projects</a>
+      <a href="{{ROOT}}about/"{{NAV_ABOUT_ACTIVE}} data-i18n="nav_about">About Us</a>
+      <a href="{{ROOT}}contact/"{{NAV_CONTACT_ACTIVE}} data-i18n="nav_contact">Contact</a>
+
+      <a href="{{ROOT}}contact/" class="nav-cta" data-i18n="nav_cta">Start your project</a>
       <button id="langToggle" class="lang-toggle" type="button" aria-label="切換至中文">中文</button>
     </nav>
 

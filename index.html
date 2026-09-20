@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Nexcon Building Management: Custom homes, Melbourne's east</title>
+<title>Custom Homes &amp; Building Management Melbourne | Nexcon</title>
 <link rel="icon" href="Nexcon-favicon.jpeg">
 <link rel="apple-touch-icon" href="Nexcon-favicon.jpeg">
-<meta name="description" content="Nexcon Building Management designs and builds custom homes, house and land packages, knockdown rebuilds and renovations across Melbourne's east.">
+<meta name="description" content="Nexcon Building Management delivers custom homes, house and land packages, building inspections and residential construction services across Melbourne and regional Victoria.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=15">
+<link rel="stylesheet" href="styles.css?v=30">
 </head>
 <body>
 
@@ -25,6 +25,7 @@
   </defs>
 </svg>
 
+<!-- HEADER:START -->
 <a class="skip-link" href="#main" data-i18n="skip_link">Skip to content</a>
 
 <header class="site-header">
@@ -34,12 +35,32 @@
     </a>
 
     <nav class="site-nav" id="siteNav">
-      <a href="build-specialist/" data-i18n="nav_services">Build specialist</a>
-      <a href="house-and-land/" data-i18n="nav_house_land">House &amp; land</a>
-      <a href="house-inspections/" data-i18n="nav_inspections">House inspections</a>
-      <a href="about/" data-i18n="nav_about">About Us</a>
-      <a href="#contact" data-i18n="nav_contact">Contact</a>
+      <a href="#top" class="is-active" data-i18n="nav_home">Home</a>
 
+      <div class="nav-group">
+        <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-build"><span data-i18n="nav_group_build">Build with us</span></button>
+        <div class="nav-menu" id="menu-build">
+          <a href="custom-homes/" data-i18n="nav_custom_homes">Custom homes</a>
+          <a href="knockdown-rebuild/" data-i18n="nav_knockdown">Knockdown rebuild</a>
+          <a href="house-and-land/" data-i18n="nav_house_land">House &amp; land</a>
+          <a href="renovations-extensions/" data-i18n="nav_renovations">Renovations &amp; extensions</a>
+          <a href="multi-unit-development/" data-i18n="nav_multi_unit">Multi-unit development</a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-mgmt"><span data-i18n="nav_group_mgmt">Building management</span></button>
+        <div class="nav-menu" id="menu-mgmt">
+          <a href="project-management/" data-i18n="nav_project_mgmt">Project management</a>
+          <a href="building-inspections/" data-i18n="nav_inspections">Building inspections</a>
+        </div>
+      </div>
+
+      <a href="projects/" data-i18n="nav_projects">Projects</a>
+      <a href="about/" data-i18n="nav_about">About Us</a>
+      <a href="contact/" data-i18n="nav_contact">Contact</a>
+
+      <a href="contact/" class="nav-cta" data-i18n="nav_cta">Start your project</a>
       <button id="langToggle" class="lang-toggle" type="button" aria-label="切換至中文">中文</button>
     </nav>
 
@@ -54,6 +75,7 @@
     </button>
   </div>
 </header>
+<!-- HEADER:END -->
 
 
 
@@ -62,8 +84,13 @@
   <section class="hero" id="top">
         <div class="hero-inner">
       <div class="hero-copy">
-        <h1 class="heading heading-on-dark" data-i18n="hero_h1">A dream home, planned around you.</h1>
-        <p class="lede lede-on-dark" data-i18n="hero_lede">Skip the guesswork. Nexcon gives you the freedom to design a home that's genuinely yours, backed by fixed pricing, our own inspection team, and a 7-year structural warranty, from house and land packages to full custom builds.</p>
+        <h1 class="heading heading-on-dark" data-i18n="hero_h1">Custom Homes. Smarter Building Management.</h1>
+        <p class="hero-sub" data-i18n="hero_sub">A home planned around you. A project managed with confidence.</p>
+        <p class="lede lede-on-dark" data-i18n="hero_lede">From house and land packages and custom homes to knockdown rebuilds, renovations and construction management, Nexcon helps you navigate the building process with clear communication, practical advice and professional oversight.</p>
+        <div class="hero-actions">
+          <a href="contact/" class="pill pill-light" data-i18n="hero_btn_start">Start your project</a>
+          <a href="#services" class="pill pill-outline" data-i18n="hero_btn_services">Explore our services</a>
+        </div>
       </div>
       <div class="hero-motif" aria-hidden="true">
         <img src="nexcon-logo-centered.png" alt="" style="width:100%; max-width:340px; margin:0 auto; display:block;">
@@ -92,136 +119,151 @@
     </div>
   </div>
 
-  <section id="contact">
-    <div class="divider reveal">
-            <div class="divider-inner">
-        <h2 class="heading heading-on-dark" data-i18n="contact_divider_h2">Get a straight answer, not a sales pitch.</h2>
-        <p class="lede lede-on-dark" data-i18n="contact_divider_lede">Tell us what you're planning. We'll come back to you with a real answer, not a runaround.</p>
+  <section class="content-block reveal">
+    <div class="wrap content-grid">
+      <div class="content-side">
+        <p class="eyebrow" data-i18n="home_intro_eyebrow">Introduction</p>
+        <h3 class="heading" data-i18n="home_intro_h3">Your home. Your requirements. Our experience.</h3>
+      </div>
+      <div>
+        <p class="lede" data-i18n="home_intro_lede">Every site is different. Every family is different. And every building project comes with its own challenges.</p>
+        <p class="body-copy" style="font-size:1.05rem; max-width:65ch;" data-i18n="home_intro_body">At Nexcon, we work with you to develop a home that suits your lifestyle, site, budget and long-term plans. Whether you're looking for a house and land package, a fully customised home, a knockdown rebuild or professional construction inspections, our team helps coordinate the important details so you can make informed decisions throughout the process.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-block content-block-follow reveal" id="services">
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="home_services_eyebrow">Our services</p>
+      <h2 class="heading" style="font-size:1.4rem;" data-i18n="home_services_h2">One team. Multiple ways to build.</h2>
+      <div class="service-cards">
+        <a class="service-card" href="custom-homes/">
+          <h3 data-i18n="home_svc_custom_h">Custom Homes</h3>
+          <p data-i18n="home_svc_custom_p">Create a home designed around your lifestyle, land and individual requirements.</p>
+          <span class="service-card-link" data-i18n="home_svc_custom_link">Explore Custom Homes →</span>
+        </a>
+        <a class="service-card" href="house-and-land/">
+          <h3 data-i18n="home_svc_hal_h">House &amp; Land Packages</h3>
+          <p data-i18n="home_svc_hal_p">A practical way to purchase land and build a new home with greater cost certainty.</p>
+          <span class="service-card-link" data-i18n="home_svc_hal_link">Explore House &amp; Land →</span>
+        </a>
+        <a class="service-card" href="knockdown-rebuild/">
+          <h3 data-i18n="home_svc_knockdown_h">Knockdown Rebuild</h3>
+          <p data-i18n="home_svc_knockdown_p">Replace an existing property with a new home designed for the site and the way you want to live.</p>
+          <span class="service-card-link" data-i18n="home_svc_knockdown_link">Explore Knockdown Rebuild →</span>
+        </a>
+        <a class="service-card" href="renovations-extensions/">
+          <h3 data-i18n="home_svc_reno_h">Renovations &amp; Extensions</h3>
+          <p data-i18n="home_svc_reno_p">Improve, extend or transform your existing home.</p>
+          <span class="service-card-link" data-i18n="home_svc_reno_link">Explore Renovations →</span>
+        </a>
+        <a class="service-card" href="building-inspections/">
+          <h3 data-i18n="home_svc_insp_h">Building Inspections</h3>
+          <p data-i18n="home_svc_insp_p">Construction-stage and practical completion inspections to help identify issues before they become bigger problems.</p>
+          <span class="service-card-link" data-i18n="home_svc_insp_link">Explore Inspections →</span>
+        </a>
+        <a class="service-card" href="project-management/">
+          <h3 data-i18n="home_svc_mgmt_h">Construction Management</h3>
+          <p data-i18n="home_svc_mgmt_p">Professional coordination and oversight for homeowners who want greater visibility and control throughout their project.</p>
+          <span class="service-card-link" data-i18n="home_svc_mgmt_link">Explore Construction Management →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-block content-block-follow reveal">
+    <div class="wrap content-grid">
+      <div class="content-side">
+        <p class="eyebrow" data-i18n="home_how_eyebrow">How we work</p>
+        <h3 class="heading" data-i18n="home_how_h3">From your idea to your finished home.</h3>
+      </div>
+      <ol class="process">
+        <li><span class="num">1</span><div><h3 data-i18n="home_how1_h">Consultation</h3><p class="body-copy" data-i18n="home_how1_p">We start by understanding your property, lifestyle, budget and project objectives.</p></div></li>
+        <li><span class="num">2</span><div><h3 data-i18n="home_how2_h">Planning</h3><p class="body-copy" data-i18n="home_how2_p">We review the site and project requirements and identify the key steps involved.</p></div></li>
+        <li><span class="num">3</span><div><h3 data-i18n="home_how3_h">Design</h3><p class="body-copy" data-i18n="home_how3_p">Work with the appropriate design and consulting professionals to develop your home.</p></div></li>
+        <li><span class="num">4</span><div><h3 data-i18n="home_how4_h">Pricing</h3><p class="body-copy" data-i18n="home_how4_p">Review the scope, specifications and costs so you understand what you're committing to.</p></div></li>
+        <li><span class="num">5</span><div><h3 data-i18n="home_how5_h">Construction</h3><p class="body-copy" data-i18n="home_how5_p">Our team coordinates the construction process and keeps you informed as the project progresses.</p></div></li>
+        <li><span class="num">6</span><div><h3 data-i18n="home_how6_h">Inspection &amp; handover</h3><p class="body-copy" data-i18n="home_how6_p">We work through the final stages, inspections and completion requirements so your new home is ready for you.</p></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="why">
+    <div class="divider divider-wide reveal">
+      <div class="divider-inner">
+        <h2 class="heading heading-on-dark" data-i18n="home_why_h2">Building should be exciting, not overwhelming.</h2>
+        <p class="lede lede-on-dark" data-i18n="home_why_lede">A new home involves architects, engineers, builders, trades, suppliers, approvals, inspections and hundreds of decisions. Nexcon helps bring those moving parts together.</p>
       </div>
     </div>
     <div class="content-block reveal">
-      <div class="wrap" style="max-width:560px;">
-        <form action="https://formsubmit.co/building@nexcongroup.com.au" method="POST" class="contact-form" id="contactForm">
-          <div class="field">
-            <label for="contact-name" data-i18n="contact_label_name">Name</label>
-            <input type="text" id="contact-name" name="name" required>
-          </div>
-          <div class="field">
-            <label for="contact-email" data-i18n="contact_label_email">Email</label>
-            <input type="email" id="contact-email" name="email" required>
-          </div>
-          <div class="field">
-            <label for="contact-message" data-i18n="contact_label_message">What are you planning?</label>
-            <textarea id="contact-message" name="message" rows="4" required></textarea>
-          </div>
-          <input type="hidden" name="_subject" value="New enquiry from Nexcon website">
-          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
-          <input type="hidden" name="_template" value="basic">
-          <button type="submit" class="pill pill-primary contact-submit" data-i18n="contact_btn_send">Send message</button>
-          <p class="contact-error" id="contactError" style="display:none;" data-i18n="contact_error">Something went wrong. Please try again, or contact us directly using the details below.</p>
-          <p class="contact-warning" id="contactLimit" style="display:none;" data-i18n="contact_limit">You've used up your message limit on this device. Please contact us directly using the details below.</p>
-        </form>
-        <div class="contact-success" id="contactSuccess" style="display:none;">
-          <p class="contact-success-title" data-i18n="contact_success_title">Message received</p>
-          <p class="contact-success-body" data-i18n="contact_success_body">Thanks for reaching out. We've got your message and will be in touch soon.</p>
+      <div class="wrap why-grid">
+        <div class="service-item">
+          <p class="detail-label" data-i18n="home_why1_label">Practical advice</p>
+          <p class="body-copy" data-i18n="home_why1_body">We focus on the details that affect your project, budget and final result.</p>
         </div>
+        <div class="service-item">
+          <p class="detail-label" data-i18n="home_why2_label">Clear communication</p>
+          <p class="body-copy" data-i18n="home_why2_body">You should always understand what is happening, what comes next and what decisions need to be made.</p>
+        </div>
+        <div class="service-item">
+          <p class="detail-label" data-i18n="home_why3_label">Construction oversight</p>
+          <p class="body-copy" data-i18n="home_why3_body">Important construction stages are monitored through professional inspections and reporting.</p>
+        </div>
+        <div class="service-item">
+          <p class="detail-label" data-i18n="home_why4_label">Long-term thinking</p>
+          <p class="body-copy" data-i18n="home_why4_body">We don't just focus on getting the home built. We consider how the home will work for you in the years ahead.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="divider reveal">
+      <div class="divider-inner">
+        <h2 class="heading heading-on-dark" data-i18n="contact_divider_h2">Planning your next home?</h2>
+        <p class="lede lede-on-dark" data-i18n="contact_divider_lede">Whether you're still exploring your options or ready to start planning, we'd like to hear about your project. Tell us what you're thinking.</p>
+        <p style="margin-top:1.6rem;"><a href="contact/" class="pill pill-light" data-i18n="cta_start_arrow">Start your project &rarr;</a></p>
       </div>
     </div>
   </section>
 
 </main>
 
-<script>
-  const contactForm = document.getElementById('contactForm');
-  const CONTACT_LIMIT = 10;
-  const CONTACT_LIMIT_KEY = 'nexcon-contact-count';
-
-  function getSubmitCount() {
-    try {
-      return parseInt(localStorage.getItem(CONTACT_LIMIT_KEY), 10) || 0;
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  function incrementSubmitCount() {
-    try {
-      localStorage.setItem(CONTACT_LIMIT_KEY, String(getSubmitCount() + 1));
-    } catch (e) {
-      /* if storage is unavailable, the limit just won't persist across page loads for this visitor */
-    }
-  }
-
-  function applyLimitState() {
-    const submitBtn = contactForm.querySelector('.contact-submit');
-    const limitMsg = document.getElementById('contactLimit');
-    if (getSubmitCount() >= CONTACT_LIMIT) {
-      submitBtn.disabled = true;
-      submitBtn.style.opacity = '0.5';
-      submitBtn.style.cursor = 'not-allowed';
-      limitMsg.style.display = 'block';
-    }
-  }
-
-  if (contactForm) {
-    applyLimitState();
-
-    contactForm.addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const errorMsg = document.getElementById('contactError');
-      const limitMsg = document.getElementById('contactLimit');
-      const successMsg = document.getElementById('contactSuccess');
-      errorMsg.style.display = 'none';
-
-      if (getSubmitCount() >= CONTACT_LIMIT) {
-        successMsg.style.display = 'none';
-        limitMsg.style.display = 'block';
-        return;
-      }
-
-      try {
-        const response = await fetch(contactForm.action, {
-          method: 'POST',
-          body: new FormData(contactForm),
-          headers: { 'Accept': 'application/json' }
-        });
-        if (response.ok) {
-          incrementSubmitCount();
-          contactForm.reset();
-          successMsg.style.display = 'block';
-          applyLimitState();
-        } else {
-          errorMsg.style.display = 'block';
-        }
-      } catch (err) {
-        errorMsg.style.display = 'block';
-      }
-    });
-  }
-</script>
-
+<!-- FOOTER:START -->
 <footer id="footer-contact">
   <div class="wrap">
     <div class="footer-inner">
-      <div class="footer-logo">
-        <img src="nexcon-logo-horizontal-light.png" alt="Nexcon Building Management" class="logo-img">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <img src="nexcon-logo-horizontal-light.png" alt="Nexcon Building Management" class="logo-img">
+        </div>
+        <p class="footer-tagline" data-i18n="footer_tagline">Custom Homes. Smarter Building Management.</p>
+        <p class="footer-area" data-i18n="footer_area">Melbourne | Victoria</p>
       </div>
       <div class="footer-cols">
         <div class="footer-col">
-          <h4 data-i18n="footer_address_label">Address</h4>
-          <p>Unit 8, 197-199 Springvale Road<br>Nunawading, VIC 3131</p>
+          <h4 data-i18n="footer_services_label">Services</h4>
+          <a href="custom-homes/" data-i18n="nav_custom_homes">Custom homes</a>
+          <a href="house-and-land/" data-i18n="nav_house_land">House &amp; land</a>
+          <a href="knockdown-rebuild/" data-i18n="nav_knockdown">Knockdown rebuild</a>
+          <a href="renovations-extensions/" data-i18n="nav_renovations">Renovations &amp; extensions</a>
+          <a href="project-management/" data-i18n="nav_project_mgmt">Project management</a>
+          <a href="building-inspections/" data-i18n="nav_inspections">Building inspections</a>
+        </div>
+        <div class="footer-col">
+          <h4 data-i18n="footer_links_label">Quick links</h4>
+          <a href="#top" data-i18n="nav_home">Home</a>
+          <a href="about/" data-i18n="nav_about">About Us</a>
+          <a href="projects/" data-i18n="nav_projects">Projects</a>
+          <a href="faq/" data-i18n="nav_faq">FAQ</a>
+          <a href="contact/" data-i18n="nav_contact">Contact</a>
         </div>
         <div class="footer-col">
           <h4 data-i18n="footer_contact_label">Contact</h4>
+          <p>Unit 8, 197-199 Springvale Road<br>Nunawading, VIC 3131</p>
           <p class="footer-contact-name">Kevin Chan 陳嘉文</p>
           <a href="tel:+61411330962">+61 411 330 962</a>
           <a href="mailto:kevin@nexconbm.com.au">kevin@nexconbm.com.au</a>
-        </div>
-        <div class="footer-col">
-          <h4 data-i18n="footer_explore_label">Explore</h4>
-          <a href="build-specialist/" data-i18n="nav_services">Build specialist</a>
-          <a href="house-and-land/" data-i18n="nav_house_land">House &amp; land</a>
-          <a href="house-inspections/" data-i18n="nav_inspections">House inspections</a>
         </div>
       </div>
     </div>
@@ -245,6 +287,42 @@
     });
   });
 
+  const navGroups = document.querySelectorAll('.nav-group');
+  const desktopNav = () => window.matchMedia('(min-width: 1201px) and (hover: hover)').matches;
+  function setNavGroup(group, open) {
+    group.classList.toggle('is-open', open);
+    group.querySelector('.nav-group-toggle').setAttribute('aria-expanded', String(open));
+  }
+  navGroups.forEach(group => {
+    const toggle = group.querySelector('.nav-group-toggle');
+    toggle.addEventListener('click', () => {
+      if (group.dataset.hover === '1') { group.dataset.hover = ''; return; }
+      const open = !group.classList.contains('is-open');
+      navGroups.forEach(other => setNavGroup(other, false));
+      setNavGroup(group, open);
+    });
+    group.addEventListener('mouseenter', () => {
+      if (!desktopNav()) return;
+      navGroups.forEach(other => setNavGroup(other, false));
+      group.dataset.hover = '1';
+      setNavGroup(group, true);
+    });
+    group.addEventListener('mouseleave', () => {
+      if (!desktopNav()) return;
+      group.dataset.hover = '';
+      setNavGroup(group, false);
+    });
+    group.addEventListener('focusout', e => {
+      if (!group.contains(e.relatedTarget)) setNavGroup(group, false);
+    });
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.nav-group')) navGroups.forEach(group => setNavGroup(group, false));
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') navGroups.forEach(group => setNavGroup(group, false));
+  });
+
   document.getElementById('year').textContent = new Date().getFullYear();
 
   const revealEls = document.querySelectorAll('.reveal');
@@ -262,6 +340,7 @@
     revealEls.forEach(el => el.classList.add('is-visible'));
   }
 </script>
+<!-- FOOTER:END -->
 
 
 </body>
