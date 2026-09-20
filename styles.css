@@ -44,7 +44,7 @@ svg{display:block;}
 .header-inner{max-width:var(--max); margin:0 auto; padding:0.9rem clamp(1.25rem,4vw,3rem); display:flex; align-items:center; justify-content:space-between; gap:1.5rem;}
 .logo{display:flex; align-items:center; text-decoration:none;}
 .logo-img{height:38px; width:auto; display:block;}
-.site-nav{display:flex; align-items:center; gap:clamp(1rem,2.5vw,1.8rem);}
+.site-nav{display:flex; align-items:center; gap:clamp(1.0rem,2.0vw,2.05rem);}
 .site-nav a{text-decoration:none; font-size:0.92rem; font-weight:600; color:var(--text); padding:0.3em 0; border-bottom:2px solid transparent;}
 .site-nav a:hover{border-color:var(--rosette);}
 .site-nav a.is-active{border-color:var(--rosette);}
