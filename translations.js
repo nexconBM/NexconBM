@@ -851,7 +851,7 @@ const translations = {
     about_where_eyebrow: "我們的服務地區",
     about_where_h2: "墨爾本及維多利亞省",
     about_where_body: "我們的重點是墨爾本，尤其熟悉墨爾本東區各郊區。我們亦承接維多利亞省內選定地區的項目。",
-    about_where_btn: "聯絡世代建築管理 →",
+    about_where_btn: "聯絡世代建築管理 → ",
 
 
   }
