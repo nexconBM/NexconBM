@@ -3,11 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>About Nexcon Building Management | Melbourne</title>
+<title>Contact Nexcon Building Management | Melbourne</title>
 <link rel="icon" href="../Nexcon-favicon.jpeg">
 <link rel="apple-touch-icon" href="../Nexcon-favicon.jpeg">
-<meta name="description" content="Learn about Nexcon Building Management, a Melbourne residential construction and building management company specialising in custom homes, inspections and residential projects.">
+<meta name="description" content="Contact Nexcon about your custom home, knockdown rebuild, renovation, house and land package, construction management or building inspection.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -47,8 +46,8 @@
       </div>
 
       <a href="../projects/" data-i18n="nav_projects">Projects</a>
-      <a href="../about/" class="is-active" data-i18n="nav_about">About Us</a>
-      <a href="../contact/" data-i18n="nav_contact">Contact</a>
+      <a href="../about/" data-i18n="nav_about">About Us</a>
+      <a href="../contact/" class="is-active" data-i18n="nav_contact">Contact</a>
 
       <a href="../contact/" class="nav-cta" data-i18n="nav_cta">Start your project</a>
       <button id="langToggle" class="lang-toggle" type="button" aria-label="切換至中文">中文</button>
@@ -67,107 +66,106 @@
 </header>
 <!-- HEADER:END -->
 
-
 <main id="main">
 
   <div class="page-intro">
     <div class="page-intro-inner">
-      <h1 class="heading heading-on-dark" data-i18n="about_page_h1">About Us</h1>
-      <p class="lede lede-on-dark" data-i18n="about_page_lede">Building relationships. Managing projects. Creating homes.</p>
+      <h1 class="heading heading-on-dark" data-i18n="contact_page_h1">Let's talk about your project</h1>
+      <p class="lede lede-on-dark" data-i18n="contact_page_lede">Have a project in mind? You don't need to have everything worked out before contacting us. Tell us what you're planning and we'll help you understand the next step.</p>
     </div>
   </div>
 
   <div class="content-block reveal">
-    <div class="wrap" style="max-width:900px;">
-      <p class="eyebrow" data-i18n="about_eyebrow">About Nexcon</p>
-      <p class="lede" style="max-width:60ch;" data-i18n="about_lede">Building a home is about more than bricks, concrete and finishes. It is about creating a place that works for your family, your lifestyle and your future.</p>
-      <p class="body-copy" style="font-size:1.05rem; max-width:65ch;" data-i18n="about_body">Nexcon Building Management was established to provide homeowners with a more practical and coordinated approach to residential construction. We combine construction knowledge, project coordination and building inspection experience to help our clients make better decisions throughout their project.</p>
+    <div class="wrap contact-grid">
 
-      <div class="reveal" style="margin-top:2.5rem;">
-        <p class="eyebrow" data-i18n="about_approach_eyebrow">Our approach</p>
-        <h2 class="heading" style="font-size:1.4rem; max-width:24ch;" data-i18n="about_approach_h2">Good building starts with good communication.</h2>
-        <p class="body-copy" style="font-size:1.05rem; max-width:65ch;" data-i18n="about_approach_body1">A successful project depends on many people working together. Architects. Engineers. Builders. Trades. Suppliers. Consultants. And, most importantly, the homeowner.</p>
-        <p class="body-copy" style="font-size:1.05rem; max-width:65ch;" data-i18n="about_approach_body2">Our role is to help connect those moving parts. We aim to make the construction process easier to understand, easier to manage and more transparent for our clients.</p>
-      </div>
+      <div>
+        <p class="eyebrow" data-i18n="contact_form_eyebrow">Project details</p>
+        <form action="https://api.web3forms.com/submit" method="POST" class="contact-form" data-enquiry>
+          <div class="field-row">
+            <div class="field">
+              <label for="contact-name"><span data-i18n="contact_label_name">Name</span></label>
+              <input type="text" id="contact-name" name="name" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="contact-email"><span data-i18n="contact_label_email">Email</span></label>
+              <input type="email" id="contact-email" name="email" autocomplete="email" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="contact-phone"><span data-i18n="contact_label_phone">Phone</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <input type="tel" id="contact-phone" name="phone" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label for="contact-location"><span data-i18n="contact_label_location">Project location</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <input type="text" id="contact-location" name="project_location">
+            </div>
+          </div>
 
-      <div class="reveal" style="margin-top:2.5rem;">
-        <h2 class="eyebrow" data-i18n="values_eyebrow">Our values</h2>
-        <h3 class="heading" style="font-size:1.4rem; margin-bottom:1.2rem;" data-i18n="values_h2">What guides our work</h3>
-        <div class="service-list">
-          <div class="service-item">
-            <p class="detail-label" data-i18n="val_integrity_label">Integrity</p>
-            <p class="body-copy" data-i18n="val_integrity_body">We provide straightforward advice and communicate issues clearly.</p>
+          <fieldset class="check-group">
+            <legend data-i18n="contact_label_planning">What are you planning?</legend>
+            <div class="check-options">
+              <label class="check-option"><input type="checkbox" data-project-type value="Custom home"><span data-i18n="pt_custom">Custom home</span></label>
+              <label class="check-option"><input type="checkbox" data-project-type value="Knockdown rebuild"><span data-i18n="pt_knockdown">Knockdown rebuild</span></label>
+              <label class="check-option"><input type="checkbox" data-project-type value="House &amp; land"><span data-i18n="pt_hal">House &amp; land</span></label>
+              <label class="check-option"><input type="checkbox" data-project-type value="Renovation / extension"><span data-i18n="pt_reno">Renovation / extension</span></label>
+              <label class="check-option"><input type="checkbox" data-project-type value="Multi-unit development"><span data-i18n="pt_multi">Multi-unit development</span></label>
+              <label class="check-option"><input type="checkbox" data-project-type value="Construction project management"><span data-i18n="pt_mgmt">Construction project management</span></label>
+              <label class="check-option"><input type="checkbox" data-project-type value="Building inspection"><span data-i18n="pt_insp">Building inspection</span></label>
+              <label class="check-option"><input type="checkbox" data-project-type data-detail="contact-other" value="Other"><span data-i18n="pt_other">Other</span></label>
+            </div>
+          </fieldset>
+          <div class="field" hidden>
+            <label for="contact-other"><span data-i18n="contact_other_label">Tell us what else you're planning</span></label>
+            <input type="text" id="contact-other" autocomplete="off">
           </div>
-          <div class="service-item">
-            <p class="detail-label" data-i18n="val_quality_label">Quality</p>
-            <p class="body-copy" data-i18n="val_quality_body">We pay attention to the details that influence the quality and durability of a home.</p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="contact-budget"><span data-i18n="contact_label_budget">Approximate budget</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <input type="text" id="contact-budget" name="approximate_budget">
+            </div>
+            <div class="field">
+              <label for="contact-timeframe"><span data-i18n="contact_label_timeframe">Preferred timeframe</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <input type="text" id="contact-timeframe" name="preferred_timeframe">
+            </div>
           </div>
-          <div class="service-item">
-            <p class="detail-label" data-i18n="val_comm_label">Communication</p>
-            <p class="body-copy" data-i18n="val_comm_body">We keep clients informed throughout the project.</p>
+          <div class="field">
+            <label for="contact-message"><span data-i18n="contact_label_message">Tell us about your project</span></label>
+            <textarea id="contact-message" name="message" rows="5" required></textarea>
           </div>
-          <div class="service-item">
-            <p class="detail-label" data-i18n="val_account_label">Accountability</p>
-            <p class="body-copy" data-i18n="val_account_body">We take responsibility for our role and follow issues through to resolution.</p>
-          </div>
-          <div class="service-item">
-            <p class="detail-label" data-i18n="val_longterm_label">Long-term thinking</p>
-            <p class="body-copy" data-i18n="val_longterm_body">We consider the long-term performance and usability of the home, not just the construction process.</p>
-          </div>
+
+          <input type="hidden" name="project_type" id="projectType" value="">
+          <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE">
+          <input type="hidden" name="subject" value="New enquiry from Nexcon website">
+          <input type="hidden" name="from_name" value="Nexcon website">
+          <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+          <button type="submit" class="pill pill-primary contact-submit" data-i18n="contact_btn_send">Send enquiry</button>
+          <p class="contact-error" style="display:none;" data-i18n="contact_error">Something went wrong. Please try again, or contact us directly on +61 411 330 962 or kevin@nexconbm.com.au.</p>
+          <p class="contact-warning" style="display:none;" data-i18n="contact_limit">You've used up your message limit on this device. Please contact us directly using the details below.</p>
+        </form>
+        <div class="contact-success" id="contactSuccess" style="display:none;">
+          <p class="contact-success-title" data-i18n="contact_success_title">Enquiry received</p>
+          <p class="contact-success-body" data-i18n="contact_success_body">Thanks for reaching out. We've got your enquiry and will be in touch soon.</p>
         </div>
       </div>
 
-      <div class="reveal" style="margin-top:2.5rem;">
-        <p class="eyebrow" data-i18n="team_eyebrow">Our team</p>
-        <h2 class="heading" style="font-size:1.4rem; margin-bottom:0.4rem;" data-i18n="team_h2">The people behind the build</h2>
-        <p class="lede" style="max-width:60ch; margin-bottom:1.6rem;" data-i18n="team_lede">You deal with the people who actually manage your project, answer your questions and stand behind the work.</p>
-        <div class="team-list">
-          <div class="team-member">
-            <img src="Kevin-face.jpeg" alt="Kevin Chan" class="team-photo">
-            <div>
-              <p class="team-name">Kevin Chan 陳嘉文</p>
-              <p class="team-role" data-i18n="kevin_role">Senior Consultant</p>
-              <p class="team-credentials" data-i18n="kevin_credentials">BEng (Civil), MIEAust, RPE (Civil)</p>
-              <p class="body-copy" data-i18n="kevin_body">Kevin specialises in house and land packages and new house builds, and also looks after project management, building inspections, and multi unit developments.</p>
-            </div>
-            <img src="Kevin-whatsapp-QRcode.png" alt="Scan to chat with Kevin on WhatsApp" class="whatsapp-qr">
-          </div>
-          <div class="team-member">
-            <div class="team-photo team-photo-placeholder" aria-hidden="true">BL</div>
-            <div>
-              <p class="team-name">Bob Lok </p>
-              <p class="team-role" data-i18n="mark_role">Inspector</p>
-              <p class="body-copy" data-i18n="mark_body">Bob works across house and land and established home projects, including knockdown rebuilds, and also handles property leasing management, building inspections, dispute advisory, and project management.</p>
-            </div>
+      <aside class="content-side">
+        <p class="eyebrow" data-i18n="contact_details_eyebrow">Contact details</p>
+        <p class="team-name">Nexcon Building Management Pty Ltd</p>
+        <p class="body-copy">Unit 8, 197-199 Springvale Road<br>Nunawading VIC 3131</p>
+        <p class="body-copy"><strong>Kevin Chan 陳嘉文</strong><br>
+          <a href="tel:+61411330962">+61 411 330 962</a><br>
+          <a href="mailto:kevin@nexconbm.com.au">kevin@nexconbm.com.au</a></p>
+        <p><a href="../faq/" class="text-link" data-i18n="contact_faq_link">Read our frequently asked questions →</a></p>
+      </aside>
 
-          </div>
-        </div>
-      </div>
-
-      <div class="reveal" style="margin-top:2.5rem;">
-        <p class="eyebrow" data-i18n="about_exp_eyebrow">Our experience</p>
-        <p class="body-copy" style="font-size:1.05rem; max-width:65ch;" data-i18n="about_exp_lede">Nexcon works across residential construction projects including:</p>
-        <ul class="check-list">
-          <li data-i18n="about_exp1">Custom homes</li>
-          <li data-i18n="about_exp2">House and land packages</li>
-          <li data-i18n="about_exp3">Knockdown rebuilds</li>
-          <li data-i18n="about_exp4">Renovations and extensions</li>
-          <li data-i18n="about_exp5">Residential developments</li>
-          <li data-i18n="about_exp6">Building inspections</li>
-          <li data-i18n="about_exp7">Construction management</li>
-        </ul>
-      </div>
-
-      <div class="reveal" style="margin-top:2.5rem;">
-        <p class="eyebrow" data-i18n="about_where_eyebrow">Where we work</p>
-        <h2 class="heading" style="font-size:1.4rem;" data-i18n="about_where_h2">Melbourne &amp; Victoria</h2>
-        <p class="body-copy" style="font-size:1.05rem; max-width:65ch;" data-i18n="about_where_body">Our focus is Melbourne, with particular experience across Melbourne's eastern suburbs. We also work with selected projects throughout regional Victoria.</p>
-        <a href="../contact/" class="pill pill-primary" data-i18n="about_where_btn">Contact Nexcon →</a>
-      </div>
     </div>
   </div>
 
 </main>
+
+<script src="../enquiry.js?v=5"></script>
 
 <!-- FOOTER:START -->
 <footer id="footer-contact">
@@ -281,7 +279,6 @@
   }
 </script>
 <!-- FOOTER:END -->
-
 
 </body>
 </html>
