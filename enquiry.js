@@ -7,6 +7,7 @@
      - joins the ticked project-type checkboxes into one hidden field before sending
      - reveals a text box when a checkbox with data-detail="some-id" is ticked
        (its text is added to the joined value, e.g. "Other: solar installation")
+     - strips anything that isn't a digit from any type="tel" field as the visitor types
      - allows at most DAILY_LIMIT enquiries per day from one browser
      - shows the thank-you message on success, or an error message if sending fails
 
@@ -70,6 +71,13 @@
           return extra ? b.value + ': ' + extra : b.value;
         }).join(', ');
     }
+
+    form.querySelectorAll('input[type="tel"]').forEach(function (phone) {
+      phone.addEventListener('input', function () {
+        var digitsOnly = phone.value.replace(/\D/g, '');
+        if (digitsOnly !== phone.value) phone.value = digitsOnly;
+      });
+    });
 
     typeBoxes.forEach(function (b) {
       b.addEventListener('change', function () {

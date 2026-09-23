@@ -95,7 +95,7 @@
           <div class="field-row">
             <div class="field">
               <label for="contact-phone"><span data-i18n="contact_label_phone">Phone</span></label>
-              <input type="tel" id="contact-phone" name="phone" autocomplete="tel" required>
+              <input type="tel" id="contact-phone" name="phone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" required>
             </div>
             <div class="field">
               <label for="contact-location"><span data-i18n="contact_label_location">Project location</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
@@ -166,7 +166,7 @@
 
 </main>
 
-<script src="../enquiry.js?v=6"></script>
+<script src="../enquiry.js?v=7"></script>
 
 <!-- FOOTER:START -->
 <footer id="footer-contact">

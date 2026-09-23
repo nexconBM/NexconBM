@@ -111,11 +111,11 @@
               <label for="hal-budget"><span data-i18n="hal_label_budget">Budget</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
               <select id="hal-budget" name="budget">
                 <option value="" data-i18n="hal_opt_select">Select a range</option>
-                <option value="Under $500,000" data-i18n="hal_budget_1">Under $500,000</option>
-                <option value="$500,000 - $600,000" data-i18n="hal_budget_2">$500,000 – $600,000</option>
-                <option value="$600,000 - $700,000" data-i18n="hal_budget_3">$600,000 – $700,000</option>
-                <option value="$700,000 - $800,000" data-i18n="hal_budget_4">$700,000 – $800,000</option>
-                <option value="$800,000+" data-i18n="hal_budget_5">$800,000+</option>
+                <option value="Under $600,000" data-i18n="hal_budget_1">Under $600,000</option>
+                <option value="$600,000 - $700,000" data-i18n="hal_budget_2">$600,000 – $700,000</option>
+                <option value="$700,000 - $800,000" data-i18n="hal_budget_3">$700,000 – $800,000</option>
+                <option value="$800,000 - $900,000" data-i18n="hal_budget_4">$800,000 – $900,000</option>
+                <option value="$900,000+" data-i18n="hal_budget_5">$900,000+</option>
               </select>
             </div>
             <div class="field">
@@ -143,10 +143,9 @@
               <label for="hal-garage"><span data-i18n="hal_label_garage">Garage</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
               <select id="hal-garage" name="garage">
                 <option value="" data-i18n="hal_opt_select">Select a range</option>
-                <option value="None" data-i18n="hal_garage_0">None</option>
                 <option value="Single" data-i18n="hal_garage_1">Single</option>
                 <option value="Double" data-i18n="hal_garage_2">Double</option>
-                <option value="Triple+" data-i18n="hal_garage_3">Triple+</option>
+                
               </select>
             </div>
           </div>
@@ -167,7 +166,7 @@
             </div>
             <div class="field">
               <label for="hal-phone"><span data-i18n="contact_label_phone">Phone</span></label>
-              <input type="tel" id="hal-phone" name="phone" autocomplete="tel" required>
+              <input type="tel" id="hal-phone" name="phone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" required>
             </div>
           </div>
           <div class="field">
@@ -237,7 +236,7 @@
 
 <script src="../translations.js"></script>
 <script src="../i18n.js"></script>
-<script src="../enquiry.js?v=6"></script>
+<script src="../enquiry.js?v=7"></script>
 <script>
   const navToggle = document.getElementById('navToggle');
   const siteNav = document.getElementById('siteNav');
