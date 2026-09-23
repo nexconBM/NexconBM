@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=31">
+<link rel="stylesheet" href="../styles.css?v=32">
 </head>
 <body>
 
@@ -100,7 +100,89 @@
       <div class="reveal" style="margin-top:2.5rem;">
         <p class="eyebrow" data-i18n="hal_find_eyebrow">Find your package</p>
         <h2 class="heading" style="font-size:1.4rem;" data-i18n="hal_find_h2">Tell us what you're looking for.</h2>
-        <p style="margin-top:1.4rem;"><a href="../contact/" class="pill pill-primary" data-i18n="hal_find_btn">Find my house &amp; land package →</a></p>
+
+        <form action="https://formsubmit.co/ajax/building@nexcongroup.com.au" method="POST" class="contact-form" data-enquiry style="max-width:640px; margin-top:1.4rem;">
+          <div class="field">
+            <label for="hal-location"><span data-i18n="hal_label_location">Location</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+            <input type="text" id="hal-location" name="location" autocomplete="address-level2">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="hal-budget"><span data-i18n="hal_label_budget">Budget</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <select id="hal-budget" name="budget">
+                <option value="" data-i18n="hal_opt_select">Select a range</option>
+                <option value="Under $500,000" data-i18n="hal_budget_1">Under $500,000</option>
+                <option value="$500,000 - $600,000" data-i18n="hal_budget_2">$500,000 – $600,000</option>
+                <option value="$600,000 - $700,000" data-i18n="hal_budget_3">$600,000 – $700,000</option>
+                <option value="$700,000 - $800,000" data-i18n="hal_budget_4">$700,000 – $800,000</option>
+                <option value="$800,000+" data-i18n="hal_budget_5">$800,000+</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="hal-bedrooms"><span data-i18n="hal_label_bedrooms">Bedrooms</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <select id="hal-bedrooms" name="bedrooms">
+                <option value="" data-i18n="hal_opt_select">Select a range</option>
+                <option value="2" data-i18n="hal_bed_2">2</option>
+                <option value="3" data-i18n="hal_bed_3">3</option>
+                <option value="4" data-i18n="hal_bed_4">4</option>
+                <option value="5+" data-i18n="hal_bed_5">5+</option>
+              </select>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="hal-bathrooms"><span data-i18n="hal_label_bathrooms">Bathrooms</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <select id="hal-bathrooms" name="bathrooms">
+                <option value="" data-i18n="hal_opt_select">Select a range</option>
+                <option value="1" data-i18n="hal_bath_1">1</option>
+                <option value="2" data-i18n="hal_bath_2">2</option>
+                <option value="3+" data-i18n="hal_bath_3">3+</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="hal-garage"><span data-i18n="hal_label_garage">Garage</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+              <select id="hal-garage" name="garage">
+                <option value="" data-i18n="hal_opt_select">Select a range</option>
+                <option value="None" data-i18n="hal_garage_0">None</option>
+                <option value="Single" data-i18n="hal_garage_1">Single</option>
+                <option value="Double" data-i18n="hal_garage_2">Double</option>
+                <option value="Triple+" data-i18n="hal_garage_3">Triple+</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="hal-land"><span data-i18n="hal_label_land">Land size</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+            <select id="hal-land" name="land_size">
+              <option value="" data-i18n="hal_opt_select">Select a range</option>
+              <option value="Under 300m²" data-i18n="hal_land_1">Under 300m²</option>
+              <option value="300 - 450m²" data-i18n="hal_land_2">300 – 450m²</option>
+              <option value="450 - 600m²" data-i18n="hal_land_3">450 – 600m²</option>
+              <option value="600m²+" data-i18n="hal_land_4">600m²+</option>
+            </select>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="hal-name"><span data-i18n="contact_label_name">Name</span></label>
+              <input type="text" id="hal-name" name="name" autocomplete="name" required>
+            </div>
+            <div class="field">
+              <label for="hal-email"><span data-i18n="contact_label_email">Email</span></label>
+              <input type="email" id="hal-email" name="email" autocomplete="email" required>
+            </div>
+          </div>
+
+          <input type="hidden" name="_subject" value="New house &amp; land enquiry from Nexcon website">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+          <p><button type="submit" class="pill pill-primary contact-submit" data-i18n="hal_find_btn">Find my house &amp; land package →</button></p>
+          <p class="contact-error" style="display:none;" data-i18n="contact_error">Something went wrong. Please try again, or contact us directly on +61 411 330 962 or kevin@nexconbm.com.au.</p>
+          <p class="contact-warning" style="display:none;" data-i18n="contact_limit">You've used up your message limit on this device. Please contact us directly using the details below.</p>
+        </form>
+        <div class="contact-success" style="display:none;">
+          <p class="contact-success-title" data-i18n="contact_success_title">Enquiry received</p>
+          <p class="contact-success-body" data-i18n="contact_success_body">Thanks for reaching out. We've got your enquiry and will be in touch soon.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -151,6 +233,7 @@
 
 <script src="../translations.js"></script>
 <script src="../i18n.js"></script>
+<script src="../enquiry.js?v=6"></script>
 <script>
   const navToggle = document.getElementById('navToggle');
   const siteNav = document.getElementById('siteNav');
