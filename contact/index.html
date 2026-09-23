@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact Nexcon Building Management | Melbourne</title>
-<link rel="icon" href="../Nexcon-favicon.jpeg">
-<link rel="apple-touch-icon" href="../Nexcon-favicon.jpeg">
+<link rel="icon" href="../Nexcon-favicon.png">
+<link rel="apple-touch-icon" href="../Nexcon-favicon-apple.png">
 <meta name="description" content="Contact Nexcon about your custom home, knockdown rebuild, renovation, house and land package, construction management or building inspection.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=30">
+<link rel="stylesheet" href="../styles.css?v=32">
 </head>
 <body>
 
@@ -47,6 +47,7 @@
 
       <a href="../projects/" data-i18n="nav_projects">Projects</a>
       <a href="../about/" data-i18n="nav_about">About Us</a>
+      <a href="../faq/" data-i18n="nav_faq">FAQ</a>
       <a href="../contact/" class="is-active" data-i18n="nav_contact">Contact</a>
 
       <a href="../contact/" class="nav-cta" data-i18n="nav_cta">Start your project</a>
@@ -80,7 +81,7 @@
 
       <div>
         <p class="eyebrow" data-i18n="contact_form_eyebrow">Project details</p>
-        <form action="https://api.web3forms.com/submit" method="POST" class="contact-form" data-enquiry>
+        <form action="https://formsubmit.co/ajax/building@nexcongroup.com.au" method="POST" class="contact-form" data-enquiry>
           <div class="field-row">
             <div class="field">
               <label for="contact-name"><span data-i18n="contact_label_name">Name</span></label>
@@ -93,8 +94,8 @@
           </div>
           <div class="field-row">
             <div class="field">
-              <label for="contact-phone"><span data-i18n="contact_label_phone">Phone</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
-              <input type="tel" id="contact-phone" name="phone" autocomplete="tel">
+              <label for="contact-phone"><span data-i18n="contact_label_phone">Phone</span></label>
+              <input type="tel" id="contact-phone" name="phone" autocomplete="tel" required>
             </div>
             <div class="field">
               <label for="contact-location"><span data-i18n="contact_label_location">Project location</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
@@ -136,10 +137,10 @@
           </div>
 
           <input type="hidden" name="project_type" id="projectType" value="">
-          <input type="hidden" name="access_key" value="PASTE_YOUR_WEB3FORMS_ACCESS_KEY_HERE">
-          <input type="hidden" name="subject" value="New enquiry from Nexcon website">
-          <input type="hidden" name="from_name" value="Nexcon website">
-          <input type="checkbox" name="botcheck" style="display:none" tabindex="-1" autocomplete="off">
+          <input type="hidden" name="_subject" value="New enquiry from Nexcon website">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
           <button type="submit" class="pill pill-primary contact-submit" data-i18n="contact_btn_send">Send enquiry</button>
           <p class="contact-error" style="display:none;" data-i18n="contact_error">Something went wrong. Please try again, or contact us directly on +61 411 330 962 or kevin@nexconbm.com.au.</p>
           <p class="contact-warning" style="display:none;" data-i18n="contact_limit">You've used up your message limit on this device. Please contact us directly using the details below.</p>
@@ -165,7 +166,7 @@
 
 </main>
 
-<script src="../enquiry.js?v=5"></script>
+<script src="../enquiry.js?v=6"></script>
 
 <!-- FOOTER:START -->
 <footer id="footer-contact">

@@ -21,7 +21,7 @@ Tokens used inside the partials:
   {{NAV_HOME_ACTIVE}}, {{NAV_CUSTOM_HOMES_ACTIVE}}, {{NAV_KNOCKDOWN_ACTIVE}},
   {{NAV_HOUSE_LAND_ACTIVE}}, {{NAV_RENOVATIONS_ACTIVE}}, {{NAV_MULTI_UNIT_ACTIVE}},
   {{NAV_PROJECT_MGMT_ACTIVE}}, {{NAV_INSPECTIONS_ACTIVE}}, {{NAV_PROJECTS_ACTIVE}}, {{NAV_ABOUT_ACTIVE}},
-  {{NAV_CONTACT_ACTIVE}}
+  {{NAV_FAQ_ACTIVE}}, {{NAV_CONTACT_ACTIVE}}
              become ' class="is-active"' on the nav link of the page being
              built (chosen per page in PAGES below) and "" everywhere else.
   {{NAV_GROUP_BUILD_ACTIVE}}, {{NAV_GROUP_MGMT_ACTIVE}}
@@ -47,7 +47,7 @@ PARTIALS = ROOT / "partial"
 
 NAV_KEYS = [
     "home", "custom_homes", "knockdown", "house_land", "renovations", "multi_unit",
-    "project_mgmt", "inspections", "projects", "about", "contact",
+    "project_mgmt", "inspections", "projects", "about", "faq", "contact",
 ]
 
 # Which pages live under each dropdown in the nav (so its button is highlighted).
@@ -63,7 +63,7 @@ PAGES = [
     ("about/index.html", False, "about"),
     ("contact/index.html", False, "contact"),
     ("custom-homes/index.html", False, "custom_homes"),
-    ("faq/index.html", False, None),
+    ("faq/index.html", False, "faq"),
     ("house-and-land/index.html", False, "house_land"),
     ("building-inspections/index.html", False, "inspections"),
     ("knockdown-rebuild/index.html", False, "knockdown"),
