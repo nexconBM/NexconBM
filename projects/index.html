@@ -81,49 +81,7 @@
       <p class="eyebrow" data-i18n="proj_eyebrow">Our projects</p>
       <p class="lede" style="max-width:60ch;" data-i18n="proj_lede">We believe the best way to understand our work is to see it. Explore selected Nexcon projects and see how we approach design, construction, coordination and problem-solving.</p>
 
-      <article class="case-study reveal">
-        <p class="eyebrow" data-i18n="proj_case_eyebrow">Case study</p>
-        <h2 class="heading" style="font-size:1.4rem; margin-bottom:0;" data-i18n="proj1_title">Custom residential home, Hawthorn</h2>
-
-        <dl class="case-meta">
-          <div><dt data-i18n="proj_label_project">Project</dt><dd data-i18n="proj1_project">Custom residential home</dd></div>
-          <div><dt data-i18n="proj_label_location">Location</dt><dd data-i18n="proj1_location">Hawthorn, VIC</dd></div>
-          <div><dt data-i18n="proj_label_type">Type</dt><dd data-i18n="proj1_type">New residential construction</dd></div>
-        </dl>
-
-        <div class="case-section">
-          <p class="detail-label" data-i18n="proj_overview_label">Project overview</p>
-          <p class="body-copy" data-i18n="proj1_overview">A high-end custom residential project incorporating multiple levels, basement construction, swimming pool, lift and integrated technology.</p>
-        </div>
-
-        <div class="case-section">
-          <p class="detail-label" data-i18n="proj_features_label">Key features</p>
-          <ul class="check-list" style="margin-top:0.6rem;">
-            <li data-i18n="proj1_f1">Custom architectural design</li>
-            <li data-i18n="proj1_f2">Basement</li>
-            <li data-i18n="proj1_f3">Swimming pool</li>
-            <li data-i18n="proj1_f4">Residential lift</li>
-            <li data-i18n="proj1_f5">Smart-home integration</li>
-            <li data-i18n="proj1_f6">High-end finishes</li>
-            <li data-i18n="proj1_f7">Complex site coordination</li>
-          </ul>
-        </div>
-
-        <div class="case-section">
-          <p class="detail-label" data-i18n="proj_role_label">Nexcon's role</p>
-          <p class="body-copy" data-i18n="proj1_role">Project management and construction coordination from planning through construction.</p>
-        </div>
-
-        <div class="case-section">
-          <p class="detail-label" data-i18n="proj_challenges_label">Project challenges</p>
-          <p class="body-copy" data-i18n="proj1_challenges">Complex site conditions, consultant coordination, construction sequencing and integration of multiple specialist trades.</p>
-        </div>
-
-        <div class="case-section">
-          <p class="detail-label" data-i18n="proj_result_label">The result</p>
-          <p class="body-copy" data-i18n="proj1_result">A carefully coordinated residential project designed around the owner's lifestyle and long-term requirements.</p>
-        </div>
-      </article>
+      <div id="sheet-projects"></div>
 
       <div class="reveal" style="margin-top:2.5rem;">
         <p style="margin:0 0 1rem;"><a href="../contact/" class="pill pill-primary" data-i18n="proj_cta_btn">Discuss your project →</a></p>
@@ -176,8 +134,10 @@
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="../translations.js"></script>
 <script src="../i18n.js"></script>
+<script src="../case-studies.js?v=2"></script>
 <script>
   const navToggle = document.getElementById('navToggle');
   const siteNav = document.getElementById('siteNav');
