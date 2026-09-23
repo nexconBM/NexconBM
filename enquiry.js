@@ -1,5 +1,7 @@
-/* Nexcon enquiry form. Sends the form to Web3Forms (https://web3forms.com) in the
-   background, so the visitor stays on the page.
+/* Nexcon enquiry form. Sends the form to FormSubmit (https://formsubmit.co) in the
+   background, so the visitor stays on the page. FormSubmit is free with no signup and
+   no send limit; the first enquiry to a new address triggers a one-time confirmation
+   email that someone has to click before real submissions start arriving.
 
    For each <form data-enquiry> this script:
      - joins the ticked project-type checkboxes into one hidden field before sending
@@ -9,11 +11,10 @@
      - shows the thank-you message on success, or an error message if sending fails
 
    The daily limit is kept in the visitor's browser (localStorage), so it stops accidental
-   or casual repeat sending but not a determined spammer. Web3Forms' own spam filtering
-   (the hidden "botcheck" box) still applies on their side.
+   or casual repeat sending but not a determined spammer. FormSubmit's own spam filtering
+   (the hidden "_honey" box) still applies on their side.
 
    Markup it expects, per form:
-     input[name="access_key"]         your Web3Forms access key (hidden)
      input[data-project-type]         the checkboxes
      input[name="project_type"]       hidden field that receives the joined value
      .contact-submit / .contact-error / .contact-warning   button and messages (inside the form)
@@ -21,7 +22,6 @@
 (function () {
   var DAILY_LIMIT = 15;
   var STORAGE_KEY = 'nexconEnquiries';
-  var KEY_PLACEHOLDER = /PASTE_YOUR|YOUR_ACCESS_KEY/;
 
   function today() {
     var d = new Date();
@@ -88,13 +88,6 @@
 
       if (sentToday() >= DAILY_LIMIT) {
         limitMsg.style.display = 'block';
-        return;
-      }
-
-      var keyField = form.querySelector('input[name="access_key"]');
-      if (!keyField || KEY_PLACEHOLDER.test(keyField.value)) {
-        console.error('Nexcon contact form: the Web3Forms access key has not been set in the page.');
-        error.style.display = 'block';
         return;
       }
 
