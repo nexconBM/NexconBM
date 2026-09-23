@@ -163,6 +163,33 @@ svg{display:block;}
 .case-meta dd{margin:0; font-weight:600; color:var(--mahogany);}
 .case-section{margin-top:1.6rem;}
 @media (max-width:620px){ .case-meta{grid-template-columns:1fr;} }
+
+.case-study-layout{display:grid; grid-template-columns:200px minmax(0,1fr); gap:clamp(1.2rem,3vw,2rem); align-items:start;}
+.case-study-layout.no-media{grid-template-columns:1fr;}
+.case-study-media{max-height:520px; overflow-y:auto; overflow-x:hidden;}
+.case-gallery{display:flex; flex-direction:column; gap:0.7rem;}
+.case-gallery-img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:2px; border:1px solid var(--line-on-sand); cursor:zoom-in; display:block; transition:opacity .15s;}
+.case-gallery-img:hover, .case-gallery-img:focus-visible{opacity:0.85;}
+@media (max-width:760px){
+  .case-study-layout{grid-template-columns:1fr;}
+  .case-study-media{order:-1; max-height:none;}
+  .case-gallery{flex-direction:row; overflow-x:auto; padding-bottom:0.3rem;}
+  .case-gallery-img{width:150px; flex:none;}
+}
+
+.case-lightbox{position:fixed; inset:0; z-index:1000; background:rgba(20,10,12,0.92); display:flex; align-items:center; justify-content:center; flex-direction:column; padding:2rem;}
+.case-lightbox[hidden]{display:none;}
+.case-lightbox-img{max-width:min(88vw,1100px); max-height:78vh; object-fit:contain; border-radius:2px; box-shadow:0 10px 40px rgba(0,0,0,0.4);}
+.case-lightbox-caption{color:var(--sandstone); font-family:var(--sans); font-size:0.9rem; margin:1rem 0 0; text-align:center;}
+.case-lightbox-close{position:absolute; top:1rem; right:1.2rem; background:none; border:0; color:var(--sandstone); font-size:2.2rem; line-height:1; cursor:pointer; padding:0.2em 0.4em;}
+.case-lightbox-prev, .case-lightbox-next{position:absolute; top:50%; transform:translateY(-50%); background:rgba(244,238,231,0.12); border:0; color:var(--sandstone); font-size:1.3rem; cursor:pointer; padding:0.6em 0.9em; border-radius:999px;}
+.case-lightbox-prev:hover, .case-lightbox-next:hover{background:rgba(244,238,231,0.22);}
+.case-lightbox-prev{left:1rem;}
+.case-lightbox-next{right:1rem;}
+@media (max-width:600px){
+  .case-lightbox-prev{left:0.3rem;} .case-lightbox-next{right:0.3rem;}
+  .case-lightbox-close{top:0.5rem; right:0.6rem;}
+}
 .page-figure{margin:0 0 2rem;}
 .page-figure img{display:block; width:100%; height:clamp(200px,34vw,360px); object-fit:cover; border-radius:2px;}
 .page-figure-pair{display:grid; grid-template-columns:1fr 1fr; gap:1rem;}
