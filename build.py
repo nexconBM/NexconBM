@@ -28,6 +28,10 @@ Tokens used inside the partials:
              become " is-active" on a dropdown's button when the current page
              is one of that dropdown's pages (see NAV_GROUPS below).
 
+WARNING: everything between <!-- FOOTER:START --> and <!-- FOOTER:END --> is
+overwritten on every run. Page-specific <script> tags (enquiry.js, case-studies.js,
+PapaParse) must go AFTER <!-- FOOTER:END -->, or the next build silently deletes them.
+
 To add a new page (e.g. "contact"):
   1. Create contact/index.html containing <!-- HEADER --> and <!-- FOOTER -->.
   2. Add it to PAGES below (and a NAV_KEYS entry + nav link in
