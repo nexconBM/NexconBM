@@ -19,13 +19,10 @@
             (Windows) or Option+Return (Mac) to start a new line without leaving the cell
             -- each line becomes one bullet point.
           - "images" works the same way: one image link per line, in the same cell.
-            Each link needs to be a direct, public link to the image itself (not a page
-            that merely shows it). The easiest ways to get one:
+            The easiest ways to get a link:
               - Upload the photo to Google Drive, right-click it > Share > "Anyone with
-                the link", then copy its link. It looks like
-                https://drive.google.com/file/d/FILE_ID/view?usp=sharing -- take the
-                FILE_ID part out of the middle and paste it into this pattern instead:
-                https://drive.google.com/uc?export=view&id=FILE_ID
+                the link", then copy its link and paste it in as it is. (This file
+                rewrites Drive links into Google's embeddable form automatically.)
               - Or upload it to a free image host such as imgur.com and use the "direct
                 link" it gives you (usually ends in .jpg/.png/.webp).
           - "published" should say TRUE to show that row on the site, or FALSE (or blank)
@@ -46,9 +43,9 @@
      - Anyone with the "Publish to web" link's sheet can be edited by anyone you've shared
        the Google Sheet with (normal Google Sheets sharing rules apply); the published CSV
        link itself is read-only and just lets the website fetch the data.
-     - A Google Drive image link can occasionally show Drive's own "can't scan this file
-       for viruses" page instead of the photo, for larger files. An image host such as
-       imgur.com doesn't have this problem. */
+     - The Drive file must be shared as "Anyone with the link" or the photo won't show
+       for visitors. Very large photos load slowly; Drive photos under about 2 MB are
+       best. */
 (function () {
   var SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQccxPTfwtI-uH-VfqqOeYURM7eaKlh_-scpBXwA67zGUXJklUubeirST07ozkfn4pXkkXDJo_W757D/pub?gid=0&single=true&output=csv";
 
@@ -113,6 +110,18 @@
     return /^https:\/\//i.test(url) || /^http:\/\//i.test(url);
   }
 
+  // Google Drive's "view"/"share" links show a web page (or, for the old uc?export=view
+  // address, are blocked from appearing on other sites), so they can't be used as a
+  // picture directly. lh3.googleusercontent.com/d/FILE_ID is Google's embeddable address
+  // for the same file, so any Drive link pasted into the sheet is rewritten to that.
+  function normalizeImageUrl(url) {
+    var match =
+      url.match(/^https?:\/\/drive\.google\.com\/file\/d\/([\w-]+)/i) ||
+      url.match(/^https?:\/\/drive\.google\.com\/(?:uc|open)\?(?:[^#]*&)?id=([\w-]+)/i) ||
+      url.match(/^https?:\/\/drive\.usercontent\.google\.com\/download\?(?:[^#]*&)?id=([\w-]+)/i);
+    return match ? "https://lh3.googleusercontent.com/d/" + match[1] : url;
+  }
+
   function parseLines(value) {
     return String(value || "")
       .split(/\r?\n/)
@@ -122,7 +131,7 @@
 
   function renderCaseStudy(row, lang) {
     var features = parseLines(field(row, "features", lang));
-    var images = parseLines(row.images).filter(isSafeImageUrl);
+    var images = parseLines(row.images).filter(isSafeImageUrl).map(normalizeImageUrl);
     var project = field(row, "project", lang);
     var location = field(row, "location", lang);
     var type = field(row, "type", lang);
