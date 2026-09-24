@@ -168,7 +168,7 @@ svg{display:block;}
 .case-study-layout.no-media{grid-template-columns:1fr;}
 .case-study-media{max-height:520px; overflow-y:auto; overflow-x:hidden;}
 .case-gallery{display:flex; flex-direction:column; gap:0.7rem;}
-.case-gallery-img{width:100%; aspect-ratio:4/3; object-fit:cover; border-radius:2px; border:1px solid var(--line-on-sand); cursor:zoom-in; display:block; transition:opacity .15s;}
+.case-gallery-img{width:100%; aspect-ratio:4/3; object-fit:contain; background:var(--sandstone); border-radius:2px; border:1px solid var(--line-on-sand); cursor:zoom-in; display:block; transition:opacity .15s;}
 .case-gallery-img:hover, .case-gallery-img:focus-visible{opacity:0.85;}
 @media (max-width:760px){
   .case-study-layout{grid-template-columns:1fr;}
