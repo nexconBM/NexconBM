@@ -54,6 +54,7 @@
   if (SHEET_CSV_URL.indexOf("PASTE_YOUR") === 0) return; // not set up yet
 
   var LABELS = {
+    loading: "proj_loading",
     eyebrow: "proj_case_eyebrow",
     project: "proj_label_project",
     location: "proj_label_location",
@@ -285,6 +286,11 @@
     if (lightbox) lightbox.hidden = true;
   }
 
+  // Spinner shown until the sheet has loaded; renderAll() and the error handler clear it.
+  container.innerHTML =
+    '<div class="loading-spinner" role="status"><span class="visually-hidden">' +
+    esc(label("loading")) + "</span></div>";
+
   fetch(SHEET_CSV_URL)
     .then(function (res) {
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -302,6 +308,7 @@
       if (toggle) toggle.addEventListener("click", renderAll);
     })
     .catch(function (err) {
+      container.innerHTML = "";
       console.error("Nexcon: could not load case studies from the Google Sheet.", err);
     });
 })();

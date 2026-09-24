@@ -177,6 +177,10 @@ svg{display:block;}
   .case-gallery-img{width:150px; flex:none;}
 }
 
+.loading-spinner{width:2.6rem; height:2.6rem; margin:2.5rem auto; border:3px solid var(--line-on-sand); border-top-color:var(--bordeaux); border-radius:50%; animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+@media (prefers-reduced-motion: reduce){ .loading-spinner{animation-duration:2.4s;} }
+
 .case-lightbox{position:fixed; inset:0; z-index:1000; background:rgba(20,10,12,0.92); display:flex; align-items:center; justify-content:center; flex-direction:column; padding:2rem;}
 .case-lightbox[hidden]{display:none;}
 .case-lightbox-img{max-width:min(88vw,1100px); max-height:78vh; object-fit:contain; border-radius:2px; box-shadow:0 10px 40px rgba(0,0,0,0.4);}
