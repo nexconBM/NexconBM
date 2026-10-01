@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=38">
+<link rel="stylesheet" href="../styles.css?v=41">
 </head>
 <body>
 
@@ -160,8 +160,17 @@
             <p class="body-copy" data-i18n="insp_lookfor_body">General wear and cracking, rust on structural steel, timber rot, loose or unstable brickwork, doors and windows that don't open or close properly, and blocked subfloor ventilation, documented with photos as we go.</p>
           </div>
         </div>
-        <p style="margin-top:2rem;"><a href="../contact/" class="pill pill-primary" data-i18n="bi_cta_btn">Book an inspection →</a></p>
         <p><a href="../faq/" class="text-link" data-i18n="contact_faq_link">Read our frequently asked questions →</a></p>
+      </div>
+
+      <div class="reveal" style="margin-top:2.5rem;" id="book">
+        <p class="eyebrow" data-i18n="book_eyebrow">Book an inspection</p>
+        <h2 class="heading" style="font-size:1.4rem;" data-i18n="book_h2">Choose a date and time</h2>
+        <p class="body-copy" style="max-width:65ch;" data-i18n="book_lede">Inspections run in two 3-hour windows, 10:00 AM–1:00 PM or 2:00 PM–5:00 PM. Bookings need at least 24 hours' notice and can be made up to a month ahead.</p>
+
+        <div id="booking-widget">
+          <div class="loading-spinner" role="status"><span class="visually-hidden" data-i18n="book_loading">Loading availability…</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -280,6 +289,9 @@
   }
 </script>
 <!-- FOOTER:END -->
+
+<!-- Page-specific script: keep OUTSIDE the FOOTER block above, because build.py rewrites everything inside it. -->
+<script src="../booking.js?v=9"></script>
 
 </body>
 </html>
