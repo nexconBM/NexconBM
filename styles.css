@@ -226,6 +226,7 @@ svg{display:block;}
 .check-list{list-style:none; margin:1rem 0 0; padding:0; display:grid; grid-template-columns:repeat(2,1fr); gap:0.7rem 2rem; max-width:640px;}
 .check-list li{padding-left:0.9rem; border-left:2px solid var(--rosette); font-size:1rem;}
 @media (max-width:520px){ .check-list{grid-template-columns:1fr;} }
+.check-list-single{grid-template-columns:1fr;}
 @media (max-width:980px){ .service-cards{grid-template-columns:repeat(2,1fr);} }
 @media (max-width:700px){ .why-grid{grid-template-columns:1fr;} }
 @media (max-width:620px){ .service-cards{grid-template-columns:1fr;} }

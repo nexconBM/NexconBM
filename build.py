@@ -38,6 +38,13 @@ To add a new page (e.g. "contact"):
      partial/header.html if it should appear in the menu).
   3. Run: python build.py
 
+Content-Security-Policy: the <meta http-equiv="Content-Security-Policy"> tag lives in ONE
+place, partial/csp.html, and is written into every page's <head> between
+<!-- CSP:START --> and <!-- CSP:END --> markers (added automatically on first run, right after
+the viewport meta tag). The policy forbids inline <script> and only allows scripts from this
+site and cdnjs. If you add a new third-party script, font, image host, or fetch() target,
+add its origin to partial/csp.html or the browser will silently block it.
+
 Usage:
     python build.py
 """
@@ -94,6 +101,26 @@ def stitch(html: str, name: str, content: str, page_path: str) -> str:
     sys.exit(f"ERROR: {page_path} has no {start} block or {placeholder} placeholder.")
 
 
+def inject_csp(page_path: str) -> None:
+    path = ROOT / page_path
+    html = path.read_text(encoding="utf-8")
+    csp = (PARTIALS / "csp.html").read_text(encoding="utf-8").rstrip()
+    block = "<!-- CSP:START -->" + "\n" + csp + "\n" + "<!-- CSP:END -->"
+
+    marked = re.compile(r"<!-- CSP:START -->.*?<!-- CSP:END -->", re.S)
+    if marked.search(html):
+        new_html = marked.sub(lambda m: block, html)
+    else:
+        viewport = re.search(r'<meta name="viewport"[^>]*>' + r'\n?', html)
+        if not viewport:
+            sys.exit(f"ERROR: {page_path} has no viewport meta tag to insert the CSP after.")
+        new_html = html[: viewport.end()] + block + "\n" + html[viewport.end():]
+
+    if new_html != html:
+        path.write_text(new_html, encoding="utf-8")
+        print(f"Updated CSP in {page_path}")
+
+
 def build_page(page_path: str, is_home: bool, active_key) -> None:
     path = ROOT / page_path
     page_html = path.read_text(encoding="utf-8")
@@ -131,4 +158,6 @@ def build_page(page_path: str, is_home: bool, active_key) -> None:
 if __name__ == "__main__":
     for page_path, is_home, active_key in PAGES:
         build_page(page_path, is_home, active_key)
+    for page_path in [p for p, _, _ in PAGES] + ["404.html"]:
+        inject_csp(page_path)
     print("Done.")

@@ -50,7 +50,7 @@
 
   var SLOT_LABELS = { AM: "10:00 AM – 1:00 PM", PM: "2:00 PM – 5:00 PM" };
   var MAX_DAYS_AHEAD = 30;
-  var MIN_LEAD_HOURS = 24;
+  var MIN_LEAD_HOURS = 72; // 3 days, in hours
   var MAX_MY_BOOKINGS = 3; // active (not cancelled) bookings allowed from one browser
 
   // A courtesy limit only, tracked in this browser's own storage -- same spirit as the
@@ -343,7 +343,7 @@
   function bookErrorMessage(code) {
     var map = {
       taken: t("book_error_taken", "Sorry — that slot was just booked by someone else. Please choose another below."),
-      too_soon: t("book_error_too_soon", "That time is less than 24 hours away. Please choose a later slot."),
+      too_soon: t("book_error_too_soon", "That time is less than 3 days away. Please choose a later slot."),
       too_far: t("book_error_too_far", "That date is more than a month away. Please choose a closer slot."),
       weekend: t("book_error_weekend", "Inspections aren't available on weekends. Please choose a weekday."),
       missing_fields: t("book_error_missing", "Please fill in every field."),
@@ -362,5 +362,7 @@
   // labels and messages aren't static data-i18n elements, so re-render for the new
   // language too -- only when nothing is mid-flow (a selection or open form).
   var toggle = document.getElementById("langToggle");
-  if (toggle) toggle.addEventListener("click", function () { if (!selected) render(); });
+  // setTimeout so this runs after i18n.js's own click handler has saved the new language;
+  // this script's listener is registered first, so redrawing immediately would still read the old one.
+  if (toggle) toggle.addEventListener("click", function () { setTimeout(function () { if (!selected) render(); }, 0); });
 })();

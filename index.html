@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- CSP:START -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://script.google.com https://*.googleusercontent.com https://docs.google.com https://formsubmit.co; form-action 'self' https://formsubmit.co; base-uri 'self'; object-src 'none'">
+<!-- CSP:END -->
 
 <title>Custom Homes &amp; Building Management Melbourne | Nexcon</title>
 <link rel="icon" href="Nexcon-favicon.png">
@@ -25,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=41">
+<link rel="stylesheet" href="styles.css?v=42">
 </head>
 <body>
 
@@ -288,73 +291,7 @@
 
 <script src="translations.js"></script>
 <script src="i18n.js"></script>
-<script>
-  const navToggle = document.getElementById('navToggle');
-  const siteNav = document.getElementById('siteNav');
-  navToggle.addEventListener('click', () => {
-    const open = siteNav.classList.toggle('is-open');
-    navToggle.setAttribute('aria-expanded', String(open));
-  });
-  siteNav.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-      siteNav.classList.remove('is-open');
-      navToggle.setAttribute('aria-expanded', 'false');
-    });
-  });
-
-  const navGroups = document.querySelectorAll('.nav-group');
-  const desktopNav = () => window.matchMedia('(min-width: 1201px) and (hover: hover)').matches;
-  function setNavGroup(group, open) {
-    group.classList.toggle('is-open', open);
-    group.querySelector('.nav-group-toggle').setAttribute('aria-expanded', String(open));
-  }
-  navGroups.forEach(group => {
-    const toggle = group.querySelector('.nav-group-toggle');
-    toggle.addEventListener('click', () => {
-      if (group.dataset.hover === '1') { group.dataset.hover = ''; return; }
-      const open = !group.classList.contains('is-open');
-      navGroups.forEach(other => setNavGroup(other, false));
-      setNavGroup(group, open);
-    });
-    group.addEventListener('mouseenter', () => {
-      if (!desktopNav()) return;
-      navGroups.forEach(other => setNavGroup(other, false));
-      group.dataset.hover = '1';
-      setNavGroup(group, true);
-    });
-    group.addEventListener('mouseleave', () => {
-      if (!desktopNav()) return;
-      group.dataset.hover = '';
-      setNavGroup(group, false);
-    });
-    group.addEventListener('focusout', e => {
-      if (!group.contains(e.relatedTarget)) setNavGroup(group, false);
-    });
-  });
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.nav-group')) navGroups.forEach(group => setNavGroup(group, false));
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') navGroups.forEach(group => setNavGroup(group, false));
-  });
-
-  document.getElementById('year').textContent = new Date().getFullYear();
-
-  const revealEls = document.querySelectorAll('.reveal');
-  if ('IntersectionObserver' in window && revealEls.length) {
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          revealObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0, rootMargin: '0px 0px -10% 0px' });
-    revealEls.forEach(el => revealObserver.observe(el));
-  } else {
-    revealEls.forEach(el => el.classList.add('is-visible'));
-  }
-</script>
+<script src="site.js?v=1"></script>
 <!-- FOOTER:END -->
 
 
