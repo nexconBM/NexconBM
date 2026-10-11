@@ -15,7 +15,8 @@
 
    Rules enforced both here (for a responsive UI) and again inside the Apps Script (so
    nothing relies on the visitor's browser playing fair):
-     - A slot can only be booked at least 24 hours before it starts.
+     - A slot can only be booked at least 3 business days (Mon-Fri) ahead, e.g. today
+       being Friday, the earliest bookable day is next Wednesday.
      - A slot can't be booked more than 30 days ahead.
      - No inspections on Saturday or Sunday.
 
@@ -50,7 +51,7 @@
 
   var SLOT_LABELS = { AM: "10:00 AM – 1:00 PM", PM: "2:00 PM – 5:00 PM" };
   var MAX_DAYS_AHEAD = 30;
-  var MIN_LEAD_HOURS = 72; // 3 days, in hours
+  var MIN_LEAD_BUSINESS_DAYS = 3; // weekends don't count towards the notice period
   var MAX_MY_BOOKINGS = 3; // active (not cancelled) bookings allowed from one browser
 
   // A courtesy limit only, tracked in this browser's own storage -- same spirit as the
@@ -79,11 +80,26 @@
   }
   function slotId(date, slot) { return "slot-" + date + "-" + slot; }
 
-  var todayDateOnly = new Date();
-  todayDateOnly.setHours(0, 0, 0, 0);
-  var maxDateOnly = new Date(todayDateOnly.getFullYear(), todayDateOnly.getMonth(), todayDateOnly.getDate() + MAX_DAYS_AHEAD);
-  var viewYear = todayDateOnly.getFullYear();
-  var viewMonth = todayDateOnly.getMonth(); // 0-indexed, persists across re-renders (e.g. a language switch) so navigating months isn't lost
+  // "Today" starts as this device's clock, then is replaced by the server's Melbourne date
+  // as soon as the booking sheet answers (see fetchBooked), so a wrong laptop/phone clock
+  // can't shift which days are offered.
+  var todayDateOnly, earliestDateOnly, maxDateOnly, viewYear, viewMonth;
+  function setToday(y, m, d) { // m is 0-indexed
+    todayDateOnly = new Date(y, m, d);
+    // Earliest bookable day: today plus 3 weekdays (Fri -> Wed, Mon -> Thu).
+    earliestDateOnly = new Date(y, m, d);
+    for (var added = 0; added < MIN_LEAD_BUSINESS_DAYS; ) {
+      earliestDateOnly.setDate(earliestDateOnly.getDate() + 1);
+      var dayOfWeek = earliestDateOnly.getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) added++;
+    }
+    maxDateOnly = new Date(y, m, d + MAX_DAYS_AHEAD);
+  }
+  var deviceNow = new Date();
+  setToday(deviceNow.getFullYear(), deviceNow.getMonth(), deviceNow.getDate());
+  var viewSynced = false;
+  viewYear = todayDateOnly.getFullYear();
+  viewMonth = todayDateOnly.getMonth(); // 0-indexed, persists across re-renders (e.g. a language switch) so navigating months isn't lost
   function esc(value) {
     var div = document.createElement("div");
     div.textContent = value || "";
@@ -104,6 +120,11 @@
       .then(function (data) {
         bookedSet = {};
         (data.booked || []).forEach(function (key) { bookedSet[key] = true; });
+        var serverToday = /^(\d{4})-(\d{2})-(\d{2})$/.exec(data.today || "");
+        if (serverToday) {
+          setToday(+serverToday[1], +serverToday[2] - 1, +serverToday[3]);
+          if (!viewSynced) { viewYear = todayDateOnly.getFullYear(); viewMonth = todayDateOnly.getMonth(); viewSynced = true; }
+        }
         // A booking tracked locally may have been cancelled from elsewhere (the email
         // link works from any device), so drop anything the sheet no longer shows as
         // booked -- otherwise this browser's limit could stay stuck at 3 forever.
@@ -117,12 +138,9 @@
     var parts = dateStr.split("-").map(Number);
     var dow = new Date(parts[0], parts[1] - 1, parts[2]).getDay(); // 0 = Sun, 6 = Sat
     if (dow === 0 || dow === 6) return []; // no inspections on weekends
-    var now = new Date();
     var slots = [];
+    if (new Date(parts[0], parts[1] - 1, parts[2]) < earliestDateOnly) return slots; // too soon: don't offer it at all
     ["AM", "PM"].forEach(function (slot) {
-      var start = slotStart(dateStr, slot);
-      var hoursUntil = (start - now) / 3600000;
-      if (hoursUntil < MIN_LEAD_HOURS) return; // too soon: don't offer it at all
       slots.push({ slot: slot, taken: !!bookedSet[dateStr + "_" + slot] });
     });
     return slots;
@@ -343,7 +361,7 @@
   function bookErrorMessage(code) {
     var map = {
       taken: t("book_error_taken", "Sorry — that slot was just booked by someone else. Please choose another below."),
-      too_soon: t("book_error_too_soon", "That time is less than 3 days away. Please choose a later slot."),
+      too_soon: t("book_error_too_soon", "That time is less than 3 business days away. Please choose a later slot."),
       too_far: t("book_error_too_far", "That date is more than a month away. Please choose a closer slot."),
       weekend: t("book_error_weekend", "Inspections aren't available on weekends. Please choose a weekday."),
       missing_fields: t("book_error_missing", "Please fill in every field."),

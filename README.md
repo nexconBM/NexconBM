@@ -103,7 +103,7 @@ Client-side only — no separate URLs per language.
 
 All styling is in `styles.css`, using CSS custom properties for the palette (`--bordeaux`, `--mahogany`, `--sandstone`, …).
 
-Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=10` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
+Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=13` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
 
 - **Edit `styles.css`** → bump `?v=` on **every** page that links it (all 12 live pages share one number and must be bumped together).
 - **Edit `booking.js`** → bump its `?v=` in `building-inspections/index.html` (the only page that loads it).
@@ -156,23 +156,25 @@ booking.js (this repo)  ──fetch──▶  Google Apps Script Web App  ──
 ```
 
 - **`booking.js`** renders the calendar and booking form and talks to the Web App. The Web App URL is hardcoded as `WEBAPP_URL`; it is public by design.
-- **Apps Script** exposes `doGet` (list booked slots) and `doPost` (make a booking), and sends the confirmation emails. It lives only in the Sheet's *Extensions → Apps Script* editor, **not in git**. A snapshot is in the [appendix](#appendix-apps-script-source); the live editor is always the source of truth.
+- **Apps Script** exposes `doGet` (list booked slots) and `doPost` (make a booking), and sends the confirmation emails. It lives only in the Sheet's *Extensions → Apps Script* editor, **not in git**. A copy is saved as `booking-apps-script.gs` (see the [appendix](#appendix-apps-script-source)); the live editor is always the source of truth.
 - **Sheet:** tab named exactly `Bookings`, header row `date | slot | name | email | phone | address | status | created`.
 
 ### Rules
 
 Enforced client-side for a responsive UI **and** server-side in the Apps Script, so nothing relies on the browser:
 
-- at least 24 hours' notice
+- at least 3 business days' notice (weekends don't count: booking on a Friday, the earliest day is the following Wednesday)
 - no more than 30 days ahead
 - no Saturdays or Sundays
 - no double-booking — the script takes `LockService.getScriptLock()` so check-then-write is atomic across simultaneous requests
 
 Slots are `AM` (10:00 AM – 1:00 PM) and `PM` (2:00 PM – 5:00 PM).
 
+"Today" comes from the server, not the visitor's device: `doGet` returns `today` (Melbourne date) and `booking.js` uses it for the calendar, falling back to the device clock only if the script hasn't been updated. Cancellations by email still need 24 hours' notice.
+
 ### Calendar behaviour
 
-- Month grid, Monday-first. Disabled days: weekends, inside the 24-hour window, or past 30 days.
+- Month grid, Monday-first. Disabled days: weekends, inside the 3-business-day window, or past 30 days.
 - "Previous" stops at the current month; "Next" allows browsing exactly one month ahead.
 - Picking a day shows its slots beneath the calendar; picking a slot opens the form (name, email, phone, property address).
 - The widget never re-renders the whole calendar after a booking or conflict — that would wipe the success/warning message before it could be read. Each slot button has a stable id (`slot-YYYY-MM-DD-AM`) and only that button is swapped between open and taken. A background refetch keeps the data current.
@@ -246,154 +248,10 @@ Before pushing:
 
 ## Known loose ends
 
-- **Orphaned pages:** `legal-consulting/`, `mortgage-service/` and `property-sales-marketing/` (plus `hero-property.webp` and `property-sales-marketing/service-property-sales.webp`) are leftovers from a redesign that was reverted. They are not in `PAGES`, the nav or the sitemap, so visitors can't reach them, but they remain in the repo. Finish them or delete them.
+- The footer year still uses the visitor's device clock (harmless).
 - Spot-check Google Sheet sharing for the Bookings sheet and the case-studies sheet periodically.
 
 ## Appendix: Apps Script source
 
-Snapshot of the deployed booking backend. The live Apps Script editor is the source of truth — verify against it before relying on this copy.
+The full, current script is saved in this repo as [`booking-apps-script.gs`](booking-apps-script.gs). Paste it into the Sheet's *Extensions → Apps Script* editor, then redeploy as a new version (see above). The live editor is still the source of truth.
 
-```javascript
-/* Nexcon inspection booking backend.
-   The Sheet needs one tab named exactly "Bookings" with this header row (row 1),
-   in this exact order:
-     date | slot | name | email | phone | address | status | created
-
-   "date" is stored as YYYY-MM-DD text, "slot" is "AM" or "PM", "status" is "booked" or
-   "cancelled". Don't type anything into those columns yourself -- the script fills them
-   in as people book.
-
-   There's no self-service cancellation here -- that was tried via a one-time link in the
-   confirmation email, but turned out unreliable in practice: some email apps (notably
-   Outlook) render emailed links inside their own embedded frame, and Google's pages
-   refuse to load inside a foreign frame, breaking the link for exactly the people who
-   needed it. Instead, the booking confirmation email just asks the customer to email the
-   business to cancel; staff then cancel it manually by changing that row's "status" cell
-   from "booked" to "cancelled" directly in this Sheet. */
-
-const SHEET_NAME = 'Bookings';
-const NOTIFY_EMAIL = 'building@nexcongroup.com.au'; // where booking emails go
-const SLOT_LABELS = { AM: '10:00 AM - 1:00 PM', PM: '2:00 PM - 5:00 PM' };
-const MAX_DAYS_AHEAD = 30;
-
-function getSheet_() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
-  if (!sheet) throw new Error('No sheet tab named "' + SHEET_NAME + '" was found.');
-  return sheet;
-}
-
-function columnIndex_(header) {
-  const map = {};
-  header.forEach((h, i) => { map[h] = i; });
-  return map;
-}
-
-// Google Sheets silently converts a "2026-10-03"-shaped string into its own Date value
-// when a row is written, unless the cell is explicitly forced to stay plain text. Once
-// that happens, a value read back is a Date object, not the original string, so a plain
-// "===" comparison against an incoming date string would never match -- which is exactly
-// what broke the "is this slot already taken" check. This normalizes either shape back to
-// a plain YYYY-MM-DD string before anything compares dates, so it's safe either way.
-function normalizeDate_(value) {
-  if (value instanceof Date) {
-    return value.getFullYear() + '-' + String(value.getMonth() + 1).padStart(2, '0') + '-' + String(value.getDate()).padStart(2, '0');
-  }
-  return String(value).trim();
-}
-
-function json_(obj) {
-  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
-}
-
-// GET: returns which date+slot combinations are currently booked, so the site can grey
-// them out before anyone tries to click one.
-function doGet(e) {
-  const sheet = getSheet_();
-  const rows = sheet.getDataRange().getValues();
-  const col = columnIndex_(rows[0]);
-  const booked = [];
-  for (let i = 1; i < rows.length; i++) {
-    if (rows[i][col.status] === 'booked') {
-      booked.push(normalizeDate_(rows[i][col.date]) + '_' + rows[i][col.slot]);
-    }
-  }
-  return json_({ ok: true, booked: booked });
-}
-
-// POST: makes a new booking. Uses a script-wide lock so two people clicking "book" on
-// the same slot at the same moment can't both succeed -- whichever request gets the lock
-// first checks and writes; the second sees it's already taken.
-function doPost(e) {
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(10000);
-  } catch (err) {
-    return json_({ ok: false, error: 'busy' });
-  }
-  try {
-    const data = JSON.parse(e.postData.contents);
-    if (data.action === 'book') return handleBook_(data);
-    return json_({ ok: false, error: 'unknown_action' });
-  } catch (err) {
-    return json_({ ok: false, error: 'server_error' });
-  } finally {
-    lock.releaseLock();
-  }
-}
-
-function handleBook_(data) {
-  const { date, slot, name, email, phone, address } = data;
-  if (!date || !slot || !name || !email || !phone || !address) {
-    return json_({ ok: false, error: 'missing_fields' });
-  }
-  if (SLOT_LABELS[slot] === undefined) return json_({ ok: false, error: 'bad_slot' });
-
-  const slotStart = slotStartDate_(date, slot);
-  const dow = slotStart.getDay(); // 0 = Sun, 6 = Sat
-  if (dow === 0 || dow === 6) return json_({ ok: false, error: 'weekend' });
-  const now = new Date();
-  const hoursUntil = (slotStart - now) / 3600000;
-  if (hoursUntil < 24) return json_({ ok: false, error: 'too_soon' });
-  const maxDate = new Date(now.getTime() + MAX_DAYS_AHEAD * 24 * 3600000);
-  if (slotStart > maxDate) return json_({ ok: false, error: 'too_far' });
-
-  const sheet = getSheet_();
-  const rows = sheet.getDataRange().getValues();
-  const col = columnIndex_(rows[0]);
-
-  for (let i = 1; i < rows.length; i++) {
-    if (normalizeDate_(rows[i][col.date]) === date && rows[i][col.slot] === slot && rows[i][col.status] === 'booked') {
-      return json_({ ok: false, error: 'taken' });
-    }
-  }
-
-  sheet.appendRow([date, slot, name, email, phone, address, 'booked', new Date()]);
-  // Force the date cell we just wrote to stay plain text, so it reads back exactly as
-  // typed rather than being silently reinterpreted as a Sheets date.
-  const newRow = sheet.getLastRow();
-  sheet.getRange(newRow, col.date + 1).setNumberFormat('@').setValue(date);
-
-  const slotLabel = SLOT_LABELS[slot];
-
-  MailApp.sendEmail(NOTIFY_EMAIL,
-    'New inspection booking: ' + date + ' (' + slotLabel + ')',
-    'Name: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\nAddress: ' + address +
-    '\nDate: ' + date + '\nTime: ' + slotLabel);
-  MailApp.sendEmail(email,
-    'Your Nexcon inspection booking is confirmed',
-    'Hi ' + name + ',\n\nYour building inspection is booked for:\n' + date + ', ' + slotLabel +
-    '\nAddress: ' + address +
-    '\n\nNeed to cancel or reschedule? Just reply to this email or call us, at least 24 ' +
-    'hours before the appointment.' +
-    '\n\nQuestions? Call +61 411 330 962 or reply to this email.' +
-    '\n\nThanks,\nNexcon Building Management');
-
-  return json_({ ok: true });
-}
-
-function slotStartDate_(dateStr, slot) {
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const hour = slot === 'AM' ? 10 : 14;
-  return new Date(y, m - 1, d, hour, 0, 0);
-}
-```
