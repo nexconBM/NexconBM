@@ -13,7 +13,7 @@ Source for **https://nexconbm.com.au** — a static, bilingual (English / Tradit
 3. [The build system (`build.py`)](#the-build-system-buildpy)
 4. [Bilingual support](#bilingual-support)
 5. [Styling and cache-busting](#styling-and-cache-busting)
-6. [Contact form](#contact-form)
+6. [Contact and enquiry forms](#contact-and-enquiry-forms)
 7. [Case studies from a Google Sheet](#case-studies-from-a-google-sheet)
 8. [Inspection booking system](#inspection-booking-system)
 9. [Security notes](#security-notes)
@@ -30,7 +30,8 @@ styles.css                    The only stylesheet, shared by every page
 translations.js               English / Chinese text dictionary
 i18n.js                       Applies the language toggle
 site.js                       Nav menu, dropdowns, footer year, scroll-reveal (loaded by the footer partial)
-enquiry.js                    Contact/enquiry form handling (FormSubmit)
+enquiry.js                    Contact + house-and-land enquiry forms (posts to the Apps Script)
+captcha.js                    "I'm not a robot" check (Cloudflare Turnstile) used by every form
 case-studies.js               Loads extra case studies from a published Google Sheet
 booking.js                    Inspection booking calendar widget
 build.py                      Header/footer templating script
@@ -103,7 +104,7 @@ Client-side only — no separate URLs per language.
 
 All styling is in `styles.css`, using CSS custom properties for the palette (`--bordeaux`, `--mahogany`, `--sandstone`, …).
 
-Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=14` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
+Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=16` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
 
 - **Edit `styles.css`** → bump `?v=` on **every** page that links it (all 12 live pages share one number and must be bumped together).
 - **Edit `booking.js`** → bump its `?v=` in `building-inspections/index.html` (the only page that loads it).
@@ -114,16 +115,44 @@ Quick consistency check:
 grep -rn "styles.css?v=" --include="*.html" .
 ```
 
-## Contact form
+## Contact and enquiry forms
 
-Enquiry forms post to [FormSubmit](https://formsubmit.co) (free form-to-email relay, no backend or signup). `enquiry.js` handles every `form[data-enquiry]`:
+There are two enquiry forms: the main one on `/contact/` and a house-and-land one on `/house-and-land/`. Both are handled by `enquiry.js` (every `form[data-enquiry]`) and **post to the same Apps Script web app as the booking calendar**, as action `contact`. They used to go to a third-party form service whose address (including the business email) sat in the page source, so spammers could post straight to it and skip every check on the page. That service is gone from the site and from the CSP.
+
+`enquiry.js`:
 
 - joins ticked project-type checkboxes into one hidden field, and reveals a detail box for checkboxes with a matching `data-detail` id
 - strips non-digits from phone fields as the visitor types
-- shows a thank-you or error message based on the response
-- the first enquiry to a new destination address triggers a one-time FormSubmit confirmation email that someone must click
+- tells the server which form it is with `data-enquiry-type="house_and_land"` (no attribute = `contact`)
+- shows a thank-you, or a specific message when the server refuses (links, spam, too short, rate limit), in English and Chinese
 
-Spam protection is thin: a hidden `_honey` honeypot, `_captcha=false`, and FormSubmit's own filtering. A **client-side** daily limit (15/day, `localStorage` key `nexconEnquiries`) only guards against accidental repeat clicks — it is not a real control and is bypassed by clearing storage or posting directly.
+> `enquiry.js` has its **own copy of `WEBAPP_URL`**, separate from `booking.js`. If the web app address ever changes, change it in **both** files, or one of the two features will silently break.
+
+### Spam protection
+
+The filters that matter live on the server, in `handleContact_` (`booking-apps-script.gs`), because anything in the browser can be skipped by calling the web app directly. The checks in `enquiry.js` only give real visitors a friendly message first.
+
+- the hidden `website` box (parked off-screen, not `display:none`) must be empty; if it isn't, the request is silently dropped
+- no web links (`http`, `www`, or a bare `something.com`), and a list of spam phrases (`SPAM_PATTERNS`: casino, promo code, giveaway, bitcoin, "click here", and so on). An ordinary dollar budget deliberately does not trip it
+- message 5 to 2000 characters, valid email, 1 to 15 digit phone, field lengths capped, only fields listed in `ENQUIRY_FORMS` are accepted
+- rate limits: 3 per email address per hour, 20 per hour overall, 40 per day overall (`CONTACT_PER_*` constants)
+- enquiries go to `CONTACT_EMAIL` with the visitor's address as reply-to, so Reply answers the customer
+
+**Adding a field to a form:** add the input to the page, then add `[name, label, maxLength]` to that form's `fields` in `ENQUIRY_FORMS`, then redeploy the script. Unlisted fields are discarded. **Adding a new form:** add an entry to `ENQUIRY_FORMS` and set `data-enquiry-type` on the form.
+
+### Robot check (Cloudflare Turnstile)
+
+Every booking and every enquiry also needs a Cloudflare Turnstile token (free, usually invisible to real visitors). `captcha.js` draws it and hands the token to `booking.js` / `enquiry.js`; the Apps Script sends the token to Cloudflare and refuses the request unless Cloudflare confirms it (`verifyCaptcha_`). Tokens work once, so the forms reset the check after every attempt.
+
+- **Site key** (public): `SITE_KEY` at the top of `captcha.js`.
+- **Secret key** (private): stored in the Apps Script under *Project Settings → Script properties* as `TURNSTILE_SECRET`. It is never in this repo and must never be pasted into one.
+- **Fails closed:** if `TURNSTILE_SECRET` is missing, or Cloudflare can't be reached, every booking and enquiry is refused. A missing key can't silently switch the check off. After setting or changing the secret, run `checkSetup` once from the editor: Cloudflare should answer `success: false` with `invalid-input-response`, because the token it was sent is deliberately fake. `invalid-input-secret` means the stored secret is wrong.
+- **Security policy:** `partial/csp.html` allows `https://challenges.cloudflare.com` for scripts and frames. The Cloudflare script can't be pinned with an integrity hash; Cloudflare changes it to stay ahead of robots.
+- **Permissions:** the Apps Script needs the "connect to an external service" permission for this. Google asks once when you deploy.
+- **Testing locally:** Cloudflare publishes dummy keys: site key `1x00000000000000000000AA` (always passes) with secret `1x0000000000000000000000000000000AA`. Never leave them in place on the live site.
+- To switch to a different Cloudflare widget, change `SITE_KEY` and the `TURNSTILE_SECRET` property together.
+
+A client-side daily limit (15/day, `localStorage` key `nexconEnquiries`) only guards against accidental repeat clicks and is not a real control.
 
 ## Case studies from a Google Sheet
 
@@ -156,7 +185,7 @@ booking.js (this repo)  ──fetch──▶  Google Apps Script Web App  ──
 ```
 
 - **`booking.js`** renders the calendar and booking form and talks to the Web App. The Web App URL is hardcoded as `WEBAPP_URL`; it is public by design.
-- **Apps Script** exposes `doGet` (list booked slots) and `doPost` (make a booking), and sends the confirmation emails. It lives only in the Sheet's *Extensions → Apps Script* editor, **not in git**. A copy is saved as `booking-apps-script.gs` (see the [appendix](#appendix-apps-script-source)); the live editor is always the source of truth.
+- **Apps Script** exposes `doGet` (list booked slots) and `doPost` (make a booking, or send an enquiry-form message), and sends the emails. It lives only in the Sheet's *Extensions → Apps Script* editor, **not in git**. A copy is saved as `booking-apps-script.gs` (see the [appendix](#appendix-apps-script-source)); the live editor is always the source of truth.
 - **Sheet:** tab named exactly `Bookings`, header row `date | slot | name | email | phone | address | status | created`.
 
 ### Rules
@@ -195,7 +224,7 @@ Sheets silently converts a `YYYY-MM-DD` string into a Date when a row is written
 1. Create a Google Sheet with a `Bookings` tab and the header row above.
 2. Paste the [appendix script](#appendix-apps-script-source) into *Extensions → Apps Script*.
 3. *Deploy → New deployment → Web app*: Execute as **Me**, Who has access **Anyone**.
-4. Put the resulting `/exec` URL in `booking.js` as `WEBAPP_URL`.
+4. Put the resulting `/exec` URL in **both** `booking.js` and `enquiry.js` as `WEBAPP_URL`.
 
 ### Changing the Apps Script later
 
@@ -223,8 +252,8 @@ A code audit found no injection vulnerabilities.
 
 **Accepted limitations**
 
-- The contact form and booking per-browser limits are client-side only.
-- Neither FormSubmit nor the Apps Script has CAPTCHA or server-side rate limiting; a determined script could create fake enquiries or bookings. The booking rules above are the only backstop on that side.
+- The per-browser booking limit and the enquiry form's daily limit are client-side only.
+- The robot check, link and spam-wording filters, length caps and rate limits (see [Spam protection](#spam-protection)) stop almost all automated abuse, but a determined human can still type a plausible message and tick the box. Bookings are protected by the booking rules plus a cap of 3 upcoming bookings per email address.
 
 **Operational checks (not code)**
 
