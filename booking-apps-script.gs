@@ -1,3 +1,7 @@
+/** @OnlyCurrentDoc */
+// ^ Limits the permission this script asks for to the one Sheet it belongs to, rather
+//   than every spreadsheet in the Google account. Keep this line.
+
 /* Nexcon inspection booking backend.
    The Sheet needs one tab named exactly "Bookings" with this header row (row 1),
    in this exact order:
@@ -22,6 +26,13 @@ const MAX_DAYS_AHEAD = 30;
 const MIN_BUSINESS_DAYS = 3; // notice needed, counting Mon-Fri only
 const TIME_ZONE = 'Australia/Melbourne'; // "today" for every rule below, whatever the script's own setting is
 
+// Limits on what a visitor may send. These mirror booking.js, but the browser's copy of the
+// rules can be skipped by anyone who calls this script directly, so they are enforced here too.
+const MAX_LEN = { name: 100, email: 254, phone: 15, address: 200 };
+const EMAIL_RE = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/; // exactly one plain address
+const MAX_ACTIVE_PER_EMAIL = 3; // future bookings one email address may hold at once
+const MAX_BODY_CHARS = 4000;    // anything bigger than a normal booking request is refused
+
 // Today's date in Melbourne as YYYY-MM-DD. The website asks for this (see doGet) so it
 // never has to trust the visitor's own device clock.
 function todayString_() {
@@ -38,6 +49,20 @@ function earliestBookable_() {
     if (d.getDay() !== 0 && d.getDay() !== 6) added++;
   }
   return d;
+}
+
+// Free text from a visitor (name, address): one line, no leading = + - @ (those can turn a
+// Sheets cell into a formula), and no longer than allowed.
+function cleanText_(value, max) {
+  return String(value).trim().replace(/^[=+\-@\s]+/, '').replace(/[\r\n\t]+/g, ' ').slice(0, max);
+}
+
+// True only for a real calendar date written as YYYY-MM-DD ("2026-02-31" is not one).
+function isRealDate_(s) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const [y, m, d] = s.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d;
 }
 
 function getSheet_() {
@@ -95,7 +120,10 @@ function doPost(e) {
     return json_({ ok: false, error: 'busy' });
   }
   try {
-    const data = JSON.parse(e.postData.contents);
+    const raw = e && e.postData && e.postData.contents;
+    if (typeof raw !== 'string' || raw.length > MAX_BODY_CHARS) return json_({ ok: false, error: 'bad_request' });
+    const data = JSON.parse(raw);
+    if (!data || typeof data !== 'object') return json_({ ok: false, error: 'bad_request' });
     if (data.action === 'book') return handleBook_(data);
     return json_({ ok: false, error: 'unknown_action' });
   } catch (err) {
@@ -106,11 +134,24 @@ function doPost(e) {
 }
 
 function handleBook_(data) {
-  const { date, slot, name, email, phone, address } = data;
+  // Every field must arrive as a plain string -- not a number, list or object.
+  for (const f of ['date', 'slot', 'name', 'email', 'phone', 'address']) {
+    if (typeof data[f] !== 'string') return json_({ ok: false, error: 'missing_fields' });
+  }
+  const date = data.date.trim();
+  const slot = data.slot; // must be exactly AM or PM, checked below
+  const name = cleanText_(data.name, MAX_LEN.name);
+  const email = data.email.trim();
+  const phone = data.phone.trim();
+  const address = cleanText_(data.address, MAX_LEN.address);
+
   if (!date || !slot || !name || !email || !phone || !address) {
     return json_({ ok: false, error: 'missing_fields' });
   }
-  if (SLOT_LABELS[slot] === undefined) return json_({ ok: false, error: 'bad_slot' });
+  if (slot !== 'AM' && slot !== 'PM') return json_({ ok: false, error: 'bad_slot' });
+  if (!isRealDate_(date)) return json_({ ok: false, error: 'bad_date' });
+  if (email.length > MAX_LEN.email || !EMAIL_RE.test(email)) return json_({ ok: false, error: 'bad_email' });
+  if (!/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
 
   const slotStart = slotStartDate_(date, slot);
   const dow = slotStart.getDay(); // 0 = Sun, 6 = Sat
@@ -124,17 +165,25 @@ function handleBook_(data) {
   const rows = sheet.getDataRange().getValues();
   const col = columnIndex_(rows[0]);
 
+  const today = todayString_();
+  let activeForEmail = 0;
   for (let i = 1; i < rows.length; i++) {
-    if (normalizeDate_(rows[i][col.date]) === date && rows[i][col.slot] === slot && rows[i][col.status] === 'booked') {
-      return json_({ ok: false, error: 'taken' });
-    }
+    if (rows[i][col.status] !== 'booked') continue;
+    const rowDate = normalizeDate_(rows[i][col.date]);
+    if (rowDate === date && rows[i][col.slot] === slot) return json_({ ok: false, error: 'taken' });
+    // Only upcoming bookings count towards the cap, so a returning customer isn't blocked
+    // by inspections that have already happened.
+    if (rowDate >= today && String(rows[i][col.email]).trim().toLowerCase() === email.toLowerCase()) activeForEmail++;
   }
+  if (activeForEmail >= MAX_ACTIVE_PER_EMAIL) return json_({ ok: false, error: 'limit' });
 
-  sheet.appendRow([date, slot, name, email, phone, address, 'booked', new Date()]);
-  // Force the date cell we just wrote to stay plain text, so it reads back exactly as
-  // typed rather than being silently reinterpreted as a Sheets date.
-  const newRow = sheet.getLastRow();
-  sheet.getRange(newRow, col.date + 1).setNumberFormat('@').setValue(date);
+  // Format the new row as plain text BEFORE writing it. Otherwise Sheets reinterprets what it
+  // is given: "2026-10-03" silently becomes a date (which broke the "already taken" check),
+  // and anything starting with "=" would run as a formula.
+  const newRow = sheet.getLastRow() + 1;
+  const range = sheet.getRange(newRow, 1, 1, 8);
+  range.setNumberFormat('@');
+  range.setValues([[date, slot, name, email, phone, address, 'booked', Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd HH:mm:ss')]]);
 
   const slotLabel = SLOT_LABELS[slot];
 
