@@ -72,6 +72,12 @@
         }).join(', ');
     }
 
+    // Length caps so one submission can't carry pages of junk text into the inbox.
+    form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], textarea').forEach(function (field) {
+      if (field.maxLength > 0) return; // markup already set its own limit
+      field.maxLength = field.tagName === 'TEXTAREA' ? 3000 : field.type === 'tel' ? 15 : field.type === 'email' ? 254 : 200;
+    });
+
     form.querySelectorAll('input[type="tel"]').forEach(function (phone) {
       phone.addEventListener('input', function () {
         var digitsOnly = phone.value.replace(/\D/g, '');

@@ -53,6 +53,18 @@
   var MAX_DAYS_AHEAD = 30;
   var MIN_LEAD_BUSINESS_DAYS = 3; // weekends don't count towards the notice period
   var MAX_MY_BOOKINGS = 3; // active (not cancelled) bookings allowed from one browser
+  var MAX_LEN = { name: 100, email: 254, phone: 15, address: 200 };
+  // Exactly one address: no spaces, commas or semicolons (MailApp treats a comma-separated
+  // string as several recipients).
+  var EMAIL_RE = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/;
+
+  // Trims, caps the length, and drops leading = + - @ characters. Google Sheets treats a
+  // cell starting with one of those as a formula, and no real name or address needs them.
+  // Browser-side only, so it protects honest visitors' rows, not against someone calling
+  // the Apps Script directly -- that check belongs in booking-apps-script.gs as well.
+  function cleanText(value, max) {
+    return value.trim().replace(/^[=+\-@\s]+/, "").slice(0, max);
+  }
 
   // A courtesy limit only, tracked in this browser's own storage -- same spirit as the
   // enquiry form's daily cap. It stops one visitor holding lots of slots at once, but
@@ -291,10 +303,10 @@
     wrap.innerHTML =
       '<form class="contact-form booking-form" id="bookingForm" style="margin-top:1.5rem;">' +
       '<p class="detail-label">' + esc(t("book_selected_label", "Selected")) + ": " + esc(dateLabel) + ", " + esc(SLOT_LABELS[selected.slot]) + "</p>" +
-      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_name", "Name")) + '</label><input type="text" name="name" id="bookName" autocomplete="name" required></div>' +
-      '<div class="field"><label>' + esc(t("contact_label_email", "Email")) + '</label><input type="email" name="email" id="bookEmail" autocomplete="email" required></div></div>' +
-      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" required></div>' +
-      '<div class="field"><label>' + esc(t("book_address_label", "Property address")) + '</label><input type="text" name="address" id="bookAddress" required></div></div>' +
+      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_name", "Name")) + '</label><input type="text" name="name" id="bookName" autocomplete="name" maxlength="' + MAX_LEN.name + '" required></div>' +
+      '<div class="field"><label>' + esc(t("contact_label_email", "Email")) + '</label><input type="email" name="email" id="bookEmail" autocomplete="email" maxlength="' + MAX_LEN.email + '" required></div></div>' +
+      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" maxlength="' + MAX_LEN.phone + '" required></div>' +
+      '<div class="field"><label>' + esc(t("book_address_label", "Property address")) + '</label><input type="text" name="address" id="bookAddress" maxlength="' + MAX_LEN.address + '" required></div></div>' +
       '<button type="submit" class="pill pill-primary booking-submit">' + esc(t("book_submit_btn", "Confirm booking")) + "</button>" +
       '<p class="contact-error" id="bookError" style="display:none;"></p>' +
       '<div class="contact-success" id="bookSuccess" style="display:none;"><p class="contact-success-title">' + esc(t("book_success_title", "Booking confirmed")) + '</p><p class="contact-success-body">' + esc(t("book_success_body", "We've emailed you the details.")) + "</p></div>" +
@@ -308,6 +320,21 @@
       var success = document.getElementById("bookSuccess");
       var submitBtn = e.target.querySelector(".booking-submit");
       error.style.display = "none";
+
+      var name = cleanText(document.getElementById("bookName").value, MAX_LEN.name);
+      var email = document.getElementById("bookEmail").value.trim();
+      var phone = document.getElementById("bookPhone").value.replace(/\D/g, "").slice(0, MAX_LEN.phone);
+      var address = cleanText(document.getElementById("bookAddress").value, MAX_LEN.address);
+      if (!name || !phone || !address) {
+        error.textContent = bookErrorMessage("missing_fields");
+        error.style.display = "block";
+        return;
+      }
+      if (!EMAIL_RE.test(email) || email.length > MAX_LEN.email) {
+        error.textContent = t("book_error_email", "Please enter one valid email address.");
+        error.style.display = "block";
+        return;
+      }
       submitBtn.disabled = true;
 
       fetch(WEBAPP_URL, {
@@ -317,10 +344,10 @@
           action: "book",
           date: thisSelection.date,
           slot: thisSelection.slot,
-          name: document.getElementById("bookName").value,
-          email: document.getElementById("bookEmail").value,
-          phone: document.getElementById("bookPhone").value,
-          address: document.getElementById("bookAddress").value
+          name: name,
+          email: email,
+          phone: phone,
+          address: address
         })
       })
         .then(function (res) { return res.json(); })

@@ -105,10 +105,11 @@
     return esc(value).replace(/\r?\n/g, "<br>");
   }
 
-  // Only accept ordinary web image links -- guards against someone pasting a
-  // "javascript:" or other unexpected URL scheme into the sheet.
+  // Only accept https image links -- guards against someone pasting a "javascript:" or
+  // other unexpected URL scheme into the sheet. Plain http:// is refused too, since the
+  // site is served over https and browsers block or flag insecure images on it.
   function isSafeImageUrl(url) {
-    return /^https:\/\//i.test(url) || /^http:\/\//i.test(url);
+    return /^https:\/\//i.test(url);
   }
 
   // Google Drive's "view"/"share" links show a web page (or, for the old uc?export=view
