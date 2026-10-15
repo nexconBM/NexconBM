@@ -408,6 +408,7 @@
       weekend: t("book_error_weekend", "Inspections aren't available on weekends. Please choose a weekday."),
       missing_fields: t("book_error_missing", "Please fill in every field."),
       bad_email: t("book_error_email", "Please enter one valid email address."),
+      email_limit: t("contact_error_today", "We've reached our daily limit for online requests. Please try again tomorrow, or call us on +61 411 330 962."),
       captcha_failed: t("contact_error_captcha", "Please complete the robot check (tick the box if one appears) and try again."),
       limit: t("book_error_limit", "This email address already has 3 upcoming bookings. Please email us if you need to change one."),
       busy: t("book_error_generic", "Something went wrong. Please try again, or call us on +61 411 330 962.")
