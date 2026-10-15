@@ -82,6 +82,7 @@
   }
   var bookedSet = {}; // "YYYY-MM-DD_AM" -> true
   var selected = null; // { date, slot }
+  var bookingCaptcha = null; // the "I'm not a robot" check on the open booking form
   var selectedDate = null; // "YYYY-MM-DD" of the day currently expanded under the calendar
 
   function pad(n) { return n < 10 ? "0" + n : "" + n; }
@@ -307,11 +308,16 @@
       '<div class="field"><label>' + esc(t("contact_label_email", "Email")) + '</label><input type="email" name="email" id="bookEmail" autocomplete="email" maxlength="' + MAX_LEN.email + '" required></div></div>' +
       '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" maxlength="' + MAX_LEN.phone + '" required></div>' +
       '<div class="field"><label>' + esc(t("book_address_label", "Property address")) + '</label><input type="text" name="address" id="bookAddress" maxlength="' + MAX_LEN.address + '" required></div></div>' +
+      '<div class="captcha-box" id="bookCaptcha"></div>' +
       '<button type="submit" class="pill pill-primary booking-submit">' + esc(t("book_submit_btn", "Confirm booking")) + "</button>" +
       '<p class="contact-error" id="bookError" style="display:none;"></p>' +
       '<div class="contact-success" id="bookSuccess" style="display:none;"><p class="contact-success-title">' + esc(t("book_success_title", "Booking confirmed")) + '</p><p class="contact-success-body">' + esc(t("book_success_body", "We've emailed you the details.")) + "</p></div>" +
       "</form>";
     wrap.scrollIntoView({ block: "nearest", behavior: "smooth" });
+
+    // Each time the form is rebuilt (another slot picked) the old check is thrown away first.
+    if (bookingCaptcha) bookingCaptcha.remove();
+    bookingCaptcha = window.NexconCaptcha ? window.NexconCaptcha.mount(document.getElementById("bookCaptcha")) : null;
 
     document.getElementById("bookingForm").addEventListener("submit", function (e) {
       e.preventDefault();
@@ -335,6 +341,12 @@
         error.style.display = "block";
         return;
       }
+      var captchaToken = bookingCaptcha ? bookingCaptcha.token() : "";
+      if (!captchaToken) {
+        error.textContent = bookErrorMessage("captcha_failed");
+        error.style.display = "block";
+        return;
+      }
       submitBtn.disabled = true;
 
       fetch(WEBAPP_URL, {
@@ -347,7 +359,8 @@
           name: name,
           email: email,
           phone: phone,
-          address: address
+          address: address,
+          captcha: captchaToken
         })
       })
         .then(function (res) { return res.json(); })
@@ -364,6 +377,7 @@
           }
           error.textContent = bookErrorMessage(result.error);
           error.style.display = "block";
+          if (bookingCaptcha) bookingCaptcha.reset(); // a check only works once
           if (result.error === "taken") {
             setSlotState(thisSelection.date, thisSelection.slot, true);
             selected = null;
@@ -380,6 +394,7 @@
         .catch(function () {
           error.textContent = t("book_error_generic", "Something went wrong. Please try again, or call us on +61 411 330 962.");
           error.style.display = "block";
+          if (bookingCaptcha) bookingCaptcha.reset();
           submitBtn.disabled = false;
         });
     });
@@ -393,6 +408,7 @@
       weekend: t("book_error_weekend", "Inspections aren't available on weekends. Please choose a weekday."),
       missing_fields: t("book_error_missing", "Please fill in every field."),
       bad_email: t("book_error_email", "Please enter one valid email address."),
+      captcha_failed: t("contact_error_captcha", "Please complete the robot check (tick the box if one appears) and try again."),
       limit: t("book_error_limit", "This email address already has 3 upcoming bookings. Please email us if you need to change one."),
       busy: t("book_error_generic", "Something went wrong. Please try again, or call us on +61 411 330 962.")
     };

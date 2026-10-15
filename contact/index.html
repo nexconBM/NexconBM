@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- CSP:START -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://script.google.com https://*.googleusercontent.com https://docs.google.com https://formsubmit.co; form-action 'self' https://formsubmit.co; base-uri 'self'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://challenges.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://script.google.com https://*.googleusercontent.com https://docs.google.com; form-action 'self'; base-uri 'self'; object-src 'none'">
 <!-- CSP:END -->
 <title>Contact Nexcon Building Management | Melbourne</title>
 <link rel="icon" href="../Nexcon-favicon.png">
@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=42">
+<link rel="stylesheet" href="../styles.css?v=43">
 </head>
 <body>
 
@@ -103,25 +103,25 @@
 
       <div>
         <p class="eyebrow" data-i18n="contact_form_eyebrow">Project details</p>
-        <form action="https://formsubmit.co/ajax/building@nexcongroup.com.au" method="POST" class="contact-form" data-enquiry>
+        <form class="contact-form" data-enquiry>
           <div class="field-row">
             <div class="field">
               <label for="contact-name"><span data-i18n="contact_label_name">Name</span></label>
-              <input type="text" id="contact-name" name="name" autocomplete="name" required>
+              <input type="text" id="contact-name" name="name" autocomplete="name" maxlength="100" required>
             </div>
             <div class="field">
               <label for="contact-email"><span data-i18n="contact_label_email">Email</span></label>
-              <input type="email" id="contact-email" name="email" autocomplete="email" required>
+              <input type="email" id="contact-email" name="email" autocomplete="email" maxlength="254" required>
             </div>
           </div>
           <div class="field-row">
             <div class="field">
               <label for="contact-phone"><span data-i18n="contact_label_phone">Phone</span></label>
-              <input type="tel" id="contact-phone" name="phone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" required>
+              <input type="tel" id="contact-phone" name="phone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" maxlength="15" required>
             </div>
             <div class="field">
               <label for="contact-location"><span data-i18n="contact_label_location">Project location</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
-              <input type="text" id="contact-location" name="project_location">
+              <input type="text" id="contact-location" name="project_location" maxlength="150">
             </div>
           </div>
 
@@ -148,23 +148,20 @@
           <div class="field-row">
             <div class="field">
               <label for="contact-budget"><span data-i18n="contact_label_budget">Approximate budget</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
-              <input type="text" id="contact-budget" name="approximate_budget">
+              <input type="text" id="contact-budget" name="approximate_budget" maxlength="60">
             </div>
             <div class="field">
               <label for="contact-timeframe"><span data-i18n="contact_label_timeframe">Preferred timeframe</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
-              <input type="text" id="contact-timeframe" name="preferred_timeframe">
+              <input type="text" id="contact-timeframe" name="preferred_timeframe" maxlength="60">
             </div>
           </div>
           <div class="field">
             <label for="contact-message"><span data-i18n="contact_label_message">Tell us about your project</span></label>
-            <textarea id="contact-message" name="message" rows="5" required></textarea>
+            <textarea id="contact-message" name="message" rows="5" maxlength="2000" required></textarea>
           </div>
 
           <input type="hidden" name="project_type" id="projectType" value="">
-          <input type="hidden" name="_subject" value="New enquiry from Nexcon website">
-          <input type="hidden" name="_template" value="table">
-          <input type="hidden" name="_captcha" value="false">
-          <input type="text" name="_honey" style="display:none" tabindex="-1" autocomplete="off">
+          <input type="text" name="website" aria-hidden="true" tabindex="-1" autocomplete="off" style="position:absolute; left:-9999px; width:1px; height:1px; opacity:0;">
           <button type="submit" class="pill pill-primary contact-submit" data-i18n="contact_btn_send">Send enquiry</button>
           <p data-nosnippet class="contact-error" style="display:none;" data-i18n="contact_error">Something went wrong. Please try again, or contact us directly on +61 411 330 962 or building@nexcongroup.com.au.</p>
           <p data-nosnippet class="contact-warning" style="display:none;" data-i18n="contact_limit">You've used up your message limit on this device. Please contact us directly using the details below.</p>
@@ -193,7 +190,8 @@
 
 </main>
 
-<script src="../enquiry.js?v=8"></script>
+<script src="../captcha.js?v=1"></script>
+<script src="../enquiry.js?v=10"></script>
 
 <!-- FOOTER:START -->
 <footer id="footer-contact">

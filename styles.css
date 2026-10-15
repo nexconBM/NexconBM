@@ -203,6 +203,7 @@ svg{display:block;}
 .booking-slot.is-selected{background:var(--bordeaux); color:#fff;}
 .booking-slot.is-taken{border-color:var(--line-on-sand); background:var(--sandstone); color:var(--rosewood); cursor:not-allowed; display:flex; align-items:center; gap:0.5em;}
 .booking-slot-tag{font-family:var(--ex); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; font-size:0.62rem;}
+.captcha-box{margin:1.1rem 0 0.9rem;}
 .booking-cancel-note{margin-bottom:1.2rem; font-size:0.9rem; color:var(--rosewood);}
 
 .case-lightbox{position:fixed; inset:0; z-index:1000; background:rgba(20,10,12,0.92); display:flex; align-items:center; justify-content:center; flex-direction:column; padding:2rem;}
