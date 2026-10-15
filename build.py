@@ -19,12 +19,13 @@ Tokens used inside the partials:
   {{ROOT}}   "" on the home page (index.html), "../" on every other page,
              so links work from any folder depth.
   {{NAV_HOME_ACTIVE}}, {{NAV_CUSTOM_HOMES_ACTIVE}}, {{NAV_KNOCKDOWN_ACTIVE}},
-  {{NAV_HOUSE_LAND_ACTIVE}}, {{NAV_RENOVATIONS_ACTIVE}}, {{NAV_MULTI_UNIT_ACTIVE}},
-  {{NAV_PROJECT_MGMT_ACTIVE}}, {{NAV_INSPECTIONS_ACTIVE}}, {{NAV_PROJECTS_ACTIVE}}, {{NAV_ABOUT_ACTIVE}},
+  {{NAV_HOUSE_LAND_ACTIVE}}, {{NAV_MULTI_UNIT_ACTIVE}},
+  {{NAV_PROJECT_MGMT_ACTIVE}}, {{NAV_INSPECTIONS_ACTIVE}}, {{NAV_PROP_MGMT_ACTIVE}}, {{NAV_PROP_MAINT_ACTIVE}},
+  {{NAV_PROP_RENO_ACTIVE}}, {{NAV_ABOUT_ACTIVE}},
   {{NAV_FAQ_ACTIVE}}, {{NAV_CONTACT_ACTIVE}}
              become ' class="is-active"' on the nav link of the page being
              built (chosen per page in PAGES below) and "" everywhere else.
-  {{NAV_GROUP_BUILD_ACTIVE}}, {{NAV_GROUP_MGMT_ACTIVE}}
+  {{NAV_GROUP_BUILD_ACTIVE}}, {{NAV_GROUP_MGMT_ACTIVE}}, {{NAV_GROUP_CONNECT_ACTIVE}}
              become " is-active" on a dropdown's button when the current page
              is one of that dropdown's pages (see NAV_GROUPS below).
 
@@ -57,14 +58,16 @@ ROOT = Path(__file__).parent
 PARTIALS = ROOT / "partial"
 
 NAV_KEYS = [
-    "home", "custom_homes", "knockdown", "house_land", "renovations", "multi_unit",
-    "project_mgmt", "inspections", "projects", "about", "faq", "contact",
+    "home", "custom_homes", "knockdown", "house_land", "multi_unit",
+    "project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno",
+    "about", "faq", "contact",
 ]
 
 # Which pages live under each dropdown in the nav (so its button is highlighted).
 NAV_GROUPS = {
-    "BUILD": {"custom_homes", "knockdown", "house_land", "renovations", "multi_unit"},
-    "MGMT": {"project_mgmt", "inspections"},
+    "BUILD": {"custom_homes", "knockdown", "house_land", "multi_unit"},
+    "MGMT": {"project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno", "projects"},
+    "CONNECT": {"about", "faq", "contact"},
 }
 
 # Each page: (path to its index.html, is this the homepage?, which nav
@@ -81,7 +84,9 @@ PAGES = [
     ("multi-unit-development/index.html", False, "multi_unit"),
     ("projects/index.html", False, "projects"),
     ("project-management/index.html", False, "project_mgmt"),
-    ("renovations-extensions/index.html", False, "renovations"),
+    ("renovations-extensions/index.html", False, "prop_reno"),
+    ("property-management/index.html", False, "prop_mgmt"),
+    ("property-maintenance/index.html", False, "prop_maint"),
 ]
 
 

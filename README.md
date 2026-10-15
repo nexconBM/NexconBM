@@ -42,7 +42,7 @@ robots.txt, sitemap.xml       SEO / crawler config
 404.html                      Custom not-found page
 ```
 
-Live pages (the `PAGES` list in `build.py`): `index`, `about`, `contact`, `custom-homes`, `faq`, `house-and-land`, `building-inspections`, `knockdown-rebuild`, `multi-unit-development`, `projects`, `project-management`, `renovations-extensions`.
+Live pages (the `PAGES` list in `build.py`): `index`, `about`, `contact`, `custom-homes`, `faq`, `house-and-land`, `building-inspections`, `knockdown-rebuild`, `multi-unit-development`, `projects`, `project-management`, `renovations-extensions` (shown as "Renovation & extension"), `property-management`, `property-maintenance`.
 
 ## Local preview
 
@@ -103,7 +103,7 @@ Client-side only — no separate URLs per language.
 
 All styling is in `styles.css`, using CSS custom properties for the palette (`--bordeaux`, `--mahogany`, `--sandstone`, …).
 
-Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=13` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
+Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=14` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
 
 - **Edit `styles.css`** → bump `?v=` on **every** page that links it (all 12 live pages share one number and must be bumped together).
 - **Edit `booking.js`** → bump its `?v=` in `building-inspections/index.html` (the only page that loads it).
