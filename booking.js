@@ -43,7 +43,7 @@
    keeps the full list in sync for next time the calendar is redrawn (e.g. on a language
    switch). */
 (function () {
-  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxxMu4t1qX6kxvqTSVsy56tOpYVj9D-uZylQ7xrmFdbLUxdNwiGm_tBOy7PBiXuu9YZkQ/exec";
+  var WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwVwnFCEoUFW2af6UNKjDgD9rJiawx79QUXpHPcbdRQ59AxBuukAo_o-sbrHgbk5VTa/exec";
 
   var widget = document.getElementById("booking-widget");
   if (!widget) return;
@@ -392,6 +392,8 @@
       too_far: t("book_error_too_far", "That date is more than a month away. Please choose a closer slot."),
       weekend: t("book_error_weekend", "Inspections aren't available on weekends. Please choose a weekday."),
       missing_fields: t("book_error_missing", "Please fill in every field."),
+      bad_email: t("book_error_email", "Please enter one valid email address."),
+      limit: t("book_error_limit", "This email address already has 3 upcoming bookings. Please email us if you need to change one."),
       busy: t("book_error_generic", "Something went wrong. Please try again, or call us on +61 411 330 962.")
     };
     return map[code] || t("book_error_generic", "Something went wrong. Please try again, or call us on +61 411 330 962.");
