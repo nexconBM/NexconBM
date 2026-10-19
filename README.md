@@ -34,6 +34,7 @@ enquiry.js                    Contact + house-and-land enquiry forms (posts to t
 captcha.js                    "I'm not a robot" check (Cloudflare Turnstile) used by every form
 case-studies.js               Loads extra case studies from a published Google Sheet
 booking.js                    Inspection booking calendar widget
+price-calculator.js           Inspection fee calculator on the Building Inspections page (prices live in this file)
 build.py                      Header/footer templating script
 partial/header.html           The single shared header
 partial/footer.html           The single shared footer
@@ -139,6 +140,15 @@ The filters that matter live on the server, in `handleContact_` (`booking-apps-s
 - enquiries go to `CONTACT_EMAIL` with the visitor's address as reply-to, so Reply answers the customer
 
 **Adding a field to a form:** add the input to the page, then add `[name, label, maxLength]` to that form's `fields` in `ENQUIRY_FORMS`, then redeploy the script. Unlisted fields are discarded. **Adding a new form:** add an entry to `ENQUIRY_FORMS` and set `data-enquiry-type` on the form.
+
+### Daily email allowance
+
+The web app sends mail as its Google account, which has a daily allowance (about 100 on a free Gmail account, about 1,500 on Google Workspace; a booking uses 2, an enquiry 1). The script protects against running out:
+
+- When `EMAIL_WARN_AT` (20) or fewer sends remain, **one** warning email a day goes to `NOTIFY_EMAIL` (`warnIfLowOnEmail_`).
+- When fewer than a request needs, plus `EMAIL_RESERVE` (6), remain, new bookings and enquiries are refused up front with `email_limit`, before anything is saved or any robot check is spent (`emailAllowanceOk_`). The site then says "try again tomorrow, or call us" (`contact_error_today`). The reserve keeps room for the warning itself.
+- If a send fails anyway after a booking is saved, the customer is still told it's confirmed (the booking is in the Sheet). If an enquiry's one email fails, the visitor is told, because that email is the only copy.
+- To see today's remaining allowance, add a throwaway function that logs `MailApp.getRemainingDailyQuota()` and run it from the editor.
 
 ### Robot check (Cloudflare Turnstile)
 

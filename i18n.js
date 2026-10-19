@@ -28,7 +28,20 @@
     return safeGet();
   }
 
+  // Noto Sans TC is large (its stylesheet alone is ~170 KB), so it is only fetched once the
+  // visitor actually views the site in Chinese; English visitors never download it.
+  var cjkFontRequested = false;
+  function loadCjkFont() {
+    if (cjkFontRequested) return;
+    cjkFontRequested = true;
+    var link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap";
+    document.head.appendChild(link);
+  }
+
   function applyLang(lang) {
+    if (lang === "zh") loadCjkFont();
     var dict = translations[lang] || translations.en;
 
     document.documentElement.lang = lang === "zh" ? "zh-Hant" : "en";

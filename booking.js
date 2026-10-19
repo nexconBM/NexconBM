@@ -305,9 +305,10 @@
       '<form class="contact-form booking-form" id="bookingForm" style="margin-top:1.5rem;">' +
       '<p class="detail-label">' + esc(t("book_selected_label", "Selected")) + ": " + esc(dateLabel) + ", " + esc(SLOT_LABELS[selected.slot]) + "</p>" +
       '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_name", "Name")) + '</label><input type="text" name="name" id="bookName" autocomplete="name" maxlength="' + MAX_LEN.name + '" required></div>' +
-      '<div class="field"><label>' + esc(t("contact_label_email", "Email")) + '</label><input type="email" name="email" id="bookEmail" autocomplete="email" maxlength="' + MAX_LEN.email + '" required></div></div>' +
-      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" maxlength="' + MAX_LEN.phone + '" required></div>' +
-      '<div class="field"><label>' + esc(t("book_address_label", "Property address")) + '</label><input type="text" name="address" id="bookAddress" maxlength="' + MAX_LEN.address + '" required></div></div>' +
+      '<div class="field"><label>' + esc(t("contact_label_email", "Email")) + '</label><input type="email" name="email" id="bookEmail" autocomplete="email" maxlength="' + MAX_LEN.email + '"></div></div>' +
+      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" maxlength="' + MAX_LEN.phone + '"></div>' +
+      '<div class="field"><label>' + esc(t("book_address_label", "Property address")) + ' <span class="optional">' + esc(t("contact_optional", "optional")) + '</span></label><input type="text" name="address" id="bookAddress" maxlength="' + MAX_LEN.address + '"></div></div>' +
+      '<p class="field-hint">' + esc(t("contact_either_hint", "Please give us an email address or a phone number (you only need one).")) + "</p>" +
       '<div class="captcha-box" id="bookCaptcha"></div>' +
       '<button type="submit" class="pill pill-primary booking-submit">' + esc(t("book_submit_btn", "Confirm booking")) + "</button>" +
       '<p class="contact-error" id="bookError" style="display:none;"></p>' +
@@ -331,12 +332,17 @@
       var email = document.getElementById("bookEmail").value.trim();
       var phone = document.getElementById("bookPhone").value.replace(/\D/g, "").slice(0, MAX_LEN.phone);
       var address = cleanText(document.getElementById("bookAddress").value, MAX_LEN.address);
-      if (!name || !phone || !address) {
+      if (!name) {
         error.textContent = bookErrorMessage("missing_fields");
         error.style.display = "block";
         return;
       }
-      if (!EMAIL_RE.test(email) || email.length > MAX_LEN.email) {
+      if (!email && !phone) {
+        error.textContent = bookErrorMessage("need_contact");
+        error.style.display = "block";
+        return;
+      }
+      if (email && (!EMAIL_RE.test(email) || email.length > MAX_LEN.email)) {
         error.textContent = t("book_error_email", "Please enter one valid email address.");
         error.style.display = "block";
         return;
@@ -367,7 +373,9 @@
         .then(function (result) {
           bookedSet[thisSelection.date + "_" + thisSelection.slot] = result.ok || result.error === "taken";
           if (result.ok) {
-            e.target.querySelectorAll(".field, .detail-label, .booking-submit").forEach(function (el) { el.style.display = "none"; });
+            e.target.querySelectorAll(".field, .field-hint, .detail-label, .booking-submit").forEach(function (el) { el.style.display = "none"; });
+            // No email address means no confirmation email, so say something that is still true.
+            if (!email) success.querySelector(".contact-success-body").textContent = t("book_success_body_phone", "Your booking is confirmed. If your plans change, please call us on +61 411 330 962 or email building@nexcongroup.com.au at least 24 hours beforehand.");
             success.style.display = "block";
             setSlotState(thisSelection.date, thisSelection.slot, true);
             addMyBooking(thisSelection.date, thisSelection.slot);
@@ -406,10 +414,13 @@
       too_soon: t("book_error_too_soon", "That time is less than 3 business days away. Please choose a later slot."),
       too_far: t("book_error_too_far", "That date is more than a month away. Please choose a closer slot."),
       weekend: t("book_error_weekend", "Inspections aren't available on weekends. Please choose a weekday."),
-      missing_fields: t("book_error_missing", "Please fill in every field."),
+      missing_fields: t("book_error_missing", "Please enter your name."),
+      need_contact: t("contact_error_either", "Please give us an email address or a phone number so we can reach you."),
       bad_email: t("book_error_email", "Please enter one valid email address."),
+      bad_phone: t("book_error_phone", "Please enter a phone number using digits only."),
+      email_limit: t("contact_error_today", "We've reached our daily limit for online requests. Please try again tomorrow, or call us on +61 411 330 962."),
       captcha_failed: t("contact_error_captcha", "Please complete the robot check (tick the box if one appears) and try again."),
-      limit: t("book_error_limit", "This email address already has 3 upcoming bookings. Please email us if you need to change one."),
+      limit: t("book_error_limit", "You already have 3 upcoming bookings. Please email us if you need to change one."),
       busy: t("book_error_generic", "Something went wrong. Please try again, or call us on +61 411 330 962.")
     };
     return map[code] || t("book_error_generic", "Something went wrong. Please try again, or call us on +61 411 330 962.");

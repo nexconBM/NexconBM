@@ -43,6 +43,8 @@
     spam: ['contact_error_spam', 'Your message was blocked by our spam filter. Please call us on +61 411 330 962 instead.'],
     rate_limited: ['contact_error_rate', 'We are receiving a lot of messages right now. Please try again later, or call us on +61 411 330 962.'],
     bad_email: ['book_error_email', 'Please enter one valid email address.'],
+    need_contact: ['contact_error_either', 'Please give us an email address or a phone number so we can reach you.'],
+    email_limit: ['contact_error_today', "We've reached our daily limit for online requests. Please try again tomorrow, or call us on +61 411 330 962."],
     captcha_failed: ['contact_error_captcha', 'Please complete the robot check (tick the box if one appears) and try again.']
   };
 
@@ -163,6 +165,8 @@
         if (key !== 'website') typed.push(value);
       });
 
+      // Forms marked data-either-contact need an email OR a phone number, not both.
+      if (form.hasAttribute('data-either-contact') && !(data.email || '').trim() && !(data.phone || '').trim()) { showError('need_contact'); return; }
       if (data.message !== undefined && data.message.trim().length < MIN_MESSAGE) { showError('too_short'); return; }
       if (looksLikeLink(typed.join('\n'))) { showError('has_link'); return; }
 

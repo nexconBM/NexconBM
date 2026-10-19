@@ -28,7 +28,13 @@
    this script checks with Cloudflare before doing anything. The secret key is NOT in this file.
    Store it under Project Settings (gear icon) > Script properties as TURNSTILE_SECRET. Until it
    is stored, every booking and enquiry is refused on purpose, so a missing key can never
-   silently switch the check off. After adding it, run checkSetup once from the editor. */
+   silently switch the check off. After adding it, run checkSetup once from the editor.
+
+   Google lets this account send only so many emails a day (about 100 on a free Gmail account).
+   When 20 or fewer are left, ONE warning email goes to NOTIFY_EMAIL (once a day). When fewer
+   than a request needs are left, new bookings and enquiries are refused up front, before
+   anything is saved, and the visitor is told to try again tomorrow or phone. That way a booking
+   is never saved while its emails can't be sent, and an enquiry is never silently lost. */
 
 const SHEET_NAME = 'Bookings';
 const NOTIFY_EMAIL = 'building@nexcongroup.com.au'; // where booking emails go
@@ -53,6 +59,10 @@ const MAX_MESSAGE_CHARS = 2000;
 const CONTACT_PER_HOUR = 20;            // accepted enquiries per hour, from everyone
 const CONTACT_PER_EMAIL_PER_HOUR = 3;   // accepted enquiries per hour from one email address
 const CONTACT_PER_DAY = 40;             // accepted enquiries per day, leaving mail quota for bookings
+
+// Daily email allowance.
+const EMAIL_WARN_AT = 20;   // email NOTIFY_EMAIL once a day when this many or fewer sends remain
+const EMAIL_RESERVE = 6;    // never spend the last few on customers, so our own warning can always go out
 
 // A genuine enquiry never contains these. Each pattern is specific enough that an ordinary
 // building enquiry won't trip it (a dollar budget, for example, is deliberately NOT here).
@@ -144,6 +154,40 @@ function checkSetup() {
   const secret = PropertiesService.getScriptProperties().getProperty('TURNSTILE_SECRET') || 'missing';
   const res = UrlFetchApp.fetch(TURNSTILE_VERIFY_URL, { method: 'post', payload: { secret: secret, response: 'a-deliberately-fake-token' }, muteHttpExceptions: true });
   Logger.log('Cloudflare answered: ' + res.getContentText());
+}
+
+// Is there enough of today's email allowance left to finish a request that sends `needed` emails,
+// while keeping a small reserve? Asking costs nothing.
+function emailAllowanceOk_(needed) {
+  return MailApp.getRemainingDailyQuota() >= needed + EMAIL_RESERVE;
+}
+
+// Sends ONE warning a day to NOTIFY_EMAIL when the allowance is running low. Never lets a
+// problem with the warning itself break the booking or enquiry that triggered it.
+function warnIfLowOnEmail_() {
+  try {
+    const remaining = MailApp.getRemainingDailyQuota();
+    if (remaining > EMAIL_WARN_AT) return;
+    const props = PropertiesService.getScriptProperties();
+    const key = 'quota_warned_' + todayString_();
+    if (props.getProperty(key)) return;
+    props.setProperty(key, '1');
+    props.getKeys().forEach(function (k) {   // forget earlier days' markers
+      if (k.indexOf('quota_warned_') === 0 && k !== key) props.deleteProperty(k);
+    });
+    MailApp.sendEmail(NOTIFY_EMAIL,
+      'Nexcon website: daily email allowance is running low',
+      'The website can only send a limited number of emails a day, and only about ' + remaining +
+      ' are left today.\n\n' +
+      'When they run out, new online bookings and enquiries are paused automatically. Visitors are ' +
+      'told to try again tomorrow or call +61 411 330 962. Nothing already booked is affected, and ' +
+      'the allowance refills within about a day.\n\n' +
+      'If this keeps happening, tell your web developer: it usually means a lot of genuine traffic ' +
+      'or someone testing the forms repeatedly.\n\n' +
+      'You will get at most one of these warnings per day.');
+  } catch (err) {
+    // a failed warning must never stop a real booking
+  }
 }
 
 // Counts accepted enquiries per hour (everyone), per hour per email address, and per day, and
@@ -254,13 +298,14 @@ function handleBook_(data) {
   const phone = data.phone.trim();
   const address = cleanText_(data.address, MAX_LEN.address);
 
-  if (!date || !slot || !name || !email || !phone || !address) {
-    return json_({ ok: false, error: 'missing_fields' });
-  }
+  // Name is required, and at least one way to reach the customer (email OR phone). The
+  // property address is optional.
+  if (!date || !slot || !name) return json_({ ok: false, error: 'missing_fields' });
+  if (!email && !phone) return json_({ ok: false, error: 'need_contact' });
   if (slot !== 'AM' && slot !== 'PM') return json_({ ok: false, error: 'bad_slot' });
   if (!isRealDate_(date)) return json_({ ok: false, error: 'bad_date' });
-  if (email.length > MAX_LEN.email || !EMAIL_RE.test(email)) return json_({ ok: false, error: 'bad_email' });
-  if (!/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
+  if (email && (email.length > MAX_LEN.email || !EMAIL_RE.test(email))) return json_({ ok: false, error: 'bad_email' });
+  if (phone && !/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
 
   const slotStart = slotStartDate_(date, slot);
   const dow = slotStart.getDay(); // 0 = Sun, 6 = Sat
@@ -269,6 +314,9 @@ function handleBook_(data) {
   const [ty, tm, td] = todayString_().split('-').map(Number);
   const maxDate = new Date(ty, tm - 1, td + MAX_DAYS_AHEAD, 23, 59, 59);
   if (slotStart > maxDate) return json_({ ok: false, error: 'too_far' });
+
+  // Staff always get an email; the customer only gets one if they gave an address.
+  if (!emailAllowanceOk_(email ? 2 : 1)) return json_({ ok: false, error: 'email_limit' });
 
   const captcha = verifyCaptcha_(data.captcha);
   if (captcha !== 'ok') return captchaError_(captcha);
@@ -285,7 +333,10 @@ function handleBook_(data) {
     if (rowDate === date && rows[i][col.slot] === slot) return json_({ ok: false, error: 'taken' });
     // Only upcoming bookings count towards the cap, so a returning customer isn't blocked
     // by inspections that have already happened.
-    if (rowDate >= today && String(rows[i][col.email]).trim().toLowerCase() === email.toLowerCase()) activeForEmail++;
+    // The cap follows whichever contact detail was given: same email, or same phone number.
+    const sameEmail = email && String(rows[i][col.email]).trim().toLowerCase() === email.toLowerCase();
+    const samePhone = phone && String(rows[i][col.phone]).trim() === phone;
+    if (rowDate >= today && (sameEmail || samePhone)) activeForEmail++;
   }
   if (activeForEmail >= MAX_ACTIVE_PER_EMAIL) return json_({ ok: false, error: 'limit' });
 
@@ -299,19 +350,27 @@ function handleBook_(data) {
 
   const slotLabel = SLOT_LABELS[slot];
 
-  MailApp.sendEmail(NOTIFY_EMAIL,
-    'New inspection booking: ' + date + ' (' + slotLabel + ')',
-    'Name: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\nAddress: ' + address +
-    '\nDate: ' + date + '\nTime: ' + slotLabel);
-  MailApp.sendEmail(email,
-    'Your Nexcon inspection booking is confirmed',
-    'Hi ' + name + ',\n\nYour building inspection is booked for:\n' + date + ', ' + slotLabel +
-    '\nAddress: ' + address +
-    '\n\nNeed to cancel or reschedule? Just reply to this email or call us, at least 24 ' +
-    'hours before the appointment.' +
-    '\n\nQuestions? Call +61 411 330 962 or reply to this email.' +
-    '\n\nThanks,\nNexcon Building Management');
+  // The booking is saved by now, so it IS confirmed whatever happens to the emails. If one
+  // fails (the allowance can run out between the check above and here), say "ok" anyway: staff
+  // can still see the booking in the Sheet, and an error would only make the customer rebook.
+  try {
+    MailApp.sendEmail(NOTIFY_EMAIL,
+      'New inspection booking: ' + date + ' (' + slotLabel + ')',
+      'Name: ' + name + '\nEmail: ' + (email || '-') + '\nPhone: ' + (phone || '-') + '\nAddress: ' + (address || '-') +
+      '\nDate: ' + date + '\nTime: ' + slotLabel);
+  } catch (err) { /* see note above */ }
+  if (email) try {
+    MailApp.sendEmail(email,
+      'Your Nexcon inspection booking is confirmed',
+      'Hi ' + name + ',\n\nYour building inspection is booked for:\n' + date + ', ' + slotLabel +
+      (address ? '\nAddress: ' + address : '') +
+      '\n\nNeed to cancel or reschedule? Just reply to this email or call us, at least 24 ' +
+      'hours before the appointment.' +
+      '\n\nQuestions? Call +61 411 330 962 or reply to this email.' +
+      '\n\nThanks,\nNexcon Building Management');
+  } catch (err) { /* see note above */ }
 
+  warnIfLowOnEmail_();
   return json_({ ok: true });
 }
 
@@ -362,9 +421,11 @@ function handleContact_(data) {
   const extras = spec.fields.map(function (field) { return [field[1], cleanText_(data[field[0]] || '', field[2])]; });
   const message = String(data.message || '').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '').replace(/\n{3,}/g, '\n\n').trim();
 
-  if (!name || !email || !phone) return json_({ ok: false, error: 'missing_fields' });
-  if (email.length > MAX_LEN.email || !EMAIL_RE.test(email)) return json_({ ok: false, error: 'bad_email' });
-  if (!/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
+  // Name is required, plus at least one way to reply: an email address OR a phone number.
+  if (!name) return json_({ ok: false, error: 'missing_fields' });
+  if (!email && !phone) return json_({ ok: false, error: 'need_contact' });
+  if (email && (email.length > MAX_LEN.email || !EMAIL_RE.test(email))) return json_({ ok: false, error: 'bad_email' });
+  if (phone && !/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
   if (spec.messageRequired || message) {
     if (message.length < MIN_MESSAGE_CHARS) return json_({ ok: false, error: 'too_short' });
     if (message.length > MAX_MESSAGE_CHARS) return json_({ ok: false, error: 'too_long' });
@@ -374,21 +435,31 @@ function handleContact_(data) {
   if (hasLink_(everything)) return json_({ ok: false, error: 'has_link' });
   if (hasSpamWords_(everything)) return json_({ ok: false, error: 'spam' });
 
+  if (!emailAllowanceOk_(1)) return json_({ ok: false, error: 'email_limit' });
+
   const captcha = verifyCaptcha_(data.captcha);
   if (captcha !== 'ok') return captchaError_(captcha);
 
-  if (!contactAllowed_(email)) return json_({ ok: false, error: 'rate_limited' });
+  if (!contactAllowed_(email || phone)) return json_({ ok: false, error: 'rate_limited' }); // limit per email, or per phone if no email
 
-  MailApp.sendEmail({
-    to: CONTACT_EMAIL,
-    replyTo: email,
-    name: 'Nexcon website',
-    subject: spec.subject + ': ' + name,
-    body: 'Name: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\n' +
-      extras.map(function (x) { return x[0] + ': ' + (x[1] || '-'); }).join('\n') +
-      (message ? '\n\nMessage:\n' + message : '')
-  });
+  // The email is the ONLY copy of an enquiry. If it can't be sent, tell the visitor so they can
+  // try again or phone, rather than letting them think it arrived.
+  try {
+    const mail = {
+      to: CONTACT_EMAIL,
+      name: 'Nexcon website',
+      subject: spec.subject + ': ' + name,
+      body: 'Name: ' + name + '\nEmail: ' + (email || '-') + '\nPhone: ' + (phone || '-') + '\n' +
+        extras.map(function (x) { return x[0] + ': ' + (x[1] || '-'); }).join('\n') +
+        (message ? '\n\nMessage:\n' + message : '')
+    };
+    if (email) mail.replyTo = email; // "Reply" answers the customer directly; with no email, ring them
+    MailApp.sendEmail(mail);
+  } catch (err) {
+    return json_({ ok: false, error: 'email_limit' });
+  }
 
+  warnIfLowOnEmail_();
   return json_({ ok: true });
 }
 
