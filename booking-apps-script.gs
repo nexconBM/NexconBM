@@ -298,13 +298,14 @@ function handleBook_(data) {
   const phone = data.phone.trim();
   const address = cleanText_(data.address, MAX_LEN.address);
 
-  if (!date || !slot || !name || !email || !phone || !address) {
-    return json_({ ok: false, error: 'missing_fields' });
-  }
+  // Name is required, and at least one way to reach the customer (email OR phone). The
+  // property address is optional.
+  if (!date || !slot || !name) return json_({ ok: false, error: 'missing_fields' });
+  if (!email && !phone) return json_({ ok: false, error: 'need_contact' });
   if (slot !== 'AM' && slot !== 'PM') return json_({ ok: false, error: 'bad_slot' });
   if (!isRealDate_(date)) return json_({ ok: false, error: 'bad_date' });
-  if (email.length > MAX_LEN.email || !EMAIL_RE.test(email)) return json_({ ok: false, error: 'bad_email' });
-  if (!/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
+  if (email && (email.length > MAX_LEN.email || !EMAIL_RE.test(email))) return json_({ ok: false, error: 'bad_email' });
+  if (phone && !/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
 
   const slotStart = slotStartDate_(date, slot);
   const dow = slotStart.getDay(); // 0 = Sun, 6 = Sat
@@ -314,7 +315,8 @@ function handleBook_(data) {
   const maxDate = new Date(ty, tm - 1, td + MAX_DAYS_AHEAD, 23, 59, 59);
   if (slotStart > maxDate) return json_({ ok: false, error: 'too_far' });
 
-  if (!emailAllowanceOk_(2)) return json_({ ok: false, error: 'email_limit' });
+  // Staff always get an email; the customer only gets one if they gave an address.
+  if (!emailAllowanceOk_(email ? 2 : 1)) return json_({ ok: false, error: 'email_limit' });
 
   const captcha = verifyCaptcha_(data.captcha);
   if (captcha !== 'ok') return captchaError_(captcha);
@@ -331,7 +333,10 @@ function handleBook_(data) {
     if (rowDate === date && rows[i][col.slot] === slot) return json_({ ok: false, error: 'taken' });
     // Only upcoming bookings count towards the cap, so a returning customer isn't blocked
     // by inspections that have already happened.
-    if (rowDate >= today && String(rows[i][col.email]).trim().toLowerCase() === email.toLowerCase()) activeForEmail++;
+    // The cap follows whichever contact detail was given: same email, or same phone number.
+    const sameEmail = email && String(rows[i][col.email]).trim().toLowerCase() === email.toLowerCase();
+    const samePhone = phone && String(rows[i][col.phone]).trim() === phone;
+    if (rowDate >= today && (sameEmail || samePhone)) activeForEmail++;
   }
   if (activeForEmail >= MAX_ACTIVE_PER_EMAIL) return json_({ ok: false, error: 'limit' });
 
@@ -351,14 +356,14 @@ function handleBook_(data) {
   try {
     MailApp.sendEmail(NOTIFY_EMAIL,
       'New inspection booking: ' + date + ' (' + slotLabel + ')',
-      'Name: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\nAddress: ' + address +
+      'Name: ' + name + '\nEmail: ' + (email || '-') + '\nPhone: ' + (phone || '-') + '\nAddress: ' + (address || '-') +
       '\nDate: ' + date + '\nTime: ' + slotLabel);
   } catch (err) { /* see note above */ }
-  try {
+  if (email) try {
     MailApp.sendEmail(email,
       'Your Nexcon inspection booking is confirmed',
       'Hi ' + name + ',\n\nYour building inspection is booked for:\n' + date + ', ' + slotLabel +
-      '\nAddress: ' + address +
+      (address ? '\nAddress: ' + address : '') +
       '\n\nNeed to cancel or reschedule? Just reply to this email or call us, at least 24 ' +
       'hours before the appointment.' +
       '\n\nQuestions? Call +61 411 330 962 or reply to this email.' +
@@ -416,9 +421,11 @@ function handleContact_(data) {
   const extras = spec.fields.map(function (field) { return [field[1], cleanText_(data[field[0]] || '', field[2])]; });
   const message = String(data.message || '').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '').replace(/\n{3,}/g, '\n\n').trim();
 
-  if (!name || !email || !phone) return json_({ ok: false, error: 'missing_fields' });
-  if (email.length > MAX_LEN.email || !EMAIL_RE.test(email)) return json_({ ok: false, error: 'bad_email' });
-  if (!/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
+  // Name is required, plus at least one way to reply: an email address OR a phone number.
+  if (!name) return json_({ ok: false, error: 'missing_fields' });
+  if (!email && !phone) return json_({ ok: false, error: 'need_contact' });
+  if (email && (email.length > MAX_LEN.email || !EMAIL_RE.test(email))) return json_({ ok: false, error: 'bad_email' });
+  if (phone && !/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
   if (spec.messageRequired || message) {
     if (message.length < MIN_MESSAGE_CHARS) return json_({ ok: false, error: 'too_short' });
     if (message.length > MAX_MESSAGE_CHARS) return json_({ ok: false, error: 'too_long' });
@@ -433,20 +440,21 @@ function handleContact_(data) {
   const captcha = verifyCaptcha_(data.captcha);
   if (captcha !== 'ok') return captchaError_(captcha);
 
-  if (!contactAllowed_(email)) return json_({ ok: false, error: 'rate_limited' });
+  if (!contactAllowed_(email || phone)) return json_({ ok: false, error: 'rate_limited' }); // limit per email, or per phone if no email
 
   // The email is the ONLY copy of an enquiry. If it can't be sent, tell the visitor so they can
   // try again or phone, rather than letting them think it arrived.
   try {
-    MailApp.sendEmail({
+    const mail = {
       to: CONTACT_EMAIL,
-      replyTo: email,
       name: 'Nexcon website',
       subject: spec.subject + ': ' + name,
-      body: 'Name: ' + name + '\nEmail: ' + email + '\nPhone: ' + phone + '\n' +
+      body: 'Name: ' + name + '\nEmail: ' + (email || '-') + '\nPhone: ' + (phone || '-') + '\n' +
         extras.map(function (x) { return x[0] + ': ' + (x[1] || '-'); }).join('\n') +
         (message ? '\n\nMessage:\n' + message : '')
-    });
+    };
+    if (email) mail.replyTo = email; // "Reply" answers the customer directly; with no email, ring them
+    MailApp.sendEmail(mail);
   } catch (err) {
     return json_({ ok: false, error: 'email_limit' });
   }

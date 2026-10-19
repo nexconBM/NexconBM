@@ -34,6 +34,7 @@ enquiry.js                    Contact + house-and-land enquiry forms (posts to t
 captcha.js                    "I'm not a robot" check (Cloudflare Turnstile) used by every form
 case-studies.js               Loads extra case studies from a published Google Sheet
 booking.js                    Inspection booking calendar widget
+price-calculator.js           Inspection fee calculator on the Building Inspections page (prices live in this file)
 build.py                      Header/footer templating script
 partial/header.html           The single shared header
 partial/footer.html           The single shared footer
