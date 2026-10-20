@@ -124,6 +124,10 @@
     });
     el.appendChild(row(t("price_line_gst", "GST (10%)"), money(result.gst)));
     el.appendChild(row(t("price_line_total", "Total incl. GST"), money(result.total), "price-result-total"));
+    var notice = document.createElement("p");
+    notice.className = "price-result-notice";
+    notice.textContent = t("book_report_payment", "The inspection report will be released upon receipt of full payment.");
+    el.appendChild(notice);
   }
 
   window.NexconPricing = {

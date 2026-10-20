@@ -31,7 +31,7 @@
   }
 
   function language() {
-    try { return localStorage.getItem("nexcon-lang") === "zh" ? "zh-tw" : "auto"; } catch (e) { return "auto"; }
+    return document.documentElement.lang.indexOf("zh") === 0 ? "zh-tw" : "auto";
   }
 
   window.NexconCaptcha = {

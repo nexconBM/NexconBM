@@ -23,10 +23,15 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <!-- SEO:END -->
+<!-- HREFLANG:START -->
+<link rel="alternate" hreflang="en" href="https://nexconbm.com.au/building-inspections/">
+<link rel="alternate" hreflang="zh-Hant" href="https://nexconbm.com.au/zh/building-inspections/">
+<link rel="alternate" hreflang="x-default" href="https://nexconbm.com.au/building-inspections/">
+<!-- HREFLANG:END -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=48">
+<link rel="stylesheet" href="../styles.css?v=49">
 </head>
 <body>
 
@@ -73,7 +78,7 @@
       </div>
 
       <a href="../contact/" class="nav-cta" data-i18n="nav_cta">Start your project</a>
-      <button id="langToggle" class="lang-toggle" type="button" aria-label="切換至中文">中文</button>
+      <button id="langToggle" class="lang-toggle" type="button" aria-label="切換至中文" data-alt-href="../zh/building-inspections/">中文</button>
     </nav>
 
     <button
@@ -104,6 +109,8 @@
       <p class="lede" style="max-width:60ch;" data-i18n="book_intro">Building inspections can now be conveniently booked online. Please review the available inspection times and booking requirements before submitting your request.</p>
 
       <p class="body-copy" style="margin-top:1.2rem; max-width:65ch;" data-i18n="book_closing">Please select your preferred inspection date and time when making your online booking.</p>
+
+      <p class="payment-notice" role="note" data-i18n="book_report_payment">The inspection report will be released upon receipt of full payment.</p>
 
       <div id="booking-widget">
         <div class="loading-spinner" role="status"><span class="visually-hidden" data-i18n="book_loading">Loading availability…</span></div>
@@ -318,15 +325,15 @@
 </footer>
 
 <script src="../translations.js"></script>
-<script src="../i18n.js?v=2"></script>
+<script src="../i18n.js?v=3"></script>
 <script src="../site.js?v=1"></script>
 <!-- FOOTER:END -->
 
 <!-- Page-specific script: keep OUTSIDE the FOOTER block above, because build.py rewrites everything inside it. -->
-<script src="../captcha.js?v=1"></script>
-<script src="../pricing.js?v=1"></script>
-<script src="../booking.js?v=20"></script>
-<script src="../price-calculator.js?v=3"></script>
+<script src="../captcha.js?v=2"></script>
+<script src="../pricing.js?v=2"></script>
+<script src="../booking.js?v=22"></script>
+<script src="../price-calculator.js?v=4"></script>
 
 </body>
 </html>

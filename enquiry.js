@@ -12,7 +12,7 @@
      - joins the ticked project-type checkboxes into one hidden field before sending
      - reveals a text box when a checkbox with data-detail="some-id" is ticked
        (its text is added to the joined value, e.g. "Other: solar installation")
-     - strips anything that isn't a digit from any type="tel" field as the visitor types
+     - strips anything but digits, single spaces and a leading + from any type="tel" field as the visitor types
      - allows at most DAILY_LIMIT enquiries per day from one browser
      - shows the thank-you message on success, or an error message if sending fails
 
@@ -44,6 +44,7 @@
     spam: ['contact_error_spam', 'Your message was blocked by our spam filter. Please call us on +61 411 330 962 instead.'],
     rate_limited: ['contact_error_rate', 'We are receiving a lot of messages right now. Please try again later, or call us on +61 411 330 962.'],
     bad_email: ['book_error_email', 'Please enter one valid email address.'],
+    bad_phone: ['book_error_phone', 'Please enter a valid phone number: digits and spaces, with an optional + at the start.'],
     need_contact: ['contact_error_either', 'Please give us an email address or a phone number so we can reach you.'],
     email_limit: ['contact_error_today', "We've reached our daily limit for online requests. Please try again tomorrow, or call us on +61 411 330 962."],
     captcha_failed: ['contact_error_captcha', 'Please complete the robot check (tick the box if one appears) and try again.']
@@ -51,7 +52,7 @@
 
   function t(key, fallback) {
     try {
-      var lang = localStorage.getItem('nexcon-lang') || 'en';
+      var lang = document.documentElement.lang.indexOf('zh') === 0 ? 'zh' : 'en';
       var dict = (typeof translations !== 'undefined' && translations[lang]) || {};
       return dict[key] || fallback;
     } catch (err) { return fallback; }
@@ -130,10 +131,11 @@
       field.maxLength = field.tagName === 'TEXTAREA' ? 2000 : field.type === 'tel' ? 15 : field.type === 'email' ? 254 : 200;
     });
 
+    // Phone boxes take digits and single spaces, with one + allowed at the very start ("+61 411 330 962").
     form.querySelectorAll('input[type="tel"]').forEach(function (phone) {
       phone.addEventListener('input', function () {
-        var digitsOnly = phone.value.replace(/\D/g, '');
-        if (digitsOnly !== phone.value) phone.value = digitsOnly;
+        var cleaned = phone.value.replace(/[^\d +]/g, '').replace(/\+/g, function (m, i) { return i === 0 ? m : ''; }).replace(/ {2,}/g, ' ').replace(/^ +/, '');
+        if (cleaned !== phone.value) phone.value = cleaned;
       });
     });
 
@@ -158,6 +160,11 @@
       }
 
       // Which form this is ("contact", "house_and_land", ...) tells the server what to expect.
+      // A phone number needs at least one digit and no more than 15 (the international maximum).
+      var phoneBox = form.querySelector('input[type="tel"]');
+      var phoneDigits = phoneBox ? phoneBox.value.replace(/\D/g, '').length : 0;
+      if (phoneBox && phoneBox.value.trim() !== '' && (phoneDigits < 1 || phoneDigits > 15)) { showError('bad_phone'); return; }
+
       var data = { action: 'contact', form: form.getAttribute('data-enquiry-type') || 'contact' };
       var typed = [];
       new FormData(form).forEach(function (value, key) {

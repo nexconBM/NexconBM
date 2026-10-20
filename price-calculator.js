@@ -26,7 +26,7 @@
   var showingError = false;
 
   function currentLang() {
-    try { return localStorage.getItem("nexcon-lang") || "en"; } catch (e) { return "en"; }
+    return document.documentElement.lang.indexOf("zh") === 0 ? "zh" : "en"; // set per page: /zh/ pages are lang="zh-Hant"
   }
   function t(key, fallback) {
     var dict = (typeof translations !== "undefined" && translations[currentLang()]) || {};

@@ -356,6 +356,8 @@ footer{background:var(--mahogany); color:var(--sandstone); padding:2.4rem 0 1.6r
 .price-result-title{font-family:var(--ex); font-weight:600; text-transform:uppercase; letter-spacing:0.04em; font-size:0.78rem; color:var(--bordeaux); margin:0 0 0.7rem;}
 .price-result-row{display:flex; justify-content:space-between; gap:1rem; padding:0.4rem 0; border-bottom:1px solid var(--line-on-sand); font-size:0.95rem;}
 .price-result-total{border-bottom:none; font-weight:700; font-size:1.15rem; color:var(--mahogany); padding-top:0.7rem;}
+.payment-notice{font-family:var(--sans); font-weight:700; font-size:clamp(1.15rem,2.6vw,1.45rem); line-height:1.35; color:var(--bordeaux); background:#fff; border:2px solid var(--bordeaux); border-left-width:8px; padding:1.1rem 1.3rem; margin:1.4rem 0; max-width:65ch;}
+.price-result-notice{font-weight:700; font-size:1.1rem; line-height:1.4; color:var(--bordeaux); margin:1rem 0 0; padding-top:0.9rem; border-top:1px solid var(--line-on-sand);}
 .price-notes{margin:1.4rem 0 0; padding-left:1.2em; font-size:0.95rem; max-width:65ch;}
 .price-notes li{margin-bottom:0.4em;}
 
