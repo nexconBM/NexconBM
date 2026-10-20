@@ -185,6 +185,10 @@
               <option value="600m²+" data-i18n="hal_land_4">600m²+</option>
             </select>
           </div>
+          <div class="field">
+            <label for="hal-note"><span data-i18n="hal_label_note">Anything else we should know?</span> <span class="optional" data-i18n="contact_optional">optional</span></label>
+            <textarea id="hal-note" name="message" rows="4" maxlength="2000"></textarea>
+          </div>
           <div class="field-row">
             <div class="field">
               <label for="hal-name"><span data-i18n="contact_label_name">Name</span></label>
@@ -266,7 +270,7 @@
 
 <!-- Page-specific scripts: keep these OUTSIDE the FOOTER block above, because build.py rewrites everything inside it. -->
 <script src="../captcha.js?v=1"></script>
-<script src="../enquiry.js?v=12"></script>
+<script src="../enquiry.js?v=13"></script>
 
 </body>
 </html>

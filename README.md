@@ -143,6 +143,8 @@ The filters that matter live on the server, in `handleContact_` (`booking-apps-s
 
 **The "Blocked" tab.** Enquiries refused for a link, spam wording, the hidden trap box or the rate limit are listed (time, reason, form, name, email, phone, what they wrote) on a tab called `Blocked` in the same Google Sheet (`logBlocked_`). The tab is created automatically the first time something is blocked. Staff can skim it for a real customer caught by mistake. Robot-check failures, too-short messages and bad emails are not listed. It keeps the newest 300 lines (`BLOCKED_KEEP`), logs at most 30 an hour (`BLOCKED_PER_HOUR`), writes every cell as plain text, and a failure while logging is swallowed so it can never change what the visitor sees. It uses no email allowance. Blocked senders' contact details are stored there, so keep the Sheet private.
 
+The house and land form has an optional **note box** (`name="message"`, labelled "Anything else we should know?"). It may be left empty; if something is typed it must be at least 5 characters, and it goes through the same link and spam checks as every message. The Contact form's message box is compulsory (it has `required`); `enquiry.js` reads that attribute to decide.
+
 **Adding a field to a form:** add the input to the page, then add `[name, label, maxLength]` to that form's `fields` in `ENQUIRY_FORMS`, then redeploy the script. Unlisted fields are discarded. **Adding a new form:** add an entry to `ENQUIRY_FORMS` and set `data-enquiry-type` on the form.
 
 ### Daily email allowance
