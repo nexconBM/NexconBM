@@ -13,6 +13,11 @@
      3. Deploy it as a Web App (Execute as: Me, Who has access: Anyone).
      4. Paste the deployment URL below as WEBAPP_URL, replacing the placeholder.
 
+   The booking form also asks about the property (type, bedrooms, bathrooms, pool, Practical
+   Completion) and shows the inspection fee live, using the table in pricing.js. Those answers
+   are sent with the booking; the Apps Script works the fee out again itself and puts it in the
+   emails and on the Contacts tab.
+
    Rules enforced both here (for a responsive UI) and again inside the Apps Script (so
    nothing relies on the visitor's browser playing fair):
      - A slot can only be booked at least 3 business days (Mon-Fri) ahead, e.g. today
@@ -48,6 +53,8 @@
   var widget = document.getElementById("booking-widget");
   if (!widget) return;
   if (WEBAPP_URL.indexOf("PASTE_YOUR") === 0) return; // not set up yet
+  var P = window.NexconPricing; // the inspection fee table and maths (pricing.js, loaded just before this file)
+  if (!P) return;
 
   var SLOT_LABELS = { AM: "10:00 AM – 1:00 PM", PM: "2:00 PM – 5:00 PM" };
   var MAX_DAYS_AHEAD = 30;
@@ -297,6 +304,51 @@
     if (!taken) bindSlotClick(next);
   }
 
+  // The "About the property" part of the booking form: type, bedrooms, bathrooms, pool, PCI, and
+  // the fee worked out live from them. The server works the fee out again itself from the same
+  // answers (see handleBook_ in booking-apps-script.gs), so this is only to show the visitor the price.
+  function propertyFieldsHtml() {
+    var pick = '<option value="">' + esc(t("price_select", "Select…")) + "</option>";
+    var types = pick;
+    P.TYPES.forEach(function (ty) { types += '<option value="' + ty[0] + '">' + esc(t(ty[1], ty[2])) + "</option>"; });
+    function numbers(max) {
+      var html = pick;
+      for (var i = 1; i <= max; i++) html += '<option value="' + i + '">' + i + "</option>";
+      return html;
+    }
+    return '<p class="detail-label" style="margin-top:1.2rem;">' + esc(t("book_property_heading", "About the property")) + "</p>" +
+      '<div class="field"><label for="bookType">' + esc(t("price_label_type", "Property type")) + '</label><select id="bookType" name="property_type">' + types + "</select></div>" +
+      '<div class="field-row" id="bookSizeRow">' +
+      '<div class="field"><label for="bookBeds">' + esc(t("price_label_beds", "Bedrooms")) + '</label><select id="bookBeds" name="bedrooms">' + numbers(6) + "</select></div>" +
+      '<div class="field"><label for="bookBaths">' + esc(t("price_label_baths", "Bathrooms")) + '</label><select id="bookBaths" name="bathrooms">' + numbers(5) + "</select></div></div>" +
+      '<div class="field" id="bookPoolField" hidden><label class="check-option"><input type="checkbox" id="bookPool"><span>' + esc(t("price_pool_label", "Swimming pool inspection")) + "</span></label></div>" +
+      '<div class="field" id="bookPciField"><label class="check-option"><input type="checkbox" id="bookPci"><span>' + esc(t("price_pci_label", "Practical Completion Inspection (PCI) of a new house or apartment (+$50)")) + "</span></label></div>" +
+      '<div class="price-result" id="bookFee" style="margin-bottom:1.2rem;" aria-live="polite" hidden></div>';
+  }
+
+  // Shows/hides the property fields that only apply to some types, and redraws the fee.
+  function syncProperty() {
+    var type = document.getElementById("bookType").value;
+    var pest = P.isPest(type);
+    var pci = document.getElementById("bookPci");
+    var pool = document.getElementById("bookPool");
+    document.getElementById("bookSizeRow").style.display = pest ? "none" : "";
+    document.getElementById("bookPciField").hidden = pest;
+    document.getElementById("bookPoolField").hidden = !P.poolAvailable(type);
+    if (pest) pci.checked = false;
+    if (!P.poolAvailable(type)) pool.checked = false;
+    var beds = parseInt(document.getElementById("bookBeds").value, 10);
+    var baths = parseInt(document.getElementById("bookBaths").value, 10);
+    var fee = document.getElementById("bookFee");
+    if (type && (pest || (beds && baths))) {
+      P.render(fee, P.calculate(type, beds, baths, pci.checked, pool.checked), t);
+      fee.hidden = false;
+    } else {
+      fee.textContent = "";
+      fee.hidden = true;
+    }
+  }
+
   function renderBookingForm() {
     var wrap = document.getElementById("booking-form-wrap");
     var dateLabel = formatDay(slotStart(selected.date, selected.slot));
@@ -304,6 +356,8 @@
     wrap.innerHTML =
       '<form class="contact-form booking-form" id="bookingForm" style="margin-top:1.5rem;">' +
       '<p class="detail-label">' + esc(t("book_selected_label", "Selected")) + ": " + esc(dateLabel) + ", " + esc(SLOT_LABELS[selected.slot]) + "</p>" +
+      propertyFieldsHtml() +
+      '<p class="detail-label">' + esc(t("book_contact_heading", "Your details")) + "</p>" +
       '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_name", "Name")) + '</label><input type="text" name="name" id="bookName" autocomplete="name" maxlength="' + MAX_LEN.name + '" required></div>' +
       '<div class="field"><label>' + esc(t("contact_label_email", "Email")) + '</label><input type="email" name="email" id="bookEmail" autocomplete="email" maxlength="' + MAX_LEN.email + '"></div></div>' +
       '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" maxlength="' + MAX_LEN.phone + '"></div>' +
@@ -320,6 +374,11 @@
     if (bookingCaptcha) bookingCaptcha.remove();
     bookingCaptcha = window.NexconCaptcha ? window.NexconCaptcha.mount(document.getElementById("bookCaptcha")) : null;
 
+    ["bookType", "bookBeds", "bookBaths", "bookPci", "bookPool"].forEach(function (id) {
+      document.getElementById(id).addEventListener("change", syncProperty);
+    });
+    syncProperty();
+
     document.getElementById("bookingForm").addEventListener("submit", function (e) {
       e.preventDefault();
       var thisSelection = selected; // capture now: selected is cleared as soon as this resolves
@@ -327,6 +386,18 @@
       var success = document.getElementById("bookSuccess");
       var submitBtn = e.target.querySelector(".booking-submit");
       error.style.display = "none";
+
+      // The property details decide the fee, so they come first: a type, plus bedrooms and
+      // bathrooms unless it is pest control (a flat fee).
+      var propType = document.getElementById("bookType").value;
+      var propPest = P.isPest(propType);
+      var propBeds = parseInt(document.getElementById("bookBeds").value, 10) || 0;
+      var propBaths = parseInt(document.getElementById("bookBaths").value, 10) || 0;
+      if (!propType || (!propPest && (!propBeds || !propBaths))) {
+        error.textContent = bookErrorMessage("bad_property");
+        error.style.display = "block";
+        return;
+      }
 
       var name = cleanText(document.getElementById("bookName").value, MAX_LEN.name);
       var email = document.getElementById("bookEmail").value.trim();
@@ -366,6 +437,11 @@
           email: email,
           phone: phone,
           address: address,
+          property_type: propType,
+          bedrooms: propPest ? 0 : propBeds,
+          bathrooms: propPest ? 0 : propBaths,
+          pci: !propPest && document.getElementById("bookPci").checked,
+          pool: !propPest && P.poolAvailable(propType) && document.getElementById("bookPool").checked,
           captcha: captchaToken
         })
       })
@@ -389,7 +465,7 @@
           if (result.error === "taken") {
             setSlotState(thisSelection.date, thisSelection.slot, true);
             selected = null;
-            e.target.querySelectorAll(".field, .detail-label, .booking-submit").forEach(function (el) { el.style.display = "none"; });
+            e.target.querySelectorAll(".field, .detail-label, .price-result, .booking-submit").forEach(function (el) { el.style.display = "none"; });
             error.insertAdjacentHTML("afterend", '<p><button type="button" class="text-link" id="bookPickAnother" style="background:none;border:0;cursor:pointer;padding:0;">' + esc(t("book_pick_another", "Choose another slot ↑")) + "</button></p>");
             document.getElementById("bookPickAnother").addEventListener("click", function () {
               document.getElementById("booking-calendar").scrollIntoView({ block: "start", behavior: "smooth" });
@@ -418,6 +494,7 @@
       need_contact: t("contact_error_either", "Please give us an email address or a phone number so we can reach you."),
       bad_email: t("book_error_email", "Please enter one valid email address."),
       bad_phone: t("book_error_phone", "Please enter a phone number using digits only."),
+      bad_property: t("book_error_property", "Please choose the property type, bedrooms and bathrooms so we can work out the fee."),
       email_limit: t("contact_error_today", "We've reached our daily limit for online requests. Please try again tomorrow, or call us on +61 411 330 962."),
       captcha_failed: t("contact_error_captcha", "Please complete the robot check (tick the box if one appears) and try again."),
       limit: t("book_error_limit", "You already have 3 upcoming bookings. Please email us if you need to change one."),

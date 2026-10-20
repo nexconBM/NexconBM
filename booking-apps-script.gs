@@ -42,6 +42,11 @@
    by mistake (then phone them, and tell the developer so the filter can be loosened). It keeps the
    newest 300 lines and logs at most 30 an hour. Robot-check failures are not listed.
 
+   A booking also carries the property answers (type, bedrooms, bathrooms, pool, Practical Completion).
+   This script works the inspection fee out from them itself (INSPECTION_PRICES below, a copy of
+   pricing.js on the website) and puts it in both emails and on the Contacts line. The answers are
+   optional here, so an older cached page can still book; a bad answer is refused as bad_property.
+
    A second automatic tab, "Contacts", gets one line for every accepted enquiry (a backup copy of the
    email) and every inspection booking (with its date, slot and address). It is never trimmed. It is
    only a record: the calendar and the booking limits read the "Bookings" tab alone, so nothing on
@@ -60,6 +65,30 @@ const MAX_LEN = { name: 100, email: 254, phone: 15, address: 200 };
 const EMAIL_RE = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/; // exactly one plain address
 const MAX_ACTIVE_PER_EMAIL = 3; // future bookings one email address may hold at once
 const MAX_BODY_CHARS = 8000;    // anything bigger than a normal booking/enquiry request is refused
+
+// Inspection fees (AUD, before GST). THIS TABLE IS A COPY of the one in pricing.js on the website, and the
+// two must always match: the page shows the visitor a fee, and this script works the same fee out again
+// itself (never trusting the page) for the emails and the Contacts tab. Change both together.
+const INSPECTION_PRICES = {      // [1 bed 1 bath, 2 bed 1 bath, 2 bed 2 bath, 3 bed 2 bath]
+  house_single: [550, 550, 600, 650],
+  house_double: [550, 550, 600, 650],
+  townhouse_1: [550, 550, 600, 600],
+  townhouse_2: [550, 550, 600, 650],
+  townhouse_3: [550, 550, 600, 650],
+  city_apartment: [550, 550, 600, 650],
+  suburban_apartment: [500, 500, 550, 600]
+};
+const INSPECTION_TIERS = [[1, 1], [2, 1], [2, 2], [3, 2]]; // [bedrooms, bathrooms] each price above covers
+const PEST_PRICES = { pest_slab: 300, pest_sub: 350 };     // flat fee
+const POOL_TYPES = { house_single: true, house_double: true }; // swimming pool inspection: houses only, no extra charge
+const EXTRA_ROOM_FEE = 50;       // each bedroom beyond 3 and each bathroom beyond 2
+const PCI_FEE = 50;              // Practical Completion Inspection of a new house or apartment
+const GST_RATE = 0.10;
+const PROPERTY_LABELS = {
+  house_single: 'House (single storey)', house_double: 'House (double storey)', townhouse_1: 'Single storey townhouse',
+  townhouse_2: '2 storey townhouse', townhouse_3: '3 storey townhouse', city_apartment: 'City apartment',
+  suburban_apartment: 'Suburban apartment', pest_slab: 'Pest control (concrete slab floor)', pest_sub: 'Pest control (sub floor)'
+};
 
 const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 
@@ -135,6 +164,47 @@ function hasLink_(text) {
   const t = String(text).replace(/\S+@\S+/g, ' ');
   return /(https?:\/\/|ftp:\/\/|www\.)/i.test(t) ||
     /\b[a-z0-9-]{2,}\.(com|net|org|info|biz|xyz|top|click|link|ru|cn|shop|online|site|live|club|vip|bet|win|app|io|ly|gl)\b/i.test(t);
+}
+
+function money_(n) {
+  return '$' + (Math.round(n * 100) / 100).toFixed(n % 1 === 0 ? 0 : 2);
+}
+
+// Reads the property answers that came with a booking (all optional, so a page that is still the
+// older version can still book) and works the fee out. Returns:
+//   { none: true }            no property answers were sent
+//   { bad: true }             something is not allowed (unknown type, rooms out of range, wrong tick box)
+//   { description, feeText }  e.g. "House (single storey), 3 bedrooms, 2 bathrooms"
+//                             and  "$650 + GST $65 = $715 total"
+function propertyFromRequest_(data) {
+  if (data.property_type === undefined) return { none: true };
+  const type = data.property_type;
+  const has = function (obj, key) { return Object.prototype.hasOwnProperty.call(obj, key); };
+  if (typeof type !== 'string' || !(has(INSPECTION_PRICES, type) || has(PEST_PRICES, type))) return { bad: true };
+  for (const f of ['pci', 'pool']) {
+    if (data[f] !== undefined && typeof data[f] !== 'boolean') return { bad: true };
+  }
+  let subtotal, description;
+  if (has(PEST_PRICES, type)) {
+    if (data.pci === true || data.pool === true) return { bad: true }; // pest control has neither
+    subtotal = PEST_PRICES[type];
+    description = PROPERTY_LABELS[type];
+  } else {
+    const beds = data.bedrooms, baths = data.bathrooms;
+    if (!Number.isInteger(beds) || beds < 1 || beds > 6 || !Number.isInteger(baths) || baths < 1 || baths > 5) return { bad: true };
+    if (data.pool === true && !has(POOL_TYPES, type)) return { bad: true };
+    const cb = Math.min(beds, 3), cr = Math.min(baths, 2);
+    const list = INSPECTION_PRICES[type];
+    let base = list[list.length - 1];
+    for (let i = 0; i < INSPECTION_TIERS.length; i++) {
+      if (cb <= INSPECTION_TIERS[i][0] && cr <= INSPECTION_TIERS[i][1]) { base = list[i]; break; }
+    }
+    subtotal = base + Math.max(0, beds - 3) * EXTRA_ROOM_FEE + Math.max(0, baths - 2) * EXTRA_ROOM_FEE + (data.pci === true ? PCI_FEE : 0);
+    description = PROPERTY_LABELS[type] + ', ' + beds + (beds === 1 ? ' bedroom, ' : ' bedrooms, ') + baths + (baths === 1 ? ' bathroom' : ' bathrooms') +
+      (data.pci === true ? ', Practical Completion Inspection' : '') + (data.pool === true ? ', swimming pool inspection' : '');
+  }
+  const gst = subtotal * GST_RATE;
+  return { description: description, feeText: money_(subtotal) + ' + GST ' + money_(gst) + ' = ' + money_(subtotal + gst) + ' total' };
 }
 
 function hasSpamWords_(text) {
@@ -377,6 +447,8 @@ function handleBook_(data) {
   if (!isRealDate_(date)) return json_({ ok: false, error: 'bad_date' });
   if (email && (email.length > MAX_LEN.email || !EMAIL_RE.test(email))) return json_({ ok: false, error: 'bad_email' });
   if (phone && !/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
+  const property = propertyFromRequest_(data); // the fee comes from the answers, worked out here, never from the page
+  if (property.bad) return json_({ ok: false, error: 'bad_property' });
 
   const slotStart = slotStartDate_(date, slot);
   const dow = slotStart.getDay(); // 0 = Sun, 6 = Sat
@@ -418,7 +490,8 @@ function handleBook_(data) {
   const range = sheet.getRange(newRow, 1, 1, 8);
   range.setNumberFormat('@');
   range.setValues([[date, slot, name, email, phone, address, 'booked', Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd HH:mm:ss')]]);
-  logContact_('booking', name, email, phone, date, slot, address, '', '', ''); // a record only; the calendar never reads the Contacts tab
+  const propertyDetails = property.none ? '' : 'Property: ' + property.description + '; Fee: ' + property.feeText;
+  logContact_('booking', name, email, phone, date, slot, address, propertyDetails, '', ''); // a record only; the calendar never reads the Contacts tab
 
   const slotLabel = SLOT_LABELS[slot];
 
@@ -429,13 +502,15 @@ function handleBook_(data) {
     MailApp.sendEmail(NOTIFY_EMAIL,
       'New inspection booking: ' + date + ' (' + slotLabel + ')',
       'Name: ' + name + '\nEmail: ' + (email || '-') + '\nPhone: ' + (phone || '-') + '\nAddress: ' + (address || '-') +
-      '\nDate: ' + date + '\nTime: ' + slotLabel);
+      '\nDate: ' + date + '\nTime: ' + slotLabel +
+      (property.none ? '' : '\nProperty: ' + property.description + '\nFee: ' + property.feeText));
   } catch (err) { /* see note above */ }
   if (email) try {
     MailApp.sendEmail(email,
       'Your Nexcon inspection booking is confirmed',
       'Hi ' + name + ',\n\nYour building inspection is booked for:\n' + date + ', ' + slotLabel +
       (address ? '\nAddress: ' + address : '') +
+      (property.none ? '' : '\nProperty: ' + property.description + '\nInspection fee: ' + property.feeText) +
       '\n\nNeed to cancel or reschedule? Just reply to this email or call us, at least 24 ' +
       'hours before the appointment.' +
       '\n\nQuestions? Call +61 411 330 962 or reply to this email.' +

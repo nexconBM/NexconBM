@@ -34,7 +34,8 @@ enquiry.js                    Contact + house-and-land enquiry forms (posts to t
 captcha.js                    "I'm not a robot" check (Cloudflare Turnstile) used by every form
 case-studies.js               Loads extra case studies from a published Google Sheet
 booking.js                    Inspection booking calendar widget
-price-calculator.js           Inspection fee calculator on the Building Inspections page (prices live in this file)
+pricing.js                    Inspection fee table and calculation, shared by the calculator and the booking form (the prices live here)
+price-calculator.js           Inspection fee calculator on the Building Inspections page (uses pricing.js)
 build.py                      Header/footer templating script
 partial/header.html           The single shared header
 partial/footer.html           The single shared footer
@@ -105,7 +106,7 @@ Client-side only — no separate URLs per language.
 
 All styling is in `styles.css`, using CSS custom properties for the palette (`--bordeaux`, `--mahogany`, `--sandstone`, …).
 
-Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=16` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
+Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=20` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
 
 - **Edit `styles.css`** → bump `?v=` on **every** page that links it (all 12 live pages share one number and must be bumped together).
 - **Edit `booking.js`** → bump its `?v=` in `building-inspections/index.html` (the only page that loads it).
@@ -216,6 +217,14 @@ Enforced client-side for a responsive UI **and** server-side in the Apps Script,
 Slots are `AM` (10:00 AM – 1:00 PM) and `PM` (2:00 PM – 5:00 PM).
 
 "Today" comes from the server, not the visitor's device: `doGet` returns `today` (Melbourne date) and `booking.js` uses it for the calendar, falling back to the device clock only if the script hasn't been updated. Cancellations by email still need 24 hours' notice.
+
+### Property details and the fee
+
+The booking form asks about the property (type, bedrooms, bathrooms, and tick boxes for a swimming pool and a Practical Completion Inspection) and shows the inspection fee live, using `pricing.js`. Pest control is a flat fee and hides the room fields. The answers are sent with the booking as `property_type`, `bedrooms`, `bathrooms`, `pci` and `pool`.
+
+The script never trusts the page's price: `propertyFromRequest_` in `booking-apps-script.gs` checks the answers (known type, 1-6 bedrooms, 1-5 bathrooms, real booleans, pool only for houses, no PCI for pest control; anything else is refused as `bad_property`) and works the fee out again. The result goes into the staff email, the customer's confirmation email (as "Inspection fee: $650 + GST $65 = $715 total") and the `details` column of the booking's line on the `Contacts` tab. The `Bookings` tab keeps its 8 columns.
+
+The answers are optional on the server, so a visitor still holding an older cached copy of the page can book (no fee lines are added). **The price table exists twice**: `pricing.js` (website) and `INSPECTION_PRICES` and friends at the top of `booking-apps-script.gs` (script). If the fee sheet changes, edit both, deploy a new script version, and bump the `?v=` on `pricing.js`. A test that compares the two tables on every combination of type, bedrooms, bathrooms, PCI and pool belongs in any change to either (the harness used during development did this; 542 combinations).
 
 ### Calendar behaviour
 
