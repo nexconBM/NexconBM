@@ -42,6 +42,12 @@
    by mistake (then phone them, and tell the developer so the filter can be loosened). It keeps the
    newest 300 lines and logs at most 30 an hour. Robot-check failures are not listed.
 
+   Phone numbers may contain single spaces and one + at the very start (cleanPhone_), with 1 to 15
+   digits. The 3-bookings limit treats "0400 000 000" and "0400000000" as the same number.
+
+   The customer's confirmation email carries the notice that the inspection report is released
+   upon receipt of full payment (the website shows it prominently too).
+
    A booking also carries the property answers (type, bedrooms, bathrooms, pool, Practical Completion).
    This script works the inspection fee out from them itself (INSPECTION_PRICES below, a copy of
    pricing.js on the website) and puts it in both emails and on the Contacts line. The answers are
@@ -61,7 +67,7 @@ const TIME_ZONE = 'Australia/Melbourne'; // "today" for every rule below, whatev
 
 // Limits on what a visitor may send. These mirror booking.js, but the browser's copy of the
 // rules can be skipped by anyone who calls this script directly, so they are enforced here too.
-const MAX_LEN = { name: 100, email: 254, phone: 15, address: 200 };
+const MAX_LEN = { name: 100, email: 254, phone: 25, address: 200 }; // phone: up to 15 digits plus spaces and a leading +
 const EMAIL_RE = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/; // exactly one plain address
 const MAX_ACTIVE_PER_EMAIL = 3; // future bookings one email address may hold at once
 const MAX_BODY_CHARS = 8000;    // anything bigger than a normal booking/enquiry request is refused
@@ -211,6 +217,27 @@ function hasSpamWords_(text) {
   return SPAM_PATTERNS.some(function (re) { return re.test(text); });
 }
 
+// Phone numbers may have single spaces and one + at the very start ("+61 411 330 962", "0411 330 962"),
+// and 1 to 15 digits (the international maximum). Returns '' when none was given, null when it is
+// not allowed, otherwise the number with repeated spaces tidied. Nothing else gets through, so a
+// leading + can never be part of a spreadsheet formula.
+function cleanPhone_(raw) {
+  const p = String(raw).trim().replace(/ {2,}/g, ' ');
+  if (p === '') return '';
+  if (!/^\+?\d[\d ]*$/.test(p)) return null;
+  return p.replace(/\D/g, '').length <= 15 && p.length <= MAX_LEN.phone ? p : null;
+}
+
+// A phone number with the spaces taken out, so "0400 000 000" and "0400000000" count as the same number.
+function phoneKey_(p) {
+  return String(p).replace(/ /g, '');
+}
+
+// For the log tabs: keeps only digits, spaces and a leading +, since what was typed may not have been validated.
+function logPhone_(p) {
+  return String(p || '').replace(/[^\d +]/g, '').slice(0, MAX_LEN.phone);
+}
+
 function md5hex_(s) {
   return Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, s)
     .map(function (b) { return (b < 0 ? b + 256 : b).toString(16).padStart(2, '0'); }).join('');
@@ -323,7 +350,7 @@ function logBlocked_(reason, formName, name, email, phone, text) {
     if (logged >= BLOCKED_PER_HOUR) return;
     cache.put(hourKey, String(logged + 1), 3600);
     appendLogRow_(BLOCKED_SHEET_NAME, BLOCKED_HEADER, [Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd HH:mm:ss'), reason, formName,
-      cleanText_(name, MAX_LEN.name), cleanText_(email, MAX_LEN.email), cleanText_(phone, MAX_LEN.phone), cleanText_(text, 600)], BLOCKED_KEEP);
+      cleanText_(name, MAX_LEN.name), cleanText_(email, MAX_LEN.email), logPhone_(phone), cleanText_(text, 600)], BLOCKED_KEEP);
   } catch (err) { /* see above */ }
 }
 
@@ -335,7 +362,7 @@ function logBlocked_(reason, formName, name, email, phone, text) {
 function logContact_(type, name, email, phone, date, slot, address, details, message, note) {
   try {
     appendLogRow_(CONTACTS_SHEET_NAME, CONTACTS_HEADER, [Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd HH:mm:ss'), type,
-      cleanText_(name, MAX_LEN.name), cleanText_(email, MAX_LEN.email), cleanText_(phone, MAX_LEN.phone), date, slot,
+      cleanText_(name, MAX_LEN.name), cleanText_(email, MAX_LEN.email), logPhone_(phone), date, slot,
       cleanText_(address, MAX_LEN.address), cleanText_(details, 700),
       String(message || '').replace(/^[=+\-@\s]+/, '').slice(0, MAX_MESSAGE_CHARS), note || ''], 0);
   } catch (err) { /* see above */ }
@@ -436,17 +463,17 @@ function handleBook_(data) {
   const slot = data.slot; // must be exactly AM or PM, checked below
   const name = cleanText_(data.name, MAX_LEN.name);
   const email = data.email.trim();
-  const phone = data.phone.trim();
+  const phone = cleanPhone_(data.phone); // '' = none given, null = not an allowed phone number
   const address = cleanText_(data.address, MAX_LEN.address);
 
   // Name is required, and at least one way to reach the customer (email OR phone). The
   // property address is optional.
   if (!date || !slot || !name) return json_({ ok: false, error: 'missing_fields' });
-  if (!email && !phone) return json_({ ok: false, error: 'need_contact' });
+  if (!email && !data.phone.trim()) return json_({ ok: false, error: 'need_contact' });
   if (slot !== 'AM' && slot !== 'PM') return json_({ ok: false, error: 'bad_slot' });
   if (!isRealDate_(date)) return json_({ ok: false, error: 'bad_date' });
   if (email && (email.length > MAX_LEN.email || !EMAIL_RE.test(email))) return json_({ ok: false, error: 'bad_email' });
-  if (phone && !/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
+  if (phone === null) return json_({ ok: false, error: 'bad_phone' });
   const property = propertyFromRequest_(data); // the fee comes from the answers, worked out here, never from the page
   if (property.bad) return json_({ ok: false, error: 'bad_property' });
 
@@ -478,7 +505,7 @@ function handleBook_(data) {
     // by inspections that have already happened.
     // The cap follows whichever contact detail was given: same email, or same phone number.
     const sameEmail = email && String(rows[i][col.email]).trim().toLowerCase() === email.toLowerCase();
-    const samePhone = phone && String(rows[i][col.phone]).trim() === phone;
+    const samePhone = phone && phoneKey_(String(rows[i][col.phone]).trim()) === phoneKey_(phone); // spaces don't make a different number
     if (rowDate >= today && (sameEmail || samePhone)) activeForEmail++;
   }
   if (activeForEmail >= MAX_ACTIVE_PER_EMAIL) return json_({ ok: false, error: 'limit' });
@@ -511,6 +538,7 @@ function handleBook_(data) {
       'Hi ' + name + ',\n\nYour building inspection is booked for:\n' + date + ', ' + slotLabel +
       (address ? '\nAddress: ' + address : '') +
       (property.none ? '' : '\nProperty: ' + property.description + '\nInspection fee: ' + property.feeText) +
+      '\n\nIMPORTANT: The inspection report will be released upon receipt of full payment.' +
       '\n\nNeed to cancel or reschedule? Just reply to this email or call us, at least 24 ' +
       'hours before the appointment.' +
       '\n\nQuestions? Call +61 411 330 962 or reply to this email.' +
@@ -568,15 +596,15 @@ function handleContact_(data) {
 
   const name = cleanText_(data.name, MAX_LEN.name);
   const email = data.email.trim();
-  const phone = data.phone.trim();
+  const phone = cleanPhone_(data.phone); // '' = none given, null = not an allowed phone number
   const extras = spec.fields.map(function (field) { return [field[1], cleanText_(data[field[0]] || '', field[2])]; });
   const message = String(data.message || '').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, '').replace(/\n{3,}/g, '\n\n').trim();
 
   // Name is required, plus at least one way to reply: an email address OR a phone number.
   if (!name) return json_({ ok: false, error: 'missing_fields' });
-  if (!email && !phone) return json_({ ok: false, error: 'need_contact' });
+  if (!email && !data.phone.trim()) return json_({ ok: false, error: 'need_contact' });
   if (email && (email.length > MAX_LEN.email || !EMAIL_RE.test(email))) return json_({ ok: false, error: 'bad_email' });
-  if (phone && !/^\d{1,15}$/.test(phone)) return json_({ ok: false, error: 'bad_phone' });
+  if (phone === null) return json_({ ok: false, error: 'bad_phone' });
   if (spec.messageRequired || message) {
     if (message.length < MIN_MESSAGE_CHARS) return json_({ ok: false, error: 'too_short' });
     if (message.length > MAX_MESSAGE_CHARS) return json_({ ok: false, error: 'too_long' });
@@ -591,7 +619,7 @@ function handleContact_(data) {
   const captcha = verifyCaptcha_(data.captcha);
   if (captcha !== 'ok') return captchaError_(captcha);
 
-  if (!contactAllowed_(email || phone)) { // limit per email, or per phone if no email
+  if (!contactAllowed_(email || phoneKey_(phone))) { // limit per email, or per phone number (spaces ignored) if no email
     logBlocked_('rate limit', formName, name, email, phone, everything);
     return json_({ ok: false, error: 'rate_limited' });
   }

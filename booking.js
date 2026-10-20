@@ -60,10 +60,15 @@
   var MAX_DAYS_AHEAD = 30;
   var MIN_LEAD_BUSINESS_DAYS = 3; // weekends don't count towards the notice period
   var MAX_MY_BOOKINGS = 3; // active (not cancelled) bookings allowed from one browser
-  var MAX_LEN = { name: 100, email: 254, phone: 15, address: 200 };
+  var MAX_LEN = { name: 100, email: 254, phone: 25, address: 200 }; // phone: up to 15 digits plus spaces and a leading +
   // Exactly one address: no spaces, commas or semicolons (MailApp treats a comma-separated
   // string as several recipients).
   var EMAIL_RE = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]+$/;
+
+  // Phone numbers: digits and single spaces, with one + allowed at the very start ("+61 411 330 962").
+  function cleanPhone(value) {
+    return value.trim().replace(/[^\d +]/g, "").replace(/\+/g, function (m, i) { return i === 0 ? m : ""; }).replace(/ {2,}/g, " ").slice(0, MAX_LEN.phone);
+  }
 
   // Trims, caps the length, and drops leading = + - @ characters. Google Sheets treats a
   // cell starting with one of those as a formula, and no real name or address needs them.
@@ -127,7 +132,7 @@
   }
 
   function currentLang() {
-    try { return localStorage.getItem("nexcon-lang") || "en"; } catch (e) { return "en"; }
+    return document.documentElement.lang.indexOf("zh") === 0 ? "zh" : "en"; // set per page: /zh/ pages are lang="zh-Hant"
   }
   function t(key, fallback) {
     var dict = (typeof translations !== "undefined" && translations[currentLang()]) || {};
@@ -360,7 +365,7 @@
       '<p class="detail-label">' + esc(t("book_contact_heading", "Your details")) + "</p>" +
       '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_name", "Name")) + '</label><input type="text" name="name" id="bookName" autocomplete="name" maxlength="' + MAX_LEN.name + '" required></div>' +
       '<div class="field"><label>' + esc(t("contact_label_email", "Email")) + '</label><input type="email" name="email" id="bookEmail" autocomplete="email" maxlength="' + MAX_LEN.email + '"></div></div>' +
-      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="numeric" pattern="[0-9]+" title="Numbers only" maxlength="' + MAX_LEN.phone + '"></div>' +
+      '<div class="field-row"><div class="field"><label>' + esc(t("contact_label_phone", "Phone")) + '</label><input type="tel" name="phone" id="bookPhone" autocomplete="tel" inputmode="tel" pattern="\\+?[0-9 ]+" title="Digits and spaces, with an optional + at the start" maxlength="' + MAX_LEN.phone + '"></div>' +
       '<div class="field"><label>' + esc(t("book_address_label", "Property address")) + ' <span class="optional">' + esc(t("contact_optional", "optional")) + '</span></label><input type="text" name="address" id="bookAddress" maxlength="' + MAX_LEN.address + '"></div></div>' +
       '<p class="field-hint">' + esc(t("contact_either_hint", "Please give us an email address or a phone number (you only need one).")) + "</p>" +
       '<div class="captcha-box" id="bookCaptcha"></div>' +
@@ -378,6 +383,11 @@
       document.getElementById(id).addEventListener("change", syncProperty);
     });
     syncProperty();
+    var phoneBox = document.getElementById("bookPhone");
+    phoneBox.addEventListener("input", function () { // tidy the number as it is typed
+      var cleaned = phoneBox.value.replace(/[^\d +]/g, "").replace(/\+/g, function (m, i) { return i === 0 ? m : ""; }).replace(/ {2,}/g, " ").replace(/^ +/, "");
+      if (cleaned !== phoneBox.value) phoneBox.value = cleaned;
+    });
 
     document.getElementById("bookingForm").addEventListener("submit", function (e) {
       e.preventDefault();
@@ -401,7 +411,7 @@
 
       var name = cleanText(document.getElementById("bookName").value, MAX_LEN.name);
       var email = document.getElementById("bookEmail").value.trim();
-      var phone = document.getElementById("bookPhone").value.replace(/\D/g, "").slice(0, MAX_LEN.phone);
+      var phone = cleanPhone(document.getElementById("bookPhone").value);
       var address = cleanText(document.getElementById("bookAddress").value, MAX_LEN.address);
       if (!name) {
         error.textContent = bookErrorMessage("missing_fields");
@@ -415,6 +425,12 @@
       }
       if (email && (!EMAIL_RE.test(email) || email.length > MAX_LEN.email)) {
         error.textContent = t("book_error_email", "Please enter one valid email address.");
+        error.style.display = "block";
+        return;
+      }
+      var phoneDigits = phone.replace(/\D/g, "").length;
+      if (phone && (phoneDigits < 1 || phoneDigits > 15)) { // at least one digit, and 15 at most (the international maximum)
+        error.textContent = bookErrorMessage("bad_phone");
         error.style.display = "block";
         return;
       }
