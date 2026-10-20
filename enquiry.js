@@ -23,6 +23,7 @@
      input[data-project-type]         the checkboxes
      input[name="project_type"]       hidden field that receives the joined value
      input[name="website"]            the hidden spam-trap box (must stay empty)
+     textarea[name="message"]         the message / note box (add `required` to make it compulsory, as on Contact)
      (the "I'm not a robot" check is added automatically above the Send button; see captcha.js)
      data-enquiry-type="..."          optional: which form this is (default "contact"); the server
                                       keeps a list of the fields each type may carry
@@ -167,7 +168,10 @@
 
       // Forms marked data-either-contact need an email OR a phone number, not both.
       if (form.hasAttribute('data-either-contact') && !(data.email || '').trim() && !(data.phone || '').trim()) { showError('need_contact'); return; }
-      if (data.message !== undefined && data.message.trim().length < MIN_MESSAGE) { showError('too_short'); return; }
+      // A message box that is optional (the house and land note) may be left empty; if anything is typed it still has to be real.
+      var messageBox = form.querySelector('textarea[name="message"]');
+      var messageRequired = !!(messageBox && messageBox.required);
+      if (data.message !== undefined && (messageRequired || data.message.trim() !== '') && data.message.trim().length < MIN_MESSAGE) { showError('too_short'); return; }
       if (looksLikeLink(typed.join('\n'))) { showError('has_link'); return; }
 
       var token = captcha ? captcha.token() : '';
