@@ -139,6 +139,10 @@ The filters that matter live on the server, in `handleContact_` (`booking-apps-s
 - rate limits: 3 per email address per hour, 20 per hour overall, 40 per day overall (`CONTACT_PER_*` constants)
 - enquiries go to `CONTACT_EMAIL` with the visitor's address as reply-to, so Reply answers the customer
 
+**The "Contacts" tab.** Every accepted enquiry (type `contact` or `house_and_land`, with its details and message) and every inspection booking (type `booking`, with its date, slot and address) is also written as one line on a tab called `Contacts` in the same Sheet (`logContact_`). It is created automatically, never trimmed, written as plain text, and is a searchable record of everyone who got in touch; for an enquiry it is a second copy of the email. **It is only a record.** The calendar and the 3-bookings limit read the `Bookings` tab alone, so a line on `Contacts` can never hold a time slot or block anyone. A failure while writing is swallowed so it can never change what the visitor sees. It holds customers' personal details, so keep the Sheet private.
+
+**The "Blocked" tab.** Enquiries refused for a link, spam wording, the hidden trap box or the rate limit are listed (time, reason, form, name, email, phone, what they wrote) on a tab called `Blocked` in the same Google Sheet (`logBlocked_`). The tab is created automatically the first time something is blocked. Staff can skim it for a real customer caught by mistake. Robot-check failures, too-short messages and bad emails are not listed. It keeps the newest 300 lines (`BLOCKED_KEEP`), logs at most 30 an hour (`BLOCKED_PER_HOUR`), writes every cell as plain text, and a failure while logging is swallowed so it can never change what the visitor sees. It uses no email allowance. Blocked senders' contact details are stored there, so keep the Sheet private.
+
 **Adding a field to a form:** add the input to the page, then add `[name, label, maxLength]` to that form's `fields` in `ENQUIRY_FORMS`, then redeploy the script. Unlisted fields are discarded. **Adding a new form:** add an entry to `ENQUIRY_FORMS` and set `data-enquiry-type` on the form.
 
 ### Daily email allowance
@@ -147,7 +151,7 @@ The web app sends mail as its Google account, which has a daily allowance (about
 
 - When `EMAIL_WARN_AT` (20) or fewer sends remain, **one** warning email a day goes to `NOTIFY_EMAIL` (`warnIfLowOnEmail_`).
 - When fewer than a request needs, plus `EMAIL_RESERVE` (6), remain, new bookings and enquiries are refused up front with `email_limit`, before anything is saved or any robot check is spent (`emailAllowanceOk_`). The site then says "try again tomorrow, or call us" (`contact_error_today`). The reserve keeps room for the warning itself.
-- If a send fails anyway after a booking is saved, the customer is still told it's confirmed (the booking is in the Sheet). If an enquiry's one email fails, the visitor is told, because that email is the only copy.
+- If a send fails anyway after a booking is saved, the customer is still told it's confirmed (the booking is in the Sheet). If an enquiry's one email fails, the visitor is told, because the visitor is told, and the enquiry is still kept on the `Contacts` tab with a note saying the email failed, so staff can follow up.
 - To see today's remaining allowance, add a throwaway function that logs `MailApp.getRemainingDailyQuota()` and run it from the editor.
 
 ### Robot check (Cloudflare Turnstile)
@@ -264,6 +268,10 @@ A code audit found no injection vulnerabilities.
 
 - The per-browser booking limit and the enquiry form's daily limit are client-side only.
 - The robot check, link and spam-wording filters, length caps and rate limits (see [Spam protection](#spam-protection)) stop almost all automated abuse, but a determined human can still type a plausible message and tick the box. Bookings are protected by the booking rules plus a cap of 3 upcoming bookings per email address.
+
+**Not fixable from this repository: HTTP security headers**
+
+GitHub Pages cannot set response headers. Security scanners that only look at headers therefore report `X-Content-Type-Options`, `X-Frame-Options` and parts of `Content-Security-Policy` as missing, even though the real CSP is in a `<meta>` tag (which browsers do honour, except for `frame-ancestors`, which only works as a header). The practical risk is low (no logins; clickjacking would only trick someone into pressing a form button that still needs a robot check). To add real headers, put the domain behind Cloudflare (free plan; the nameservers are currently GoDaddy's) and add a *Modify Response Header* rule with `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, and a `Content-Security-Policy` header that repeats `partial/csp.html` plus `frame-ancestors 'none'`. Import and check every existing DNS record (especially any mail records) before switching nameservers.
 
 **Operational checks (not code)**
 

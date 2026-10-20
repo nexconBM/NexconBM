@@ -34,7 +34,18 @@
    When 20 or fewer are left, ONE warning email goes to NOTIFY_EMAIL (once a day). When fewer
    than a request needs are left, new bookings and enquiries are refused up front, before
    anything is saved, and the visitor is told to try again tomorrow or phone. That way a booking
-   is never saved while its emails can't be sent, and an enquiry is never silently lost. */
+   is never saved while its emails can't be sent, and an enquiry is never silently lost.
+
+   Enquiries that are refused for a link, spam wording, the hidden trap box or the rate limit are
+   listed on a tab called "Blocked" (created automatically) in this same Sheet: time, reason, form,
+   name, email, phone and what they wrote. Check it now and then in case a real customer was caught
+   by mistake (then phone them, and tell the developer so the filter can be loosened). It keeps the
+   newest 300 lines and logs at most 30 an hour. Robot-check failures are not listed.
+
+   A second automatic tab, "Contacts", gets one line for every accepted enquiry (a backup copy of the
+   email) and every inspection booking (with its date, slot and address). It is never trimmed. It is
+   only a record: the calendar and the booking limits read the "Bookings" tab alone, so nothing on
+   "Contacts" can hold a time slot or stop anyone booking the same one. */
 
 const SHEET_NAME = 'Bookings';
 const NOTIFY_EMAIL = 'building@nexcongroup.com.au'; // where booking emails go
@@ -59,6 +70,20 @@ const MAX_MESSAGE_CHARS = 2000;
 const CONTACT_PER_HOUR = 20;            // accepted enquiries per hour, from everyone
 const CONTACT_PER_EMAIL_PER_HOUR = 3;   // accepted enquiries per hour from one email address
 const CONTACT_PER_DAY = 40;             // accepted enquiries per day, leaving mail quota for bookings
+
+// Refused enquiries are listed on a tab called "Blocked" in this same Sheet (created automatically),
+// so staff can spot a real customer who was caught by mistake. No email is used for this.
+const BLOCKED_SHEET_NAME = 'Blocked';
+const BLOCKED_HEADER = ['time', 'reason', 'form', 'name', 'email', 'phone', 'what they wrote'];
+const BLOCKED_KEEP = 300;               // newest rows kept; older ones are deleted
+const BLOCKED_PER_HOUR = 30;            // at most this many logged per hour, so a flood of junk can't fill the Sheet or slow real visitors
+
+// Every enquiry that gets through, and every inspection booking, is also written as one line on a tab
+// called "Contacts" (created automatically): a searchable record of everyone who got in touch. For an
+// enquiry this is a backup copy of the email. This tab is only a record. The booking calendar never
+// reads it, so a line here can never hold a time slot, count towards a booking limit, or block anyone.
+const CONTACTS_SHEET_NAME = 'Contacts';
+const CONTACTS_HEADER = ['received', 'type', 'name', 'email', 'phone', 'inspection date', 'slot', 'address', 'details', 'message', 'note'];
 
 // Daily email allowance.
 const EMAIL_WARN_AT = 20;   // email NOTIFY_EMAIL once a day when this many or fewer sends remain
@@ -217,6 +242,52 @@ function contactAllowed_(email) {
   return true;
 }
 
+// Adds one line to the "Blocked" tab: when, why it was refused ('link', 'spam wording', 'trap box',
+// 'rate limit'), which form, and what the sender typed. Runs inside doPost's lock. Anything that goes
+// wrong here is swallowed on purpose: keeping this list must never change what the visitor sees.
+function logBlocked_(reason, formName, name, email, phone, text) {
+  try {
+    const cache = CacheService.getScriptCache();
+    const hourKey = 'blocked_hour_' + Utilities.formatDate(new Date(), TIME_ZONE, 'yyyyMMddHH');
+    const logged = Number(cache.get(hourKey) || 0);
+    if (logged >= BLOCKED_PER_HOUR) return;
+    cache.put(hourKey, String(logged + 1), 3600);
+    appendLogRow_(BLOCKED_SHEET_NAME, BLOCKED_HEADER, [Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd HH:mm:ss'), reason, formName,
+      cleanText_(name, MAX_LEN.name), cleanText_(email, MAX_LEN.email), cleanText_(phone, MAX_LEN.phone), cleanText_(text, 600)], BLOCKED_KEEP);
+  } catch (err) { /* see above */ }
+}
+
+// Adds one line to the "Contacts" tab: an accepted enquiry (type "contact" or "house_and_land") or a
+// booking (type "booking", with its date, slot and address). Never trimmed: it is the customer record.
+// "note" is blank, or says that the email to staff failed. Like logBlocked_, any failure here is
+// swallowed so it can never change what the visitor sees, and nothing on this tab is ever read by
+// the booking rules.
+function logContact_(type, name, email, phone, date, slot, address, details, message, note) {
+  try {
+    appendLogRow_(CONTACTS_SHEET_NAME, CONTACTS_HEADER, [Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd HH:mm:ss'), type,
+      cleanText_(name, MAX_LEN.name), cleanText_(email, MAX_LEN.email), cleanText_(phone, MAX_LEN.phone), date, slot,
+      cleanText_(address, MAX_LEN.address), cleanText_(details, 700),
+      String(message || '').replace(/^[=+\-@\s]+/, '').slice(0, MAX_MESSAGE_CHARS), note || ''], 0);
+  } catch (err) { /* see above */ }
+}
+
+// Appends one row of text to a log tab, creating the tab (with a frozen header row) the first time.
+// keepNewest > 0 deletes the oldest rows beyond that many; 0 keeps everything.
+function appendLogRow_(sheetName, header, row, keepNewest) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+    sheet.appendRow(header);
+    sheet.setFrozenRows(1);
+  }
+  const range = sheet.getRange(sheet.getLastRow() + 1, 1, 1, row.length);
+  range.setNumberFormat('@'); // plain text, so nothing a sender typed can run as a formula (or turn a date into a number)
+  range.setValues([row]);
+  const surplus = sheet.getLastRow() - 1 - keepNewest;
+  if (keepNewest > 0 && surplus > 0) sheet.deleteRows(2, surplus);
+}
+
 function getSheet_() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
   if (!sheet) throw new Error('No sheet tab named "' + SHEET_NAME + '" was found.');
@@ -347,6 +418,7 @@ function handleBook_(data) {
   const range = sheet.getRange(newRow, 1, 1, 8);
   range.setNumberFormat('@');
   range.setValues([[date, slot, name, email, phone, address, 'booked', Utilities.formatDate(new Date(), TIME_ZONE, 'yyyy-MM-dd HH:mm:ss')]]);
+  logContact_('booking', name, email, phone, date, slot, address, '', '', ''); // a record only; the calendar never reads the Contacts tab
 
   const slotLabel = SLOT_LABELS[slot];
 
@@ -398,7 +470,11 @@ const ENQUIRY_FORMS = {
 function handleContact_(data) {
   // Hidden "website" box: people never see it, robots fill everything. Say "ok" so the robot
   // learns nothing, but send nothing.
-  if (typeof data.website === 'string' && data.website.trim() !== '') return json_({ ok: true });
+  if (typeof data.website === 'string' && data.website.trim() !== '') {
+    const str = function (v) { return typeof v === 'string' ? v : ''; };
+    logBlocked_('trap box', str(data.form) || 'contact', str(data.name), str(data.email), str(data.phone), str(data.website) + ' ' + str(data.message));
+    return json_({ ok: true });
+  }
 
   const formName = data.form === undefined ? 'contact' : data.form;
   if (typeof formName !== 'string' || !Object.prototype.hasOwnProperty.call(ENQUIRY_FORMS, formName)) {
@@ -432,17 +508,22 @@ function handleContact_(data) {
   }
 
   const everything = [name].concat(extras.map(function (x) { return x[1]; }), [message]).join('\n');
-  if (hasLink_(everything)) return json_({ ok: false, error: 'has_link' });
-  if (hasSpamWords_(everything)) return json_({ ok: false, error: 'spam' });
+  if (hasLink_(everything)) { logBlocked_('link', formName, name, email, phone, everything); return json_({ ok: false, error: 'has_link' }); }
+  if (hasSpamWords_(everything)) { logBlocked_('spam wording', formName, name, email, phone, everything); return json_({ ok: false, error: 'spam' }); }
 
   if (!emailAllowanceOk_(1)) return json_({ ok: false, error: 'email_limit' });
 
   const captcha = verifyCaptcha_(data.captcha);
   if (captcha !== 'ok') return captchaError_(captcha);
 
-  if (!contactAllowed_(email || phone)) return json_({ ok: false, error: 'rate_limited' }); // limit per email, or per phone if no email
+  if (!contactAllowed_(email || phone)) { // limit per email, or per phone if no email
+    logBlocked_('rate limit', formName, name, email, phone, everything);
+    return json_({ ok: false, error: 'rate_limited' });
+  }
 
-  // The email is the ONLY copy of an enquiry. If it can't be sent, tell the visitor so they can
+  const enquiryDetails = extras.filter(function (x) { return x[1]; }).map(function (x) { return x[0] + ': ' + x[1]; }).join('; ');
+
+  // The email is the main copy of an enquiry (the Contacts tab keeps a second). If it can't be sent, tell the visitor so they can
   // try again or phone, rather than letting them think it arrived.
   try {
     const mail = {
@@ -456,8 +537,11 @@ function handleContact_(data) {
     if (email) mail.replyTo = email; // "Reply" answers the customer directly; with no email, ring them
     MailApp.sendEmail(mail);
   } catch (err) {
+    // The visitor is told it failed (and may try again), but keep what they wrote so staff can still follow up.
+    logContact_(formName, name, email, phone, '', '', '', enquiryDetails, message, 'EMAIL FAILED: visitor was told to try again or phone');
     return json_({ ok: false, error: 'email_limit' });
   }
+  logContact_(formName, name, email, phone, '', '', '', enquiryDetails, message, '');
 
   warnIfLowOnEmail_();
   return json_({ ok: true });
