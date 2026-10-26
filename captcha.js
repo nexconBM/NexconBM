@@ -31,7 +31,9 @@
   }
 
   function language() {
-    return document.documentElement.lang.indexOf("zh") === 0 ? "zh-tw" : "auto";
+    var lang = document.documentElement.lang;
+    if (lang === "zh-Hans") return "zh-cn";
+    return lang.indexOf("zh") === 0 ? "zh-tw" : "auto";
   }
 
   window.NexconCaptcha = {

@@ -53,7 +53,18 @@ at other zh pages while images/CSS/JS still load from the site root. These are r
 Google can index (the old toggle-only translation was invisible to search engines). Never edit
 files under zh/ by hand -- they are regenerated (and stale ones deleted) on every run. Every
 page also gets hreflang <link> tags between <!-- HREFLANG:START --> / <!-- HREFLANG:END -->,
-and sitemap.xml is rewritten to list both languages.
+and sitemap.xml is rewritten to list every language.
+
+Simplified Chinese pages (/zh-hans/...): each /zh/ page is converted from Traditional to Simplified
+characters with OpenCC (pip install opencc), then HANS_WORDS swaps Hong Kong wording for the words
+mainland Chinese readers use and search for (e.g. 买楼 -> 买房). Like zh/, never edit zh-hans/ by
+hand. Text that scripts add after load (calculator, booking, forms) comes from translations.zh;
+build.py writes a Simplified copy of it to translations-hans.js, which zh-hans pages load after
+translations.js.
+
+Language switcher: {{LANG_SWITCH}} in partial/header.html becomes "Eng | 简 | 繁", three links to
+this page in each language (see lang_switch), between <!-- LANGSWITCH:START/END --> markers so
+the Chinese copies can re-point them.
 
 Usage:
     python build.py
@@ -73,6 +84,55 @@ ROOT = Path(__file__).parent
 PARTIALS = ROOT / "partial"
 SITE = "https://nexconbm.com.au"
 ZH_DIR = "zh"
+HANS_DIR = "zh-hans"
+
+# The language switcher, in display order: (data-lang key, URL prefix, lang code, label, full name).
+LANGS = [
+    ("en", "", "en", "Eng", "English"),
+    ("zh-hans", "/" + HANS_DIR, "zh-Hans", "简", "简体中文"),
+    ("zh-hant", "/" + ZH_DIR, "zh-Hant", "繁", "繁體中文"),
+]
+
+# Hong Kong wording -> mainland wording, applied after OpenCC has converted the characters
+# (so the left side is already Simplified). Longest phrases first; check new Chinese text against
+# this list when you add it.
+HANS_WORDS = [
+    ("购买前检验", "买房前验房"),
+    ("业主立案法团", "业主委员会"),
+    ("拆卸重建", "推倒重建"),
+    ("度身订造", "量身定制"),
+    ("维多利亚省", "维多利亚州"),
+    ("交楼验收", "交房验收"),
+    ("屋地套餐", "房地套餐"),
+    ("联系资料", "联系方式"),
+    ("联络资料", "联系方式"),
+    ("验楼师", "验房师"),
+    ("住宅升降机", "家用电梯"),
+    ("升降机", "电梯"),
+    ("著眼", "着眼"),
+    ("意味著", "意味着"),
+    ("讯息", "信息"),
+    ("透过", "通过"),
+    ("买楼", "买房"),
+    ("交楼", "交房"),
+    ("收楼", "收房"),
+    ("新楼", "新房"),
+    ("楼宇", "房屋"),
+    ("家私", "家具"),
+    ("订造", "定制"),
+    ("联络", "联系"),
+    ("睡房", "卧室"),
+    ("视乎", "取决于"),
+    ("质素", "质量"),
+    ("新屋", "新房"),
+    ("旧屋", "旧房"),
+    ("建屋", "建房"),
+    ("地台", "地板"),
+    ("簷槽", "檐沟"),
+    ("檐槽", "檐沟"),
+    ("传送", "发送"),
+    ("电邮", "电子邮箱"),
+]
 
 NAV_KEYS = [
     "home", "custom_homes", "knockdown", "house_land", "multi_unit",
@@ -218,7 +278,7 @@ def build_page(page_path: str, is_home: bool, active_key) -> None:
     footer_html = footer_html.replace("{{ROOT}}", root_prefix)
     # The English page's toggle points at its /zh/ copy (make_zh_page flips it back).
     en_path = url_path(page_path)
-    header_html = header_html.replace("{{LANG_ALT_HREF}}", relative_url("/" + ZH_DIR + en_path, en_path))
+    header_html = header_html.replace("{{LANG_SWITCH}}", lang_switch("en", en_path, en_path))
 
     for key in NAV_KEYS:
         token = "{{NAV_" + key.upper() + "_ACTIVE}}"
@@ -366,10 +426,11 @@ def rewrite_links(page_html: str, en_dir: str, zh_dir: str) -> str:
 
 
 def hreflang_block(en_path: str) -> str:
-    en_url, zh_url = SITE + en_path, SITE + "/" + ZH_DIR + en_path
+    en_url, zh_url, hans_url = SITE + en_path, SITE + "/" + ZH_DIR + en_path, SITE + "/" + HANS_DIR + en_path
     return "\n".join([
         "<!-- HREFLANG:START -->",
         f'<link rel="alternate" hreflang="en" href="{en_url}">',
+        f'<link rel="alternate" hreflang="zh-Hans" href="{hans_url}">',
         f'<link rel="alternate" hreflang="zh-Hant" href="{zh_url}">',
         f'<link rel="alternate" hreflang="x-default" href="{en_url}">',
         "<!-- HREFLANG:END -->",
@@ -425,13 +486,8 @@ def make_zh_page(page_path: str, zh: dict) -> str:
     out = set_meta(out, r'(<link rel="canonical" href=")[^"]*(")', SITE + zh_path, page_path)
     out = set_meta(out, r'(<meta property="og:url" content=")[^"]*(")', SITE + zh_path, page_path)
 
-    # The language toggle on a Chinese page says "EN" and goes back to the English page.
-    out = re.sub(
-        r'<button id="langToggle"[^>]*>[^<]*</button>',
-        lambda m: '<button id="langToggle" class="lang-toggle" type="button" aria-label="Switch to English" '
-                  f'data-alt-href="{relative_url(en_path, zh_path)}">EN</button>',
-        out, count=1,
-    )
+    # rewrite_links pointed every switcher link at a zh page; redraw it for this page.
+    out = stitch(out, "LANGSWITCH", lang_switch("zh-hant", en_path, zh_path), page_path)
     # Load the Chinese font up front instead of waiting for i18n.js to request it.
     out = out.replace("</head>", CJK_FONT + "\n</head>", 1)
 
@@ -442,9 +498,74 @@ def make_zh_page(page_path: str, zh: dict) -> str:
     return f"{ZH_DIR}/{page_path}"
 
 
-def clean_zh_dir(keep: set) -> None:
-    """Delete generated zh pages whose English page is no longer in PAGES."""
-    zh_root = ROOT / ZH_DIR
+def lang_switch(current: str, en_path: str, from_dir: str) -> str:
+    """The "Eng | 简 | 繁" switcher for one page, as seen from from_dir, with current marked."""
+    links = []
+    for key, prefix, code, label, name in LANGS:
+        href = relative_url(prefix + en_path, from_dir)
+        here = ' aria-current="page"' if key == current else ""
+        links.append(f'<a href="{href}" lang="{code}" hreflang="{code}" data-lang="{key}" title="{name}"{here}>{label}</a>')
+    return ("<!-- LANGSWITCH:START -->\n"
+            '      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language / 语言 / 語言">'
+            + '<span class="lang-sep" aria-hidden="true">|</span>'.join(links)
+            + "</div>\n      <!-- LANGSWITCH:END -->")
+
+
+def simplified_converter():
+    try:
+        import opencc
+    except ImportError:
+        sys.exit("ERROR: the Simplified Chinese pages need OpenCC. Run: pip install opencc")
+    converter = opencc.OpenCC("hk2s")
+
+    def to_hans(text: str) -> str:
+        text = converter.convert(text)
+        for hk, mainland in HANS_WORDS:
+            text = text.replace(hk, mainland)
+        return text
+
+    return to_hans
+
+
+def make_hans_page(page_path: str, to_hans) -> str:
+    """Build the /zh-hans/ copy of a page from its (already built) /zh/ copy and return its path."""
+    en_path = url_path(page_path)
+    hans_path = "/" + HANS_DIR + en_path
+    # zh/ and zh-hans/ have the same folder depth, so every relative link carries over unchanged.
+    out = to_hans((ROOT / ZH_DIR / page_path).read_text(encoding="utf-8"))
+
+    out = re.sub(r'<html lang="[^"]*"', '<html lang="zh-Hans"', out, count=1)
+    out = set_meta(out, r'(<meta property="og:locale" content=")[^"]*(")', "zh_CN", page_path)
+    out = set_meta(out, r'(<link rel="canonical" href=")[^"]*(")', SITE + hans_path, page_path)
+    out = set_meta(out, r'(<meta property="og:url" content=")[^"]*(")', SITE + hans_path, page_path)
+    out = stitch(out, "LANGSWITCH", lang_switch("zh-hans", en_path, hans_path), page_path)
+    out = out.replace("family=Noto+Sans+TC:", "family=Noto+Sans+SC:")
+    # Script-added text reads translations.zh: load the Simplified copy over it.
+    out = re.sub(r'(<script src="([^"]*)translations\.js"></script>)',
+                 lambda m: m.group(1) + f'\n<script src="{m.group(2)}translations-hans.js"></script>', out, count=1)
+
+    hans_file = ROOT / HANS_DIR / page_path
+    hans_file.parent.mkdir(parents=True, exist_ok=True)
+    hans_file.write_text(out, encoding="utf-8")
+    print(f"Built {HANS_DIR}/{page_path}")
+    return f"{HANS_DIR}/{page_path}"
+
+
+def write_hans_translations(zh: dict, to_hans) -> None:
+    """translations-hans.js: translations.zh in Simplified, loaded by zh-hans pages after translations.js."""
+    hans = {key: to_hans(value) for key, value in zh.items()}
+    new = ("/* Generated by build.py from the zh block of translations.js: edit that, not this file.\n"
+           "   Loaded after translations.js on /zh-hans/ pages so script-added text is Simplified too. */\n"
+           "translations.zh = " + json.dumps(hans, ensure_ascii=False, indent=2) + ";\n")
+    path = ROOT / "translations-hans.js"
+    if not path.exists() or path.read_text(encoding="utf-8") != new:
+        path.write_text(new, encoding="utf-8")
+        print("Updated translations-hans.js")
+
+
+def clean_zh_dir(keep: set, folder_name: str = ZH_DIR) -> None:
+    """Delete generated Chinese pages whose English page is no longer in PAGES."""
+    zh_root = ROOT / folder_name
     if not zh_root.exists():
         return
     for file in zh_root.rglob("index.html"):
@@ -457,28 +578,46 @@ def clean_zh_dir(keep: set) -> None:
             shutil.rmtree(folder)
 
 
+# sitemap-en.xml lists the English pages and sitemap-zh.xml both Chinese versions (so Search
+# Console reports their indexing separately); sitemap.xml is the index that lists the two, and
+# is the only one robots.txt and Search Console need.
+SITEMAPS = [("sitemap-en.xml", [""]), ("sitemap-zh.xml", ["/" + HANS_DIR, "/" + ZH_DIR])]
+
+
+def write_if_changed(name: str, text: str) -> None:
+    path = ROOT / name
+    if not path.exists() or path.read_text(encoding="utf-8") != text:
+        path.write_text(text, encoding="utf-8")
+        print(f"Updated {name}")
+
+
 def write_sitemap() -> None:
-    lines = [
+    for name, prefixes in SITEMAPS:
+        lines = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<!-- Generated by build.py: edit PAGES there, not this file. -->',
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+        ]
+        for prefix in prefixes:
+            for page_path, _, _ in PAGES:
+                en_path = url_path(page_path)
+                en_url, zh_url, hans_url = SITE + en_path, SITE + "/" + ZH_DIR + en_path, SITE + "/" + HANS_DIR + en_path
+                alternates = (
+                    f'<xhtml:link rel="alternate" hreflang="en" href="{en_url}"/>'
+                    f'<xhtml:link rel="alternate" hreflang="zh-Hans" href="{hans_url}"/>'
+                    f'<xhtml:link rel="alternate" hreflang="zh-Hant" href="{zh_url}"/>'
+                    f'<xhtml:link rel="alternate" hreflang="x-default" href="{en_url}"/>'
+                )
+                lines.append(f"  <url><loc>{SITE}{prefix}{en_path}</loc>{alternates}</url>")
+        lines.append("</urlset>")
+        write_if_changed(name, "\n".join(lines) + "\n")
+
+    index = [
         '<?xml version="1.0" encoding="UTF-8"?>',
-        '<!-- Generated by build.py: edit PAGES there, not this file. -->',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">',
-    ]
-    for page_path, _, _ in PAGES:
-        en_path = url_path(page_path)
-        en_url, zh_url = SITE + en_path, SITE + "/" + ZH_DIR + en_path
-        alternates = (
-            f'<xhtml:link rel="alternate" hreflang="en" href="{en_url}"/>'
-            f'<xhtml:link rel="alternate" hreflang="zh-Hant" href="{zh_url}"/>'
-            f'<xhtml:link rel="alternate" hreflang="x-default" href="{en_url}"/>'
-        )
-        for loc in (en_url, zh_url):
-            lines.append(f"  <url><loc>{loc}</loc>{alternates}</url>")
-    lines.append("</urlset>")
-    new = "\n".join(lines) + "\n"
-    path = ROOT / "sitemap.xml"
-    if not path.exists() or path.read_text(encoding="utf-8") != new:
-        path.write_text(new, encoding="utf-8")
-        print("Updated sitemap.xml")
+        '<!-- Generated by build.py: lists the English and Chinese sitemaps. -->',
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ] + [f"  <sitemap><loc>{SITE}/{name}</loc></sitemap>" for name, _ in SITEMAPS] + ["</sitemapindex>"]
+    write_if_changed("sitemap.xml", "\n".join(index) + "\n")
 
 
 if __name__ == "__main__":
@@ -492,5 +631,10 @@ if __name__ == "__main__":
     zh = load_zh_translations()
     built = {make_zh_page(page_path, zh) for page_path, _, _ in PAGES}
     clean_zh_dir(built)
+
+    to_hans = simplified_converter()
+    write_hans_translations(zh, to_hans)
+    built = {make_hans_page(page_path, to_hans) for page_path, _, _ in PAGES}
+    clean_zh_dir(built, HANS_DIR)
     write_sitemap()
     print("Done.")
