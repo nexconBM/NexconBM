@@ -25,13 +25,14 @@
 <!-- SEO:END -->
 <!-- HREFLANG:START -->
 <link rel="alternate" hreflang="en" href="https://nexconbm.com.au/building-inspections/">
+<link rel="alternate" hreflang="zh-Hans" href="https://nexconbm.com.au/zh-hans/building-inspections/">
 <link rel="alternate" hreflang="zh-Hant" href="https://nexconbm.com.au/zh/building-inspections/">
 <link rel="alternate" hreflang="x-default" href="https://nexconbm.com.au/building-inspections/">
 <!-- HREFLANG:END -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../styles.css?v=49">
+<link rel="stylesheet" href="../../styles.css?v=50">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -79,7 +80,11 @@
       </div>
 
       <a href="../contact/" class="nav-cta" data-i18n="nav_cta">開始您的項目</a>
-      <button id="langToggle" class="lang-toggle" type="button" aria-label="Switch to English" data-alt-href="../../building-inspections/">EN</button>
+      <!-- LANGSWITCH:START -->
+<!-- LANGSWITCH:START -->
+      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language / 语言 / 語言"><a href="../../building-inspections/" lang="en" hreflang="en" data-lang="en" title="English">Eng</a><span class="lang-sep" aria-hidden="true">|</span><a href="../../zh-hans/building-inspections/" lang="zh-Hans" hreflang="zh-Hans" data-lang="zh-hans" title="简体中文">简</a><span class="lang-sep" aria-hidden="true">|</span><a href="./" lang="zh-Hant" hreflang="zh-Hant" data-lang="zh-hant" title="繁體中文" aria-current="page">繁</a></div>
+      <!-- LANGSWITCH:END -->
+<!-- LANGSWITCH:END -->
     </nav>
 
     <button
@@ -326,12 +331,12 @@
 </footer>
 
 <script src="../../translations.js"></script>
-<script src="../../i18n.js?v=3"></script>
+<script src="../../i18n.js?v=4"></script>
 <script src="../../site.js?v=1"></script>
 <!-- FOOTER:END -->
 
 <!-- Page-specific script: keep OUTSIDE the FOOTER block above, because build.py rewrites everything inside it. -->
-<script src="../../captcha.js?v=2"></script>
+<script src="../../captcha.js?v=3"></script>
 <script src="../../pricing.js?v=2"></script>
 <script src="../../booking.js?v=22"></script>
 <script src="../../price-calculator.js?v=4"></script>

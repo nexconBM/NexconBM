@@ -14,6 +14,12 @@
   --serif: "Source Serif Pro", "Noto Sans TC", Georgia, serif;
   --max: 1180px;
 }
+/* Simplified Chinese pages (/zh-hans/) load Noto Sans SC instead of TC. */
+html[lang="zh-Hans"]{
+  --ex: "Archivo Expanded", "Noto Sans SC", sans-serif;
+  --sans: "Archivo", "Noto Sans SC", -apple-system, Segoe UI, sans-serif;
+  --serif: "Source Serif Pro", "Noto Sans SC", Georgia, serif;
+}
 *{box-sizing:border-box;}
 html{scroll-behavior:smooth;}
 @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
@@ -48,9 +54,11 @@ svg{display:block;}
 .site-nav a{text-decoration:none; font-size:0.92rem; font-weight:600; color:var(--text); padding:0.3em 0; border-bottom:2px solid transparent;}
 .site-nav a:hover{border-color:var(--rosette);}
 .site-nav a.is-active{border-color:var(--rosette);}
-.lang-toggle{font-family:var(--ex); font-weight:700; font-size:0.8rem; letter-spacing:0.02em; background:none; border:1.5px solid var(--bordeaux); color:var(--bordeaux); border-radius:999px; padding:0.35em 0.9em; cursor:pointer; transition:background-color .2s, color .2s;}
-.lang-toggle{flex:none; white-space:nowrap;}
-.lang-toggle:hover{background:var(--bordeaux); color:var(--sandstone);}
+.lang-switch{flex:none; display:inline-flex; align-items:center; gap:0.15em; white-space:nowrap; font-family:var(--ex); font-size:0.8rem; border:1.5px solid var(--bordeaux); border-radius:999px; padding:0.2em 0.5em;}
+.site-nav .lang-switch a{font-size:inherit; font-weight:600; color:var(--bordeaux); padding:0.15em 0.35em; border:0; border-radius:999px; transition:background-color .2s, color .2s;}
+.site-nav .lang-switch a:hover{background:rgba(106,36,52,0.1);}
+.site-nav .lang-switch a[aria-current="page"]{background:var(--bordeaux); color:var(--sandstone); font-weight:700;}
+.lang-sep{color:rgba(106,36,52,0.35);}
 .pill{display:inline-block; font-family:var(--sans); font-weight:700; font-size:0.85rem; text-decoration:none; padding:0.7em 1.4em; border-radius:999px; transition:background-color .2s, color .2s;}
 .pill-primary{background:var(--bordeaux); color:var(--sandstone);}
 .pill-primary:hover{background:var(--mahogany);}
