@@ -607,41 +607,81 @@ def write_if_changed(name: str, text: str) -> None:
 # Extra words each page should be found by (in the page's own language), added to its search entry.
 SEARCH_EXTRA = {
     "building-inspections/index.html": {
-        "en": "price prices pricing cost fee fees quote book booking calendar appointment pest control PCI practical completion pool",
-        "zh": "價錢 價格 收費 費用 報價 預約 預訂 日曆 蟲害 竣工驗收 泳池",
+        "en": "price prices pricing cost fee fees quote book booking calendar appointment pest control PCI practical completion pool report inspection report",
+        "zh": "價錢 價格 收費 費用 報價 預約 預訂 日曆 蟲害 竣工驗收 泳池 報告 檢驗報告",
+    },
+    # The contact details sit in the footer and the form is left out of the search, so say what this page is for.
+    "contact/index.html": {
+        "en": "contact phone call email address enquiry enquire quote get in touch message office Nunawading Noble Park 0411 330 962 building@nexcongroup.com.au",
+        "zh": "聯絡 聯繫 電話 致電 電郵 電子郵件 地址 查詢 報價 辦公室 留言",
     },
 }
 
 
+# Text that would only make the search results confusing, so it is left out of the index:
+#  - forms and their labels/options (a form's checkbox list would make the Contact page match every service),
+#  - the customer testimonial, hidden messages (errors, "thank you", "loading..."), and button/arrow text
+#    like "Start your project ->" that repeats on many pages.
+SEARCH_SKIP_TAGS = {"script", "style", "noscript", "svg", "form", "select", "textarea", "button"}
+SEARCH_SKIP_CLASSES = {"visually-hidden", "loading-spinner", "pill", "text-link", "testimonial"}
+SEARCH_SKIP_IDS = {"testimonials", "booking-widget"}
+VOID_TAGS = {"area", "base", "br", "col", "embed", "hr", "img", "input", "link", "meta", "source", "track", "wbr"}
+
+
 class _TextExtractor(HTMLParser):
-    """The visible text of an HTML fragment (no scripts, styles or tags)."""
+    """The visible, useful text of an HTML fragment (see SEARCH_SKIP_* for what is left out)."""
 
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.parts, self.skip = [], 0
+        self.parts = []
+        self.skip_tag = None   # the tag that opened the region being skipped
+        self.skip_depth = 0    # how many of that same tag are open inside it
+
+    @staticmethod
+    def _should_skip(tag, attrs):
+        d = dict(attrs)
+        classes = set((d.get("class") or "").split())
+        style = (d.get("style") or "").replace(" ", "").lower()
+        return (tag in SEARCH_SKIP_TAGS or "hidden" in d or "data-nosnippet" in d or "display:none" in style
+                or d.get("id") in SEARCH_SKIP_IDS or bool(classes & SEARCH_SKIP_CLASSES) or any(c.startswith("pill") for c in classes))
 
     def handle_starttag(self, tag, attrs):
-        if tag in ("script", "style", "noscript", "svg"):
-            self.skip += 1
-        if tag in ("p", "div", "li", "h1", "h2", "h3", "br", "section"):
+        if self.skip_tag:
+            if tag == self.skip_tag:
+                self.skip_depth += 1
+            return
+        if tag not in VOID_TAGS and self._should_skip(tag, attrs):
+            self.skip_tag, self.skip_depth = tag, 1
+            return
+        if tag in ("p", "div", "li", "h1", "h2", "h3", "br", "section", "figure", "blockquote"):
             self.parts.append(" ")
 
     def handle_endtag(self, tag):
-        if tag in ("script", "style", "noscript", "svg") and self.skip:
-            self.skip -= 1
-        if tag in ("p", "div", "li", "h1", "h2", "h3", "section"):
+        if self.skip_tag:
+            if tag == self.skip_tag:
+                self.skip_depth -= 1
+                if self.skip_depth == 0:
+                    self.skip_tag = None
+                    self.parts.append(" ")
+            return
+        if tag in ("p", "div", "li", "h1", "h2", "h3", "section", "figure", "blockquote"):
             self.parts.append(" ")
 
     def handle_data(self, data):
-        if not self.skip:
+        if not self.skip_tag:
             self.parts.append(data)
 
     def text(self) -> str:
         return re.sub(r"\s+", " ", "".join(self.parts)).strip()
 
 
+# Pages whose own heading is a slogan: show the menu name in search results instead (English, and the nav_* key for Chinese).
+SEARCH_TITLES = {"index.html": ("Home", "nav_home"), "contact/index.html": ("Contact", "nav_contact")}
+
+
 def write_search_index(to_hans) -> None:
     """One JSON file per language: [{u: path, t: title, d: description, b: body text}, ...]."""
+    zh_text = load_zh_translations()
     for name, folder, lang in (("search-index-en.json", "", "en"), ("search-index-zh.json", ZH_DIR, "zh"),
                                ("search-index-hans.json", HANS_DIR, "hans")):
         entries = []
@@ -654,6 +694,9 @@ def write_search_index(to_hans) -> None:
             h1 = re.search(r"<h1[^>]*>(.*?)</h1>", main.group(1), re.S)
             title_src = h1.group(1) if h1 else re.search(r"<title>(.*?)</title>", page_html, re.S).group(1)
             title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html.unescape(title_src))).strip()
+            if page_path in SEARCH_TITLES:
+                english, nav_key = SEARCH_TITLES[page_path]
+                title = english if lang == "en" else (to_hans(zh_text[nav_key]) if lang == "hans" else zh_text[nav_key])
             desc_match = re.search(r'<meta name="description" content="([^"]*)"', page_html)
             desc = html.unescape(desc_match.group(1)) if desc_match else ""
             extractor = _TextExtractor()

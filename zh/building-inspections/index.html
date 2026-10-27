@@ -32,7 +32,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../styles.css?v=57">
+<link rel="stylesheet" href="../../styles.css?v=58">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -113,6 +113,10 @@
         <input type="search" id="searchInput" name="q" autocomplete="off" maxlength="80" placeholder="Search the site…">
         <button type="button" class="search-close" aria-label="Close search">&times;</button>
       </form>
+      <label class="search-option" for="searchAll" title="Ticked: a page must contain every word you type. Unticked: a page with any one of the words is enough.">
+        <input type="checkbox" id="searchAll" checked>
+        <span data-i18n="search_match_all">符合所有關鍵字</span>
+      </label>
       <p class="search-status" aria-live="polite"></p>
       <ul class="search-results"></ul>
     </div>
@@ -356,7 +360,7 @@
 <script src="../../translations.js"></script>
 <script src="../../i18n.js?v=4"></script>
 <script src="../../site.js?v=1"></script>
-<script src="../../search.js?v=1"></script>
+<script src="../../search.js?v=2"></script>
 <!-- FOOTER:END -->
 
 <!-- Page-specific script: keep OUTSIDE the FOOTER block above, because build.py rewrites everything inside it. -->

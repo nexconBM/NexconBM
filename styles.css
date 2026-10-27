@@ -85,6 +85,8 @@ svg{display:block;}
 .search-form input[type="search"]{flex:1; min-width:0; font:inherit; font-size:1.05rem; padding:0.75rem 1.1rem; border:1.5px solid var(--bordeaux); border-radius:999px; background:#fff; color:var(--text);}
 .search-form input[type="search"]:focus{outline:2px solid var(--rosette); outline-offset:2px;}
 .search-close{border:none; background:none; font-size:1.8rem; line-height:1; color:var(--bordeaux); cursor:pointer; padding:0.1rem 0.6rem;}
+.search-option{display:inline-flex; align-items:center; gap:0.55rem; margin:0.85rem 0 0 0.4rem; font-size:0.92rem; cursor:pointer; user-select:none;}
+.search-option input{width:1.05rem; height:1.05rem; accent-color:var(--bordeaux); cursor:pointer; margin:0;}
 .search-status{margin:0.8rem 0 0; font-size:0.9rem; opacity:0.8; min-height:1.2em;}
 .search-results{list-style:none; margin:0.4rem 0 0; padding:0; display:grid; gap:0.2rem;}
 .search-results a{display:block; text-decoration:none; padding:0.7rem 0.9rem; border-radius:10px; color:var(--text);}
