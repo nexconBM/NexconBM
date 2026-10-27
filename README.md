@@ -44,9 +44,6 @@ partial/csp.html              The Content-Security-Policy <meta> tag (written in
 CNAME                         Custom domain for GitHub Pages
 robots.txt, sitemap.xml       SEO / crawler config. sitemap.xml is an index of sitemap-en.xml and sitemap-zh.xml (all generated)
 404.html                      Custom not-found page
-favicon.ico, favicon-48x48.png, icon-192.png, icon-512.png, apple-touch-icon.png, site.webmanifest
-                              The icon set (tab icon, Google results, phone home screen). Linked from every page by build.py
-Nexcon-favicon*.png           The original 864 px artwork the icon set was made from (no longer linked)
 ```
 
 Live pages (the `PAGES` list in `build.py`): `index`, `about`, `contact`, `custom-homes`, `faq`, `house-and-land`, `building-inspections`, `knockdown-rebuild`, `multi-unit-development`, `projects`, `project-management`, `renovations-extensions` (shown as "Renovation & extension"), `property-management`, `property-maintenance`, `other-services` (shown as "Other services": gardening, including lawn mowing and tree trimming, and furniture building and repair; gardening lives only on that page, not on Maintenance).
@@ -96,16 +93,6 @@ The policy blocks **inline `<script>`** and only allows scripts from this site a
 1. Create `new-page/index.html` containing bare `<!-- HEADER -->` and `<!-- FOOTER -->` placeholders.
 2. Add it to `PAGES` in `build.py` (plus a `NAV_KEYS` entry and nav link in `partial/header.html` if it belongs in the menu).
 3. Run `python build.py`.
-
-## Favicon and phone icons
-
-Every page (and `404.html`) gets the same icon links from `ICON_LINKS` in `build.py`, written between `<!-- ICONS:START -->` and `<!-- ICONS:END -->` in each `<head>`. They point at root files because phones, apps and Google look for `/favicon.ico` and `/apple-touch-icon.png` by default (before this was added both returned 404, so many phones showed a generic globe):
-
-- `favicon.ico` (16, 32 and 48 px) and `favicon-48x48.png`: browser tabs, bookmarks and Google search results (Google wants a square icon whose size is a multiple of 48 px).
-- `icon-192.png` and `icon-512.png` (opaque white background): Android home-screen shortcuts, listed in `site.webmanifest`.
-- `apple-touch-icon.png` (180 px, opaque white): iPhone/iPad home screen.
-
-The mark in the original artwork has wide empty margins, so the set was cut tighter around it to stay readable at 16 px. To change the logo, make new files with the same names from the new artwork and push. Browsers cache favicons for a long time, and **Google only refreshes the icon in search results when it next crawls the home page** (days to a few weeks); request indexing of the home page in Search Console to nudge it.
 
 ## Site search
 
