@@ -69,6 +69,10 @@
         <input type="search" id="searchInput" name="q" autocomplete="off" maxlength="80" placeholder="Search the site…">
         <button type="button" class="search-close" aria-label="Close search">&times;</button>
       </form>
+      <label class="search-option" for="searchAll" title="Ticked: a page must contain every word you type. Unticked: a page with any one of the words is enough.">
+        <input type="checkbox" id="searchAll" checked>
+        <span data-i18n="search_match_all">Match all words</span>
+      </label>
       <p class="search-status" aria-live="polite"></p>
       <ul class="search-results"></ul>
     </div>

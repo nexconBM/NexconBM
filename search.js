@@ -4,10 +4,12 @@
    title, description and text (search-index-en.json, search-index-zh.json, search-index-hans.json,
    in the site root). The file for the page's own language is fetched the first time the panel opens.
 
-   Matching: every word the visitor types must appear somewhere on the page (title, description or
-   text); a title match ranks highest. If nothing matches all the words, pages matching ANY word are
-   shown instead. Chinese has no spaces between words, so it is matched as plain substrings: one
-   character is enough. Latin words need at least 2 letters.
+   Matching: the "Match all words" tick box (#searchAll, ticked by default and remembered in this browser)
+   decides how several words are combined. Ticked: every word the visitor types must appear somewhere on
+   the page (title, description or text). Unticked: a page with ANY one of the words is enough, and pages
+   containing more of the words rank higher. A title match ranks highest either way. Chinese has no spaces
+   between words, so it is matched as plain substrings (one character is enough; separate words with a
+   space to use the tick box). Latin words need at least 2 letters.
 
    Results are built with textContent (never innerHTML), so nothing typed or indexed can inject HTML.
    Esc, the x button, or a click outside closes the panel; Enter opens the first result.
@@ -24,6 +26,8 @@
   var input = panel.querySelector("input[type=search]");
   var closeBtn = panel.querySelector(".search-close");
   var statusEl = panel.querySelector(".search-status");
+  var allBox = panel.querySelector("#searchAll"); // "Match all words"
+  var STORAGE_KEY = "nexcon-search-all";
   var listEl = panel.querySelector(".search-results");
   var MAX_RESULTS = 8;
   var SNIPPET_BEFORE = 55;
@@ -47,6 +51,10 @@
   input.setAttribute("placeholder", t("search_placeholder", "Search the site…"));
   input.setAttribute("aria-label", t("search_label", "Search"));
   closeBtn.setAttribute("aria-label", t("search_close", "Close search"));
+  if (allBox) {
+    allBox.parentNode.setAttribute("title", t("search_match_all_hint", allBox.parentNode.getAttribute("title") || ""));
+    try { if (localStorage.getItem(STORAGE_KEY) === "0") allBox.checked = false; } catch (e) { /* storage blocked: stays ticked */ }
+  }
 
   var entries = null;     // the loaded index
   var loading = null;     // the in-flight request
@@ -80,6 +88,8 @@
     return n;
   }
 
+  function matchAll() { return !allBox || allBox.checked; }
+
   function run(query) {
     var terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     function score(e, all) {
@@ -98,8 +108,7 @@
         .filter(function (r) { return r.s > 0; })
         .sort(function (a, b) { return b.s - a.s; });
     }
-    var ranked = rank(true);
-    if (!ranked.length && terms.length > 1) ranked = rank(false);
+    var ranked = rank(matchAll());
     return ranked.slice(0, MAX_RESULTS).map(function (r) { return r.e; });
   }
 
@@ -148,6 +157,10 @@
     if (!entries) return; // still loading; render() runs again when it arrives
     var terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     current = run(query);
+    if (!current.length && terms.length > 1 && matchAll()) {
+      show(t("search_none_all", "No page contains all of “%q”. Untick “Match all words” to see pages with any of those words.").replace("%q", query.trim()));
+      return;
+    }
     if (!current.length) {
       show(t("search_none", "No results for “%q”. Try another word, or call us on +61 411 330 962.").replace("%q", query.trim()));
       return;
@@ -194,6 +207,12 @@
   });
   closeBtn.addEventListener("click", function () { close(true); });
   input.addEventListener("input", render);
+  if (allBox) {
+    allBox.addEventListener("change", function () {
+      try { localStorage.setItem(STORAGE_KEY, allBox.checked ? "1" : "0"); } catch (e) { /* not remembered */ }
+      render();
+    });
+  }
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var first = listEl.querySelector("a");
