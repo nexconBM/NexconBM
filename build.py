@@ -68,12 +68,6 @@ search-index-zh.json, search-index-hans.json (all in the site root, regenerated 
 adds keywords a page should be found by even though the words aren't in its text (they rank above
 ordinary text matches).
 
-Icons: every page's favicon links live in ONE place, ICON_LINKS below, written into each page's <head>
-(and 404.html) between <!-- ICONS:START --> / <!-- ICONS:END --> markers. They point at root-absolute
-files (favicon.ico, favicon-48x48.png, icon-192.png, apple-touch-icon.png, site.webmanifest) because phones,
-apps and Google look for /favicon.ico and /apple-touch-icon.png by default. To change the logo, rebuild those
-files from the new artwork and keep the names.
-
 Language switcher: {{LANG_SWITCH}} in partial/header.html becomes "Eng | 繁 | 简", three links to
 this page in each language (see lang_switch), between <!-- LANGSWITCH:START/END --> markers so
 the Chinese copies can re-point them.
@@ -264,32 +258,6 @@ def stitch(html: str, name: str, content: str, page_path: str) -> str:
         return html.replace(placeholder, block)
 
     sys.exit(f"ERROR: {page_path} has no {start} block or {placeholder} placeholder.")
-
-
-ICON_LINKS = """<!-- ICONS:START -->
-<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
-<link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
-<link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="manifest" href="/site.webmanifest">
-<!-- ICONS:END -->"""
-
-
-def inject_icons(page_path: str) -> None:
-    """Put the shared favicon links in the page's <head>, replacing the old hand-written ones the first time."""
-    path = ROOT / page_path
-    page_html = path.read_text(encoding="utf-8")
-    marked = re.compile(r"<!-- ICONS:START -->.*?<!-- ICONS:END -->", re.S)
-    if marked.search(page_html):
-        new_html = marked.sub(lambda m: ICON_LINKS, page_html)
-    else:
-        old = re.compile(r'<link rel="icon"[^>]*>[ \t]*\n?[ \t]*<link rel="apple-touch-icon"[^>]*>')
-        if not old.search(page_html):
-            sys.exit(f"ERROR: {page_path} has no <link rel=\"icon\"> / apple-touch-icon lines to replace.")
-        new_html = old.sub(lambda m: ICON_LINKS, page_html, count=1)
-    if new_html != page_html:
-        path.write_text(new_html, encoding="utf-8")
-        print(f"Updated icons in {page_path}")
 
 
 def inject_csp(page_path: str) -> None:
@@ -735,8 +703,6 @@ if __name__ == "__main__":
         inject_csp(page_path)
     for page_path, _, _ in PAGES:
         inject_hreflang(page_path)
-    for page_path in [p for p, _, _ in PAGES] + ["404.html"]:
-        inject_icons(page_path)
 
     zh = load_zh_translations()
     built = {make_zh_page(page_path, zh) for page_path, _, _ in PAGES}
