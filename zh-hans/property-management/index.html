@@ -7,8 +7,13 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://challenges.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://script.google.com https://*.googleusercontent.com https://docs.google.com; form-action 'self'; base-uri 'self'; object-src 'none'">
 <!-- CSP:END -->
 <title>墨尔本物业管理｜房屋维护规划｜世代建筑管理 Nexcon</title>
-<link rel="icon" href="../../Nexcon-favicon.png">
-<link rel="apple-touch-icon" href="../../Nexcon-favicon-apple.png">
+<!-- ICONS:START -->
+<link rel="icon" href="../../favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="../../favicon-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="../../icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="manifest" href="../../site.webmanifest">
+<!-- ICONS:END -->
 <meta name="description" content="以房屋状况为本的墨尔本物业管理：状况评估、保养规划、统筹技工及清晰报告。">
 <!-- SEO:START -->
 <link rel="canonical" href="https://nexconbm.com.au/zh-hans/property-management/">
@@ -32,7 +37,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../styles.css?v=50">
+<link rel="stylesheet" href="../../styles.css?v=51">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -67,6 +72,7 @@
           <a href="./" class="is-active" data-i18n="nav_prop_mgmt">物业管理</a>
           <a href="../property-maintenance/" data-i18n="nav_prop_maint">保养</a>
           <a href="../renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a>
+          <a href="../other-services/" data-i18n="nav_other_services">其他服务</a>
         </div>
       </div>
 
@@ -80,13 +86,20 @@
       </div>
 
       <a href="../contact/" class="nav-cta" data-i18n="nav_cta">开始您的项目</a>
+      <button class="search-toggle search-toggle-nav" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Search">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
       <!-- LANGSWITCH:START -->
 <!-- LANGSWITCH:START -->
-      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language / 语言 / 語言"><a href="../../property-management/" lang="en" hreflang="en" data-lang="en" title="English">Eng</a><span class="lang-sep" aria-hidden="true">|</span><a href="./" lang="zh-Hans" hreflang="zh-Hans" data-lang="zh-hans" title="简体中文" aria-current="page">简</a><span class="lang-sep" aria-hidden="true">|</span><a href="../../zh/property-management/" lang="zh-Hant" hreflang="zh-Hant" data-lang="zh-hant" title="繁體中文">繁</a></div>
+      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language / 语言 / 語言"><a href="../../property-management/" lang="en" hreflang="en" data-lang="en" title="English">Eng</a><span class="lang-sep" aria-hidden="true">|</span><a href="../../zh/property-management/" lang="zh-Hant" hreflang="zh-Hant" data-lang="zh-hant" title="繁體中文">繁</a><span class="lang-sep" aria-hidden="true">|</span><a href="./" lang="zh-Hans" hreflang="zh-Hans" data-lang="zh-hans" title="简体中文" aria-current="page">简</a></div>
       <!-- LANGSWITCH:END -->
 <!-- LANGSWITCH:END -->
 <!-- LANGSWITCH:END -->
     </nav>
+
+    <button class="search-toggle search-toggle-bar" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Search">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
 
     <button
       class="nav-toggle"
@@ -97,6 +110,18 @@
     >
       <span></span>
     </button>
+  </div>
+
+  <div class="search-panel" id="searchPanel" role="search" hidden>
+    <div class="search-panel-inner">
+      <form class="search-form" action="#" novalidate>
+        <label class="visually-hidden" for="searchInput" data-i18n="search_label">搜索</label>
+        <input type="search" id="searchInput" name="q" autocomplete="off" maxlength="80" placeholder="Search the site…">
+        <button type="button" class="search-close" aria-label="Close search">&times;</button>
+      </form>
+      <p class="search-status" aria-live="polite"></p>
+      <ul class="search-results"></ul>
+    </div>
   </div>
 </header>
 <!-- HEADER:END -->
@@ -178,6 +203,7 @@
           <a href="./" data-i18n="nav_prop_mgmt">物业管理</a>
           <a href="../property-maintenance/" data-i18n="nav_prop_maint">保养</a>
           <a href="../renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a>
+          <a href="../other-services/" data-i18n="nav_other_services">其他服务</a>
         </div>
         <div class="footer-col">
           <h2 data-i18n="footer_links_label">快速连结</h2>
@@ -204,6 +230,7 @@
 <script src="../../translations-hans.js"></script>
 <script src="../../i18n.js?v=4"></script>
 <script src="../../site.js?v=1"></script>
+<script src="../../search.js?v=1"></script>
 <!-- FOOTER:END -->
 
 </body>

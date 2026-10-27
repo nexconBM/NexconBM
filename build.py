@@ -21,7 +21,7 @@ Tokens used inside the partials:
   {{NAV_HOME_ACTIVE}}, {{NAV_CUSTOM_HOMES_ACTIVE}}, {{NAV_KNOCKDOWN_ACTIVE}},
   {{NAV_HOUSE_LAND_ACTIVE}}, {{NAV_MULTI_UNIT_ACTIVE}},
   {{NAV_PROJECT_MGMT_ACTIVE}}, {{NAV_INSPECTIONS_ACTIVE}}, {{NAV_PROP_MGMT_ACTIVE}}, {{NAV_PROP_MAINT_ACTIVE}},
-  {{NAV_PROP_RENO_ACTIVE}}, {{NAV_ABOUT_ACTIVE}},
+  {{NAV_PROP_RENO_ACTIVE}}, {{NAV_OTHER_SERVICES_ACTIVE}}, {{NAV_ABOUT_ACTIVE}},
   {{NAV_FAQ_ACTIVE}}, {{NAV_CONTACT_ACTIVE}}
              become ' class="is-active"' on the nav link of the page being
              built (chosen per page in PAGES below) and "" everywhere else.
@@ -62,7 +62,19 @@ hand. Text that scripts add after load (calculator, booking, forms) comes from t
 build.py writes a Simplified copy of it to translations-hans.js, which zh-hans pages load after
 translations.js.
 
-Language switcher: {{LANG_SWITCH}} in partial/header.html becomes "Eng | 简 | 繁", three links to
+Site search: the magnifier in the header (partial/header.html, search.js) searches a small JSON file
+per language, written by write_search_index() from the built pages' <main> text: search-index-en.json,
+search-index-zh.json, search-index-hans.json (all in the site root, regenerated every run). SEARCH_EXTRA
+adds keywords a page should be found by even though the words aren't in its text (they rank above
+ordinary text matches).
+
+Icons: every page's favicon links live in ONE place, ICON_LINKS below, written into each page's <head>
+(and 404.html) between <!-- ICONS:START --> / <!-- ICONS:END --> markers. They point at root-absolute
+files (favicon.ico, favicon-48x48.png, icon-192.png, apple-touch-icon.png, site.webmanifest) because phones,
+apps and Google look for /favicon.ico and /apple-touch-icon.png by default. To change the logo, rebuild those
+files from the new artwork and keep the names.
+
+Language switcher: {{LANG_SWITCH}} in partial/header.html becomes "Eng | 繁 | 简", three links to
 this page in each language (see lang_switch), between <!-- LANGSWITCH:START/END --> markers so
 the Chinese copies can re-point them.
 
@@ -89,8 +101,8 @@ HANS_DIR = "zh-hans"
 # The language switcher, in display order: (data-lang key, URL prefix, lang code, label, full name).
 LANGS = [
     ("en", "", "en", "Eng", "English"),
-    ("zh-hans", "/" + HANS_DIR, "zh-Hans", "简", "简体中文"),
     ("zh-hant", "/" + ZH_DIR, "zh-Hant", "繁", "繁體中文"),
+    ("zh-hans", "/" + HANS_DIR, "zh-Hans", "简", "简体中文"),
 ]
 
 # Hong Kong wording -> mainland wording, applied after OpenCC has converted the characters
@@ -132,18 +144,20 @@ HANS_WORDS = [
     ("檐槽", "檐沟"),
     ("传送", "发送"),
     ("电邮", "电子邮箱"),
+    ("搜寻", "搜索"),
+    ("关键字", "关键词"),
 ]
 
 NAV_KEYS = [
     "home", "custom_homes", "knockdown", "house_land", "multi_unit",
-    "project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno",
+    "project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno", "other_services",
     "about", "faq", "contact",
 ]
 
 # Which pages live under each dropdown in the nav (so its button is highlighted).
 NAV_GROUPS = {
     "BUILD": {"custom_homes", "knockdown", "house_land", "multi_unit"},
-    "MGMT": {"project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno", "projects"},
+    "MGMT": {"project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno", "other_services", "projects"},
     "CONNECT": {"about", "faq", "contact"},
 }
 
@@ -164,6 +178,7 @@ PAGES = [
     ("renovations-extensions/index.html", False, "prop_reno"),
     ("property-management/index.html", False, "prop_mgmt"),
     ("property-maintenance/index.html", False, "prop_maint"),
+    ("other-services/index.html", False, "other_services"),
 ]
 
 # Chinese <title> and meta description for each page's /zh/ copy. These are what Google shows
@@ -222,6 +237,10 @@ ZH_META = {
         "墨爾本物業管理｜房屋維護規劃｜世代建築管理 Nexcon",
         "以樓宇狀況為本的墨爾本物業管理：狀況評估、保養規劃、統籌技工及清晰報告。",
     ),
+    "other-services/index.html": (
+        "墨爾本園藝割草及家具維修｜其他服務｜世代建築管理 Nexcon",
+        "墨爾本園藝、割草、修剪樹木，以及家具製作及維修服務，由世代建築管理（Nexcon）團隊處理。",
+    ),
     "property-maintenance/index.html": (
         "墨爾本房屋維修及保養｜Property Maintenance｜世代建築管理 Nexcon",
         "墨爾本物業保養及維修服務：一般維修、屋頂及簷槽保養、統籌技工及定期保養。",
@@ -245,6 +264,32 @@ def stitch(html: str, name: str, content: str, page_path: str) -> str:
         return html.replace(placeholder, block)
 
     sys.exit(f"ERROR: {page_path} has no {start} block or {placeholder} placeholder.")
+
+
+ICON_LINKS = """<!-- ICONS:START -->
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="/favicon-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<!-- ICONS:END -->"""
+
+
+def inject_icons(page_path: str) -> None:
+    """Put the shared favicon links in the page's <head>, replacing the old hand-written ones the first time."""
+    path = ROOT / page_path
+    page_html = path.read_text(encoding="utf-8")
+    marked = re.compile(r"<!-- ICONS:START -->.*?<!-- ICONS:END -->", re.S)
+    if marked.search(page_html):
+        new_html = marked.sub(lambda m: ICON_LINKS, page_html)
+    else:
+        old = re.compile(r'<link rel="icon"[^>]*>[ \t]*\n?[ \t]*<link rel="apple-touch-icon"[^>]*>')
+        if not old.search(page_html):
+            sys.exit(f"ERROR: {page_path} has no <link rel=\"icon\"> / apple-touch-icon lines to replace.")
+        new_html = old.sub(lambda m: ICON_LINKS, page_html, count=1)
+    if new_html != page_html:
+        path.write_text(new_html, encoding="utf-8")
+        print(f"Updated icons in {page_path}")
 
 
 def inject_csp(page_path: str) -> None:
@@ -499,7 +544,7 @@ def make_zh_page(page_path: str, zh: dict) -> str:
 
 
 def lang_switch(current: str, en_path: str, from_dir: str) -> str:
-    """The "Eng | 简 | 繁" switcher for one page, as seen from from_dir, with current marked."""
+    """The "Eng | 繁 | 简" switcher for one page, as seen from from_dir, with current marked."""
     links = []
     for key, prefix, code, label, name in LANGS:
         href = relative_url(prefix + en_path, from_dir)
@@ -591,6 +636,69 @@ def write_if_changed(name: str, text: str) -> None:
         print(f"Updated {name}")
 
 
+# Extra words each page should be found by (in the page's own language), added to its search entry.
+SEARCH_EXTRA = {
+    "building-inspections/index.html": {
+        "en": "price prices pricing cost fee fees quote book booking calendar appointment pest control PCI practical completion pool",
+        "zh": "價錢 價格 收費 費用 報價 預約 預訂 日曆 蟲害 竣工驗收 泳池",
+    },
+}
+
+
+class _TextExtractor(HTMLParser):
+    """The visible text of an HTML fragment (no scripts, styles or tags)."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.parts, self.skip = [], 0
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ("script", "style", "noscript", "svg"):
+            self.skip += 1
+        if tag in ("p", "div", "li", "h1", "h2", "h3", "br", "section"):
+            self.parts.append(" ")
+
+    def handle_endtag(self, tag):
+        if tag in ("script", "style", "noscript", "svg") and self.skip:
+            self.skip -= 1
+        if tag in ("p", "div", "li", "h1", "h2", "h3", "section"):
+            self.parts.append(" ")
+
+    def handle_data(self, data):
+        if not self.skip:
+            self.parts.append(data)
+
+    def text(self) -> str:
+        return re.sub(r"\s+", " ", "".join(self.parts)).strip()
+
+
+def write_search_index(to_hans) -> None:
+    """One JSON file per language: [{u: path, t: title, d: description, b: body text}, ...]."""
+    for name, folder, lang in (("search-index-en.json", "", "en"), ("search-index-zh.json", ZH_DIR, "zh"),
+                               ("search-index-hans.json", HANS_DIR, "hans")):
+        entries = []
+        for page_path, _, _ in PAGES:
+            built = (folder + "/" if folder else "") + page_path
+            page_html = (ROOT / built).read_text(encoding="utf-8")
+            main = re.search(r'<main id="main">(.*?)</main>', page_html, re.S)
+            if not main:
+                continue
+            h1 = re.search(r"<h1[^>]*>(.*?)</h1>", main.group(1), re.S)
+            title_src = h1.group(1) if h1 else re.search(r"<title>(.*?)</title>", page_html, re.S).group(1)
+            title = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", html.unescape(title_src))).strip()
+            desc_match = re.search(r'<meta name="description" content="([^"]*)"', page_html)
+            desc = html.unescape(desc_match.group(1)) if desc_match else ""
+            extractor = _TextExtractor()
+            extractor.feed(main.group(1))
+            body = extractor.text()
+            extra = SEARCH_EXTRA.get(page_path, {}).get("en" if lang == "en" else "zh", "")
+            entry = {"u": (("/" + folder) if folder else "") + url_path(page_path), "t": title, "d": desc, "b": body}
+            if extra:
+                entry["k"] = to_hans(extra) if lang == "hans" else extra  # keywords: found by these even if not in the text
+            entries.append(entry)
+        write_if_changed(name, json.dumps(entries, ensure_ascii=False, separators=(",", ":")) + "\n")
+
+
 def write_sitemap() -> None:
     for name, prefixes in SITEMAPS:
         lines = [
@@ -627,6 +735,8 @@ if __name__ == "__main__":
         inject_csp(page_path)
     for page_path, _, _ in PAGES:
         inject_hreflang(page_path)
+    for page_path in [p for p, _, _ in PAGES] + ["404.html"]:
+        inject_icons(page_path)
 
     zh = load_zh_translations()
     built = {make_zh_page(page_path, zh) for page_path, _, _ in PAGES}
@@ -636,5 +746,6 @@ if __name__ == "__main__":
     write_hans_translations(zh, to_hans)
     built = {make_hans_page(page_path, to_hans) for page_path, _, _ in PAGES}
     clean_zh_dir(built, HANS_DIR)
+    write_search_index(to_hans)
     write_sitemap()
     print("Done.")
