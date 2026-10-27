@@ -32,6 +32,7 @@ i18n.js                       Applies the language toggle
 site.js                       Nav menu, dropdowns, footer year, scroll-reveal (loaded by the footer partial)
 enquiry.js                    Contact + house-and-land enquiry forms (posts to the Apps Script)
 captcha.js                    "I'm not a robot" check (Cloudflare Turnstile) used by every form
+analytics.js                  Visitor analytics (Cloudflare Web Analytics, token already set)
 case-studies.js               Loads extra case studies from a published Google Sheet
 booking.js                    Inspection booking calendar widget
 pricing.js                    Inspection fee table and calculation, shared by the calculator and the booking form (the prices live here)
@@ -97,6 +98,15 @@ The policy blocks **inline `<script>`** and only allows scripts from this site a
 ## Testimonial on the home page
 
 The "What our customers say" section (`#testimonials` in `index.html`, styled by `.testimonial*` in `styles.css`) holds one customer quote. Its words are the `home_testi_*` keys in `translations.js` (quote, name and suburb, service; English and Chinese). **Only publish a real customer's own words, with their permission** (fake or invented reviews are illegal under Australian consumer law). To add more, repeat the `<figure class="testimonial">` block with new keys. The part of the quote that is emphasised is wrapped in `<strong>` inside the translation text (the blockquote has `data-i18n-html` so the tag is kept); the highlight style is `.testimonial-quote strong`.
+
+## Visitor analytics
+
+`analytics.js` (loaded on every page from `partial/footer.html`) adds **Cloudflare Web Analytics**: free, no cookies, no profile of individual visitors. It counts page views, countries, browsers, referrers (where visitors came from) and page speed, and shows them in the Cloudflare dashboard under *Analytics & Logs → Web Analytics*.
+
+- **Setup (done):** the site is added in Cloudflare (*Web Analytics*, hostname `nexconbm.com.au`) and its token is `TOKEN` in `analytics.js`. To switch to another Cloudflare site, replace `TOKEN` with the one from that site's snippet (the long string in `data-cf-beacon`). The token is **public** (it appears in the page source); it is not a secret like the Turnstile secret key. With the `PASTE_YOUR...` placeholder the file does nothing.
+- **When it runs:** only on `nexconbm.com.au` / `www.` (so local previews and test copies are never counted), and not for visitors with Do Not Track or Global Privacy Control switched on. To leave your own visits out, run `localStorage.setItem("nexcon-no-analytics", "1")` once in the browser console on the live site (`removeItem` to undo).
+- **Security policy:** `partial/csp.html` allows `https://static.cloudflareinsights.com` (script) and `https://cloudflareinsights.com` (reporting). The beacon can't be pinned with an integrity hash because Cloudflare updates it.
+- **Privacy:** it uses no cookies, so no cookie banner is needed, but mention it in the privacy policy (see the guide's open items).
 
 ## Site search
 
