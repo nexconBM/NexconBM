@@ -94,6 +94,10 @@ The policy blocks **inline `<script>`** and only allows scripts from this site a
 2. Add it to `PAGES` in `build.py` (plus a `NAV_KEYS` entry and nav link in `partial/header.html` if it belongs in the menu).
 3. Run `python build.py`.
 
+## Testimonial on the home page
+
+The "What our customers say" section (`#testimonials` in `index.html`, styled by `.testimonial*` in `styles.css`) holds one customer quote. Its words are the `home_testi_*` keys in `translations.js` (quote, name and suburb, service; English and Chinese). **Only publish a real customer's own words, with their permission** (fake or invented reviews are illegal under Australian consumer law). To add more, repeat the `<figure class="testimonial">` block with new keys. The part of the quote that is emphasised is wrapped in `<strong>` inside the translation text (the blockquote has `data-i18n-html` so the tag is kept); the highlight style is `.testimonial-quote strong`.
+
 ## Site search
 
 A magnifier button opens a search box (`.search-toggle` buttons and `#searchPanel` in `partial/header.html`; on desktop the magnifier sits in the menu just before the language switcher, on phones and tablets a second copy sits beside the menu button, and CSS shows one at a time; styled by the `.search-*` rules in `styles.css`, driven by `search.js`, which `partial/footer.html` loads on every page). Nothing is sent anywhere: the search runs in the browser over one small JSON file per language that `build.py` writes on every run (`write_search_index`): `search-index-en.json`, `search-index-zh.json` (Traditional), `search-index-hans.json` (Simplified), about 25 KB each, in the site root. Each entry is a page's title, description and visible text (`<main>` only, so the menu and footer don't match everything), plus optional keywords.
@@ -132,6 +136,21 @@ Quick consistency check:
 ```bash
 grep -rn "styles.css?v=" --include="*.html" .
 ```
+
+### Fonts
+
+All fonts are free Google Fonts, loaded by a `<link>` in every page's `<head>` (allowed by the CSP: `fonts.googleapis.com` for the stylesheet, `fonts.gstatic.com` for the files). The names are set once at the top of `styles.css`:
+
+| Variable | Font | Used for | Weights loaded |
+| --- | --- | --- | --- |
+| `--ex` | **Archivo Expanded** | Headings, small uppercase labels (`.detail-label`, `.eyebrow`), the language buttons | 500, 600, 700, 800 |
+| `--sans` | **Archivo** | Body text, menus, buttons, forms | 400, 500, 600, 700 |
+| `--serif` | **Source Serif Pro** | The grey-pink lines under headings (`.lede`), the home hero line, footer tagline, `.quote`, and the testimonial (light italic) | 300 and 400, roman and italic |
+| (fallback in all three) | **Noto Sans TC** / **Noto Sans SC** | Chinese text. `/zh/` pages use TC, `/zh-hans/` pages use SC (`html[lang="zh-Hans"]` in `styles.css` swaps the variables) | 400 to 800 |
+
+- The Chinese font is large, so it is only loaded on Chinese pages: `build.py` (`CJK_FONT`) adds its `<link>` to the generated `/zh/` pages and swaps TC for SC on `/zh-hans/`, and `i18n.js` loads it as a fallback.
+- **Only the weights above exist.** The serif has no bold face, so bold or 600+ serif text is a faked bold and looks rough. For emphasis in serif text use weight 400, colour or a highlight (as the testimonial does). Chinese text is the opposite: use bold (700) there.
+- **To change a font:** change the name in the variable at the top of `styles.css` AND the `family=` list in the Google Fonts `<link>` of every page (it is written by hand in each page's head, not a shared partial, so search all `*.html` for `fonts.googleapis.com`; the generated `zh/` and `zh-hans/` copies follow the English pages after `python build.py`). Then bump the `styles.css?v=` number everywhere. A new font host also needs adding to `partial/csp.html`.
 
 ## Contact and enquiry forms
 
