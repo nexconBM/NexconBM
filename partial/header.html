@@ -27,6 +27,7 @@
           <a href="{{ROOT}}property-management/"{{NAV_PROP_MGMT_ACTIVE}} data-i18n="nav_prop_mgmt">Property management</a>
           <a href="{{ROOT}}property-maintenance/"{{NAV_PROP_MAINT_ACTIVE}} data-i18n="nav_prop_maint">Maintenance</a>
           <a href="{{ROOT}}renovations-extensions/"{{NAV_PROP_RENO_ACTIVE}} data-i18n="nav_prop_reno">Renovation &amp; extension</a>
+          <a href="{{ROOT}}other-services/"{{NAV_OTHER_SERVICES_ACTIVE}} data-i18n="nav_other_services">Other services</a>
         </div>
       </div>
 
@@ -40,8 +41,15 @@
       </div>
 
       <a href="{{ROOT}}contact/" class="nav-cta" data-i18n="nav_cta">Start your project</a>
+      <button class="search-toggle search-toggle-nav" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Search">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
       {{LANG_SWITCH}}
     </nav>
+
+    <button class="search-toggle search-toggle-bar" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Search">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
 
     <button
       class="nav-toggle"
@@ -52,5 +60,17 @@
     >
       <span></span>
     </button>
+  </div>
+
+  <div class="search-panel" id="searchPanel" role="search" hidden>
+    <div class="search-panel-inner">
+      <form class="search-form" action="#" novalidate>
+        <label class="visually-hidden" for="searchInput" data-i18n="search_label">Search</label>
+        <input type="search" id="searchInput" name="q" autocomplete="off" maxlength="80" placeholder="Search the site…">
+        <button type="button" class="search-close" aria-label="Close search">&times;</button>
+      </form>
+      <p class="search-status" aria-live="polite"></p>
+      <ul class="search-results"></ul>
+    </div>
   </div>
 </header>

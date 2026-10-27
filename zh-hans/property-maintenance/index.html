@@ -7,8 +7,13 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; frame-src https://challenges.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://script.google.com https://*.googleusercontent.com https://docs.google.com; form-action 'self'; base-uri 'self'; object-src 'none'">
 <!-- CSP:END -->
 <title>墨尔本房屋维修及保养｜Property Maintenance｜世代建筑管理 Nexcon</title>
-<link rel="icon" href="../../Nexcon-favicon.png">
-<link rel="apple-touch-icon" href="../../Nexcon-favicon-apple.png">
+<!-- ICONS:START -->
+<link rel="icon" href="../../favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="../../favicon-48x48.png" sizes="48x48">
+<link rel="icon" type="image/png" href="../../icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="../../apple-touch-icon.png">
+<link rel="manifest" href="../../site.webmanifest">
+<!-- ICONS:END -->
 <meta name="description" content="墨尔本物业保养及维修服务：一般维修、屋顶及檐沟保养、统筹技工及定期保养。">
 <!-- SEO:START -->
 <link rel="canonical" href="https://nexconbm.com.au/zh-hans/property-maintenance/">
@@ -32,7 +37,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../../styles.css?v=50">
+<link rel="stylesheet" href="../../styles.css?v=51">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -67,6 +72,7 @@
           <a href="../property-management/" data-i18n="nav_prop_mgmt">物业管理</a>
           <a href="./" class="is-active" data-i18n="nav_prop_maint">保养</a>
           <a href="../renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a>
+          <a href="../other-services/" data-i18n="nav_other_services">其他服务</a>
         </div>
       </div>
 
@@ -80,13 +86,20 @@
       </div>
 
       <a href="../contact/" class="nav-cta" data-i18n="nav_cta">开始您的项目</a>
+      <button class="search-toggle search-toggle-nav" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Search">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
       <!-- LANGSWITCH:START -->
 <!-- LANGSWITCH:START -->
-      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language / 语言 / 語言"><a href="../../property-maintenance/" lang="en" hreflang="en" data-lang="en" title="English">Eng</a><span class="lang-sep" aria-hidden="true">|</span><a href="./" lang="zh-Hans" hreflang="zh-Hans" data-lang="zh-hans" title="简体中文" aria-current="page">简</a><span class="lang-sep" aria-hidden="true">|</span><a href="../../zh/property-maintenance/" lang="zh-Hant" hreflang="zh-Hant" data-lang="zh-hant" title="繁體中文">繁</a></div>
+      <div class="lang-switch" id="langSwitch" role="group" aria-label="Language / 语言 / 語言"><a href="../../property-maintenance/" lang="en" hreflang="en" data-lang="en" title="English">Eng</a><span class="lang-sep" aria-hidden="true">|</span><a href="../../zh/property-maintenance/" lang="zh-Hant" hreflang="zh-Hant" data-lang="zh-hant" title="繁體中文">繁</a><span class="lang-sep" aria-hidden="true">|</span><a href="./" lang="zh-Hans" hreflang="zh-Hans" data-lang="zh-hans" title="简体中文" aria-current="page">简</a></div>
       <!-- LANGSWITCH:END -->
 <!-- LANGSWITCH:END -->
 <!-- LANGSWITCH:END -->
     </nav>
+
+    <button class="search-toggle search-toggle-bar" type="button" aria-expanded="false" aria-controls="searchPanel" aria-label="Search">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
 
     <button
       class="nav-toggle"
@@ -97,6 +110,18 @@
     >
       <span></span>
     </button>
+  </div>
+
+  <div class="search-panel" id="searchPanel" role="search" hidden>
+    <div class="search-panel-inner">
+      <form class="search-form" action="#" novalidate>
+        <label class="visually-hidden" for="searchInput" data-i18n="search_label">搜索</label>
+        <input type="search" id="searchInput" name="q" autocomplete="off" maxlength="80" placeholder="Search the site…">
+        <button type="button" class="search-close" aria-label="Close search">&times;</button>
+      </form>
+      <p class="search-status" aria-live="polite"></p>
+      <ul class="search-results"></ul>
+    </div>
   </div>
 </header>
 <!-- HEADER:END -->
@@ -124,8 +149,8 @@
             <p class="body-copy" data-i18n="pmt_w1_p">为房屋、设施及装置进行实用的维修及日常保养，由我们安排并跟进完成。</p>
           </div>
           <div class="service-item">
-            <p class="detail-label" data-i18n="pmt_w2_h">屋顶、排水槽及排水系统</p>
-            <p class="body-copy" data-i18n="pmt_w2_p">定期检查并保养屋顶、排水槽及排水系统，协助预防渗漏、淤塞及水损。</p>
+            <p class="detail-label" data-i18n="pmt_w2_h">排水槽及排水系统</p>
+            <p class="body-copy" data-i18n="pmt_w2_p">定期检查并保养排水槽及排水系统，协助预防淤塞、溢水及水损。</p>
           </div>
           <div class="service-item">
             <p class="detail-label" data-i18n="pmt_w3_h">水电工程及工匠管理</p>
@@ -136,8 +161,8 @@
             <p class="body-copy" data-i18n="pmt_w4_p">修补并重新髹油墙壁、天花及线脚，并保养门、窗、门锁及其他配件。</p>
           </div>
           <div class="service-item">
-            <p class="detail-label" data-i18n="pmt_w5_h">园艺及修剪树木</p>
-            <p class="body-copy" data-i18n="pmt_w5_p">定期进行花园保养，包括剪草、修剪枝叶、除草、修剪树木及一般户外清理。</p>
+            <p class="detail-label" data-i18n="pmt_w5_h">屋顶检查及维修</p>
+            <p class="body-copy" data-i18n="pmt_w5_p">检查屋顶有否渗漏、损毁及老化，并在小问题变成昂贵工程前安排维修。</p>
           </div>
           <div class="service-item">
             <p class="detail-label" data-i18n="pmt_w6_h">定期物业保养</p>
@@ -178,6 +203,7 @@
           <a href="../property-management/" data-i18n="nav_prop_mgmt">物业管理</a>
           <a href="./" data-i18n="nav_prop_maint">保养</a>
           <a href="../renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a>
+          <a href="../other-services/" data-i18n="nav_other_services">其他服务</a>
         </div>
         <div class="footer-col">
           <h2 data-i18n="footer_links_label">快速连结</h2>
@@ -204,6 +230,7 @@
 <script src="../../translations-hans.js"></script>
 <script src="../../i18n.js?v=4"></script>
 <script src="../../site.js?v=1"></script>
+<script src="../../search.js?v=1"></script>
 <!-- FOOTER:END -->
 
 </body>
