@@ -94,6 +94,10 @@ const translations = {
     home_why3_body: "Important construction stages are monitored through professional inspections and reporting.",
     home_why4_label: "Long-term thinking",
     home_why4_body: "We don't just focus on getting the home built. We consider how the home will work for you in the years ahead.",
+    home_testi_eyebrow: "What our customers say",
+    home_testi_quote: "“We booked Nexcon for a building inspection. The inspector was on time, walked through every room with us, and <strong>the report was clear, with photos of each issue</strong>, so we knew exactly what needed attention. It took the stress out of the process.”",
+    home_testi_name: "Ryan, Wantirna",
+    home_testi_service: "Building inspection",
 
 
 
@@ -712,6 +716,10 @@ const translations = {
     home_why3_body: "透過專業檢驗及報告，監察重要的施工階段。",
     home_why4_label: "長遠考慮",
     home_why4_body: "我們不僅著眼於把房子建成，也會考慮這個家在未來多年如何配合您的生活。",
+    home_testi_eyebrow: "客戶評價",
+    home_testi_quote: "「我們預約了 Nexcon 進行樓宇檢驗。驗房師準時到達，陪我們逐個房間檢查，<strong>報告清晰，每個問題都附有照片</strong>，讓我們清楚知道哪些地方需要處理。整個過程因此輕鬆了不少。」",
+    home_testi_name: "Ryan，Wantirna",
+    home_testi_service: "樓宇檢驗",
 
 
 
