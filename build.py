@@ -180,15 +180,15 @@ PAGES = [
 # and keep "Nexcon" so a search for the English brand name still matches.
 ZH_META = {
     "index.html": (
-        "墨爾本建築商｜定製住宅、推倒重建、驗房｜世代建築管理 Nexcon",
-        "世代建築管理（Nexcon）是墨爾本住宅建築商（builder），提供定製住宅、House and Land 房屋土地套餐、推倒重建（knockdown rebuild）及新房驗房服務，每個項目均享7年結構保養。",
+        "墨爾本房屋裝修、翻新及加建｜定製住宅、推倒重建｜世代建築管理 Nexcon",
+        "世代建築管理（Nexcon）協助墨爾本業主規劃及管理房屋裝修、翻新及加建（renovation & extension），亦提供定製住宅、House and Land 房屋土地套餐及推倒重建（knockdown rebuild）服務。",
     ),
     "about/index.html": (
         "關於我們｜墨爾本建築商 世代建築管理 Nexcon",
         "認識世代建築管理（Nexcon）的墨爾本團隊：住宅建築、項目管理及樓宇檢驗，由合資格土木工程師帶領。",
     ),
     "contact/index.html": (
-        "聯絡我們｜墨爾本建築商、驗房預約｜世代建築管理 Nexcon",
+        "聯絡我們｜墨爾本裝修、翻新、加建及建築商｜世代建築管理 Nexcon",
         "告訴我們您在墨爾本的度身訂造住宅、拆卸重建、翻新或檢驗項目。歡迎發送查詢或致電我們。",
     ),
     "custom-homes/index.html": (
@@ -224,8 +224,8 @@ ZH_META = {
         "墨爾本住宅建築項目管理：統籌建築商、審閱報價、施工檢驗及進度監察。",
     ),
     "renovations-extensions/index.html": (
-        "墨爾本房屋裝修及擴建｜Renovation & Extension｜世代建築管理 Nexcon",
-        "為墨爾本自住及投資物業規劃及管理翻新及加建工程：工程範圍、預算、統籌技工及進度報告。",
+        "墨爾本房屋裝修、翻新及加建｜Home Renovation｜世代建築管理 Nexcon",
+        "規劃及管理墨爾本自住及投資物業的房屋裝修、翻新及加建工程，由廚房、浴室到第二層加建：清晰的工程範圍、預算及進度報告。",
     ),
     "property-management/index.html": (
         "墨爾本物業管理｜房屋維護規劃｜世代建築管理 Nexcon",
