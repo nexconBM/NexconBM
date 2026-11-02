@@ -648,6 +648,11 @@ const translations = {
     about_exp5: "Residential developments",
     about_exp6: "Building inspections",
     about_exp7: "Construction management",
+    footer_nexcon_homes: "Nexcon Homes (Real estate) ↗",
+    about_homes_eyebrow: "Our related business",
+    about_homes_h2: "Looking to buy, sell or rent?",
+    about_homes_body: "Our related business, Nexcon Homes, provides real estate services in Melbourne.",
+    about_homes_link: "Visit Nexcon Homes ↗",
 
     about_where_eyebrow: "Where we work",
     about_where_h2: "Melbourne & Victoria",
@@ -1303,6 +1308,11 @@ const translations = {
     about_exp5: "住宅發展項目",
     about_exp6: "樓宇檢驗",
     about_exp7: "施工管理",
+    footer_nexcon_homes: "Nexcon Homes（房地產）↗",
+    about_homes_eyebrow: "我們的關聯公司",
+    about_homes_h2: "想買賣或租賃物業？",
+    about_homes_body: "我們的關聯公司 Nexcon Homes 在墨爾本提供房地產服務。",
+    about_homes_link: "瀏覽 Nexcon Homes ↗",
 
     about_where_eyebrow: "我們的服務地區",
     about_where_h2: "墨爾本及維多利亞省",
