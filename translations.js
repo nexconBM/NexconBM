@@ -28,6 +28,7 @@ const translations = {
 
     footer_tagline: "Custom Homes. Smarter Building Management.",
     footer_area: "Melbourne | Victoria",
+    footer_wechat_sr: "Add us on WeChat",
     footer_services_label: "Services",
     footer_links_label: "Quick links",
     footer_contact_label: "Contact",
@@ -576,6 +577,9 @@ const translations = {
     contact_details_eyebrow: "Contact details",
     contact_office_label: "Head Office",
     contact_southeast_label: "South East Office",
+    contact_offices_eyebrow: "Our office",
+    contact_offices_h2: "Visit us in Nunawading",
+    contact_directions: "Open in Google Maps →",
     contact_faq_link: "Read our frequently asked questions →",
 
     faq_page_h1: "Frequently asked questions",
@@ -688,6 +692,7 @@ const translations = {
 
     footer_tagline: "度身訂造家園。更智慧的建築管理。",
     footer_area: "墨爾本｜維多利亞省",
+    footer_wechat_sr: "在微信加我們為好友",
     footer_services_label: "服務",
     footer_links_label: "快速連結",
     footer_contact_label: "聯絡資料",
@@ -1236,6 +1241,9 @@ const translations = {
     contact_details_eyebrow: "聯絡資料",
     contact_office_label: "總公司",
     contact_southeast_label: "東南辦事處",
+    contact_offices_eyebrow: "我們的辦公室",
+    contact_offices_h2: "歡迎到訪我們位於 Nunawading 的辦公室",
+    contact_directions: "在 Google 地圖中開啟 →",
     contact_faq_link: "查看常見問題 →",
 
     faq_page_h1: "常見問題",
