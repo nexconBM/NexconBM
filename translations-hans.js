@@ -27,6 +27,7 @@ translations.zh = {
   "footer_tagline": "量身定制家园。更智慧的建筑管理。",
   "footer_area": "墨尔本｜维多利亚州",
   "footer_wechat_sr": "在微信加我们为好友",
+  "footer_youtube_sr": "在 YouTube 观看我们的影片",
   "mbar_call": "致电",
   "mbar_enquire": "查询",
   "about_eng_eyebrow": "工程师主导",
