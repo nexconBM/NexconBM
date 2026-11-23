@@ -359,8 +359,6 @@ svg{display:block;}
   .team-photo{width:100%; height:220px;}
 }
 
-/* whatsapp qr (to the right of a team member's profile) */
-.whatsapp-qr{width:80px; height:80px; object-fit:contain; border-radius:2px;}
 
 /* footer */
 footer{background:var(--mahogany); color:var(--sandstone); padding:2.4rem 0 1.6rem;}
@@ -368,6 +366,12 @@ footer{background:var(--mahogany); color:var(--sandstone); padding:2.4rem 0 1.6r
 .footer-logo{display:flex; align-items:center;}
 .footer-logo .logo-img{height:32px;}
 .footer-brand{max-width:26ch;}
+.office-maps{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.6rem;}
+.office-map iframe{display:block; width:100%; height:380px; border:0; border-radius:4px; margin:0.4rem 0 0.8rem; background:var(--line-on-sand);}
+.footer-social{display:flex; flex-wrap:wrap; align-items:center; gap:0.7rem; margin-top:0.9rem;}
+.footer-social a{display:block; line-height:0; color:var(--sandstone); opacity:0.85; transition:opacity .2s, color .2s;}
+.footer-social a:hover, .footer-social a:focus-visible{opacity:1; color:var(--blush);}
+.footer-social svg{width:26px; height:26px;}
 .footer-tagline{font-family:var(--serif); font-style:italic; font-weight:300; font-size:1.05rem; line-height:1.4; color:var(--blush); margin:0.9rem 0 0.3rem;}
 .footer-area{font-size:0.85rem; color:rgba(244,238,231,0.7); margin:0;}
 .footer-cols{display:flex; gap:clamp(1.4rem,3.2vw,3.2rem); flex-wrap:wrap;}
