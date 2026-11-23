@@ -5,6 +5,7 @@ translations.zh = {
   "nav_home": "首页",
   "nav_group_build": "建造",
   "nav_group_mgmt": "管理",
+  "nav_group_services": "服务",
   "nav_group_property": "物业",
   "nav_group_connect": "与我们联系",
   "nav_custom_homes": "量身定制住宅",

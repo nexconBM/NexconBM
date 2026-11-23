@@ -1,25 +1,27 @@
 # Nexcon Building Management website
 
-Source for **https://nexconbm.com.au** — a static, bilingual (English / Traditional Chinese) marketing site for Nexcon Building Management, with a free serverless inspection-booking calendar.
+Source for **https://nexconbm.com.au** — a static, trilingual (English / Traditional Chinese / Simplified Chinese) marketing site for Nexcon Building Management, with a free serverless inspection-booking calendar.
 
 - **Hosting:** GitHub Pages, serving the `main` branch directly (custom domain set by `CNAME`)
 - **Stack:** plain HTML / CSS / JavaScript. No framework, no bundler. One small Python script (`build.py`) stitches a shared header and footer into every page.
-- **Only backend:** a Google Apps Script "Web App" that reads/writes a Google Sheet, used by the booking feature. It is **not in this repo** (see [Booking system](#inspection-booking-system)).
+- **Only backend:** a Google Apps Script "Web App" that reads/writes a Google Sheet, used by the booking calendar and both enquiry forms. The live copy lives in the Sheet's Apps Script editor; a copy of its source is kept here as `booking-apps-script.gs` (see [Booking system](#inspection-booking-system)).
 
 ## Contents
 
 1. [Repository layout](#repository-layout)
 2. [Local preview](#local-preview)
 3. [The build system (`build.py`)](#the-build-system-buildpy)
-4. [Bilingual support](#bilingual-support)
-5. [Styling and cache-busting](#styling-and-cache-busting)
-6. [Contact and enquiry forms](#contact-and-enquiry-forms)
-7. [Case studies from a Google Sheet](#case-studies-from-a-google-sheet)
-8. [Inspection booking system](#inspection-booking-system)
-9. [Security notes](#security-notes)
-10. [Deploying](#deploying)
-11. [Known loose ends](#known-loose-ends)
-12. [Appendix: Apps Script source](#appendix-apps-script-source)
+4. [Site structure: three divisions](#site-structure-three-divisions)
+5. [Contact options on every page](#contact-options-on-every-page)
+6. [Bilingual support](#bilingual-support)
+7. [Styling and cache-busting](#styling-and-cache-busting)
+8. [Contact and enquiry forms](#contact-and-enquiry-forms)
+9. [Case studies from a Google Sheet](#case-studies-from-a-google-sheet)
+10. [Inspection booking system](#inspection-booking-system)
+11. [Security notes](#security-notes)
+12. [Deploying](#deploying)
+13. [Known loose ends](#known-loose-ends)
+14. [Appendix: Apps Script source](#appendix-apps-script-source)
 
 ## Repository layout
 
@@ -29,7 +31,7 @@ index.html                    Homepage
 styles.css                    The only stylesheet, shared by every page
 translations.js               English / Chinese text dictionary
 i18n.js                       Applies the language toggle
-site.js                       Nav menu, dropdowns, footer year, scroll-reveal (loaded by the footer partial)
+site.js                       Nav menu, dropdowns, footer year, scroll-reveal, WeChat pop-up (loaded by the footer partial)
 enquiry.js                    Contact + house-and-land enquiry forms (posts to the Apps Script)
 captcha.js                    "I'm not a robot" check (Cloudflare Turnstile) used by every form
 analytics.js                  Visitor analytics (Cloudflare Web Analytics, token already set)
@@ -42,6 +44,8 @@ translations-hans.js          GENERATED Simplified copy of translations.zh, load
 partial/header.html           The single shared header
 partial/footer.html           The single shared footer
 partial/csp.html              The Content-Security-Policy <meta> tag (written into every page's <head>)
+wechat-qr-kevin.png           Kevin's WeChat QR code, shown in the footer's WeChat pop-up
+<page>/<page>-<subject>.webp  Page photos live in their page's folder (e.g. property-management/property-management-living-room.webp)
 CNAME                         Custom domain for GitHub Pages
 robots.txt, sitemap.xml       SEO / crawler config. sitemap.xml is an index of sitemap-en.xml and sitemap-zh.xml (all generated)
 404.html                      Custom not-found page
@@ -76,7 +80,7 @@ There is exactly **one** copy of the header and footer (`partial/header.html`, `
 | --- | --- |
 | `{{ROOT}}` | `""` on the homepage, `"../"` everywhere else (so relative links work at any depth) |
 | `{{NAV_*_ACTIVE}}` | `class="is-active"` on the current page's nav link, empty elsewhere |
-| `{{NAV_GROUP_BUILD_ACTIVE}}`, `{{NAV_GROUP_MGMT_ACTIVE}}` | ` is-active` on a dropdown button when the current page is in that group |
+| `{{NAV_GROUP_BUILD_ACTIVE}}`, `{{NAV_GROUP_MGMT_ACTIVE}}`, `{{NAV_GROUP_PROPERTY_ACTIVE}}`, `{{NAV_GROUP_CONNECT_ACTIVE}}` | ` is-active` on a dropdown button when the current page is in that group (`NAV_GROUPS` in `build.py`) |
 
 ### Content-Security-Policy
 
@@ -92,12 +96,12 @@ The policy blocks **inline `<script>`** and only allows scripts from this site a
 ### Adding a page
 
 1. Create `new-page/index.html` containing bare `<!-- HEADER -->` and `<!-- FOOTER -->` placeholders.
-2. Add it to `PAGES` in `build.py` (plus a `NAV_KEYS` entry and nav link in `partial/header.html` if it belongs in the menu).
+2. Add it to `PAGES` in `build.py` (plus a `NAV_KEYS` entry and nav link in `partial/header.html` if it belongs in the menu). A service page also goes into one division: its key in `NAV_GROUPS`, its link in that dropdown, in the footer's matching list and on the homepage card (see [Site structure](#site-structure-three-divisions)).
 3. Run `python build.py`.
 
 ## Testimonial on the home page
 
-The "What our customers say" section (`#testimonials` in `index.html`, styled by `.testimonial*` in `styles.css`) holds one customer quote. Its words are the `home_testi_*` keys in `translations.js` (quote, name and suburb, service; English and Chinese). **Only publish a real customer's own words, with their permission** (fake or invented reviews are illegal under Australian consumer law). To add more, repeat the `<figure class="testimonial">` block with new keys. The part of the quote that is emphasised is wrapped in `<strong>` inside the translation text (the blockquote has `data-i18n-html` so the tag is kept); the highlight style is `.testimonial-quote strong`.
+The "What our customers say" section (`#testimonials` in `index.html`, styled by `.testimonial*` in `styles.css`) holds one customer quote, followed by a "See our reviews on Google →" link (`home_testi_google`) to the Google Business Profile. Its words are the `home_testi_*` keys in `translations.js` (quote, name and suburb, service; English and Chinese). **Only publish a real customer's own words, with their permission** (fake or invented reviews are illegal under Australian consumer law). To add more, repeat the `<figure class="testimonial">` block with new keys. The part of the quote that is emphasised is wrapped in `<strong>` inside the translation text (the blockquote has `data-i18n-html` so the tag is kept); the highlight style is `.testimonial-quote strong`.
 
 ## Visitor analytics
 
@@ -118,6 +122,29 @@ A magnifier button opens a search box (`.search-toggle` buttons and `#searchPane
 - Words shown by the search come from the `search_*` keys in `translations.js` (both languages). Results are built with `textContent`, never `innerHTML`.
 - Not searched: text that scripts add after load (the projects list from the Google Sheet, the booking calendar, fee results). Also left out on purpose, so results stay relevant (`SEARCH_SKIP_*` in `build.py`): the customer testimonial, anything inside a `<form>` (labels, dropdown options, tick boxes), hidden messages (anything with `hidden`, `data-nosnippet` or `display:none`, such as error, thank-you and loading text), and button-style links (`.pill`, `.text-link`) like "Start your project →". To keep another block out of the search, give it `data-nosnippet`.
 
+## Site structure: three divisions
+
+The services are grouped into three divisions, used consistently in the menu (`partial/header.html`), the footer's Services column (`partial/footer.html`), the homepage cards (`.division-cards` in `index.html`) and the homepage's `GeneralContractor` structured data (`hasOfferCatalog`):
+
+| Division | Menu key / label | Pages |
+| --- | --- | --- |
+| Renovation & construction | `BUILD` / "Build" | `renovations-extensions`, `custom-homes`, `knockdown-rebuild` |
+| Building management | `MGMT` / "Services" in the menu, "Manage" in the footer and homepage card | `project-management`, `building-inspections` |
+| Property & development | `PROPERTY` / "Property" | `house-and-land`, `multi-unit-development`, `property-management`, `property-maintenance`, `other-services` |
+
+Projects is a plain menu link (`NAV_KEYS` entry `projects`); About, FAQ and Contact sit under "Connect with us" (`CONNECT`). The group membership in `NAV_GROUPS` (`build.py`) only decides which dropdown button is highlighted, so moving a page means changing `NAV_GROUPS`, the header dropdown, the footer list and the homepage card together. Group labels are the `nav_group_*` keys in `translations.js`, reused as the footer and card headings; the one exception is the menu button for `MGMT`, which uses its own key `nav_group_services` ("Services") so the footer and card can keep "Manage".
+
+**Homepage hero:** the big slogan "Building Better. Managing Smarter." is a styled `<p class="heading hero-slogan">`; the line under it is the page's `<h1>` (class `hero-sub`) so the renovation keywords stay in the main heading. On Chinese pages `:lang(zh) .hero .hero-slogan{word-break:keep-all}` stops the slogan wrapping mid-phrase.
+
+**Service enquiry buttons:** each service page (except House & land and Inspections, which have their own forms) has its enquiry button twice, in `.page-intro-actions` under the title and at the end, both linking to `../contact/?service=<slug>`. `enquiry.js` ticks the Contact form checkbox whose `value`, lower-cased with runs of other characters turned into `-`, equals the slug (`Renovation / extension` → `renovation-extension`). Renaming a checkbox value breaks the matching links, so change both. `build.py` keeps the query string when it rewrites links for the Chinese copies.
+
+## Contact options on every page
+
+- **WhatsApp** (footer icon, and the mobile bar): a plain link to `https://wa.me/61411330962`.
+- **WeChat** (footer icon `.footer-wechat`): a button that opens `#wechatPanel`, a pop-up with `wechat-qr-kevin.png`, the WeChat ID and a "Copy ID" button (`site.js`; closes with ×, Escape or a click outside). It is not a link because WeChat personal links (`u.wechat.com/...`) only work when scanned inside WeChat; clicked in a browser they land on wechat.com. If the QR code is reset, replace the image (same name) and update the ID in `partial/footer.html`.
+- **Mobile contact bar** (`.mobile-contact-bar` in `partial/footer.html`): Call / WhatsApp / Enquire, fixed to the bottom of the screen at 760px and narrower; `body` gets bottom padding there so the footer isn't hidden. Labels are `mbar_*` keys.
+- **Contact page map:** an `<iframe>` of the Google Business Profile listing (`https://www.google.com/maps?cid=336079578799620430&output=embed`, lazy-loaded). Google redirects that embed to `maps.google.com`, so `frame-src` in `partial/csp.html` allows both `https://www.google.com` and `https://maps.google.com`; dropping either leaves the map blank. The same listing is linked from the homepage testimonial ("See our reviews on Google").
+
 ## Bilingual support
 
 English lives at `/page/`, Traditional Chinese at `/zh/page/`. The Chinese pages are **generated by `python build.py`** from the English pages plus `translations.js`, so Google can index them (the old toggle-only translation swapped text in the browser on the same URL, which search engines never saw).
@@ -136,10 +163,12 @@ English lives at `/page/`, Traditional Chinese at `/zh/page/`. The Chinese pages
 
 All styling is in `styles.css`, using CSS custom properties for the palette (`--bordeaux`, `--mahogany`, `--sandstone`, …).
 
-Pages reference assets with a version query string (`styles.css?v=42`, and `booking.js?v=21` on the building-inspections page). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes.
+Pages reference assets with a version query string (for example `styles.css?v=69`, `enquiry.js?v=17`). Browsers cache these aggressively, so a returning visitor can keep a stale copy indefinitely unless the number changes. The current numbers are listed in the handoff guide (section 6).
 
-- **Edit `styles.css`** → bump `?v=` on **every** page that links it (all 12 live pages share one number and must be bumped together).
-- **Edit `booking.js`** → bump its `?v=` in `building-inspections/index.html` (the only page that loads it).
+- **Edit `styles.css`** → bump `?v=` on **every** English page that links it (all 15 share one number; the Chinese copies follow after `python build.py`).
+- **Edit `site.js`, `i18n.js`, `search.js` or `analytics.js`** → bump the number once in `partial/footer.html`, then rebuild.
+- **Edit a page-specific script** (`booking.js`, `enquiry.js`, `case-studies.js`, …) → bump it on each page that loads it.
+- **Don't add `?v=` to `translations.js`:** `build.py` looks for that exact tag when it inserts `translations-hans.js` on Simplified pages.
 
 Quick consistency check:
 
@@ -171,6 +200,7 @@ There are two enquiry forms: the main one on `/contact/` and a house-and-land on
 - joins ticked project-type checkboxes into one hidden field, and reveals a detail box for checkboxes with a matching `data-detail` id
 - strips non-digits from phone fields as the visitor types
 - tells the server which form it is with `data-enquiry-type="house_and_land"` (no attribute = `contact`)
+- ticks a project type on arrival when the URL has `?service=<slug>` (see [Site structure](#site-structure-three-divisions))
 - shows a thank-you, or a specific message when the server refuses (links, spam, too short, rate limit), in English and Chinese
 
 > `enquiry.js` has its **own copy of `WEBAPP_URL`**, separate from `booking.js`. If the web app address ever changes, change it in **both** files, or one of the two features will silently break.
@@ -230,6 +260,8 @@ title | title_zh | project | project_zh | location | location_zh | type | type_z
 overview | overview_zh | features | features_zh | role | role_zh | challenges |
 challenges_zh | result | result_zh | images | published
 ```
+
+Optional extra column: `before_images` (one link per line, like `images`). When a row has before photos they are shown first with a **Before** label and the `images` photos get an **After** label (`.case-stage-*` in `styles.css`; labels `proj_before_label` / `proj_after_label`). Rows without it look as before.
 
 - A blank `_zh` cell falls back to the English text.
 - `features` and `images` hold one item per line within a cell (Alt+Enter / Option+Return).
@@ -350,7 +382,7 @@ Before pushing:
 
 - [ ] Edited `partial/header.html`, `partial/footer.html` or `partial/csp.html`? Run `python build.py`.
 - [ ] Edited `styles.css`? Bump `?v=` on every page.
-- [ ] Edited `booking.js`? Bump `?v=` in `building-inspections/index.html`.
+- [ ] Edited `booking.js`, `enquiry.js` or another page script? Bump its `?v=` on the pages that load it. Edited a script loaded by the footer? Bump it in `partial/footer.html`.
 - [ ] Added a page-specific `<script>`? It must be **after** `<!-- FOOTER:END -->`, and must be an external file (no inline scripts).
 - [ ] Using a new external service or host? Add its origin to `partial/csp.html` and rebuild.
 - [ ] Previewed locally (`python -m http.server 8000`).
@@ -360,6 +392,8 @@ Before pushing:
 ## Known loose ends
 
 - The footer year still uses the visitor's device clock (harmless).
+- `wechat.svg` and `whatsapp.svg` in the root aren't used by any page (the footer icons are inline SVG) and can be deleted.
+- The WeChat pop-up's close button label ("Close") and the WhatsApp icon's label are English-only.
 - Spot-check Google Sheet sharing for the Bookings sheet and the case-studies sheet periodically.
 
 ## Appendix: Apps Script source
