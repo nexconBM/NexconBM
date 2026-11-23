@@ -23,7 +23,7 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "GeneralContractor", "@id": "https://nexconbm.com.au/#organization", "name": "Nexcon Building Management", "legalName": "Nexcon Building Management Pty Ltd", "alternateName": ["Nexcon", "Nexcon BM"], "url": "https://nexconbm.com.au/", "logo": "https://nexconbm.com.au/nexcon-logo-horizontal.png", "image": "https://nexconbm.com.au/og-image.png", "telephone": "+61411330962", "email": "building@nexcongroup.com.au", "address": {"@type": "PostalAddress", "streetAddress": "Unit 8, 197-199 Springvale Road", "addressLocality": "Nunawading", "addressRegion": "VIC", "postalCode": "3131", "addressCountry": "AU"}, "areaServed": ["Melbourne", "Victoria"]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "GeneralContractor", "@id": "https://nexconbm.com.au/#organization", "name": "Nexcon Building Management", "legalName": "Nexcon Building Management Pty Ltd", "alternateName": ["Nexcon", "Nexcon BM"], "url": "https://nexconbm.com.au/", "logo": "https://nexconbm.com.au/nexcon-logo-horizontal.png", "image": "https://nexconbm.com.au/og-image.png", "telephone": "+61411330962", "email": "building@nexcongroup.com.au", "address": {"@type": "PostalAddress", "streetAddress": "Unit 8, 197-199 Springvale Road", "addressLocality": "Nunawading", "addressRegion": "VIC", "postalCode": "3131", "addressCountry": "AU"}, "areaServed": [{"@type": "City", "name": "Melbourne"}, {"@type": "State", "name": "Victoria"}], "geo": {"@type": "GeoCoordinates", "latitude": -37.8218129, "longitude": 145.1756382}, "hasMap": "https://www.google.com/maps?cid=336079578799620430", "sameAs": ["https://www.google.com/maps?cid=336079578799620430"], "slogan": "Building Better. Managing Smarter.", "hasOfferCatalog": {"@type": "OfferCatalog", "name": "Services", "itemListElement": [{"@type": "OfferCatalog", "name": "Build: renovation & construction", "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Home renovations & extensions", "url": "https://nexconbm.com.au/renovations-extensions/"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Custom homes", "url": "https://nexconbm.com.au/custom-homes/"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Knockdown rebuild", "url": "https://nexconbm.com.au/knockdown-rebuild/"}}]}, {"@type": "OfferCatalog", "name": "Manage: building management", "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Construction project management", "url": "https://nexconbm.com.au/project-management/"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Building inspections", "url": "https://nexconbm.com.au/building-inspections/"}}]}, {"@type": "OfferCatalog", "name": "Property: property & development", "itemListElement": [{"@type": "Offer", "itemOffered": {"@type": "Service", "name": "House & land packages", "url": "https://nexconbm.com.au/house-and-land/"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Multi-unit development", "url": "https://nexconbm.com.au/multi-unit-development/"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Property management", "url": "https://nexconbm.com.au/property-management/"}}, {"@type": "Offer", "itemOffered": {"@type": "Service", "name": "Property maintenance", "url": "https://nexconbm.com.au/property-maintenance/"}}]}]}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "Nexcon Building Management", "alternateName": ["Nexcon", "Nexcon BM"], "url": "https://nexconbm.com.au/"}</script>
 <!-- SEO:END -->
 <!-- HREFLANG:START -->
@@ -35,7 +35,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@500;600;700;800&family=Archivo:wght@400;500;600;700&family=Source+Serif+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../styles.css?v=65">
+<link rel="stylesheet" href="../styles.css?v=69">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -63,26 +63,34 @@
       <a href="#top" class="is-active" data-i18n="nav_home">首頁</a>
 
       <div class="nav-group">
-        <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-mgmt"><span data-i18n="nav_group_mgmt">管理服務</span></button>
-        <div class="nav-menu" id="menu-mgmt">
+        <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-build"><span data-i18n="nav_group_build">建造</span></button>
+        <div class="nav-menu" id="menu-build">
           <a href="renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a>
+          <a href="custom-homes/" data-i18n="nav_custom_homes">度身訂造住宅</a>
+          <a href="knockdown-rebuild/" data-i18n="nav_knockdown">拆卸重建</a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-mgmt"><span data-i18n="nav_group_mgmt">管理</span></button>
+        <div class="nav-menu" id="menu-mgmt">
           <a href="project-management/" data-i18n="nav_project_mgmt">項目管理</a>
           <a href="building-inspections/" data-i18n="nav_inspections">檢驗</a>
+        </div>
+      </div>
+
+      <div class="nav-group">
+        <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-property"><span data-i18n="nav_group_property">物業</span></button>
+        <div class="nav-menu" id="menu-property">
+          <a href="house-and-land/" data-i18n="nav_house_land">房屋土地</a>
+          <a href="multi-unit-development/" data-i18n="nav_multi_unit">多單位發展</a>
           <a href="property-management/" data-i18n="nav_prop_mgmt">物業管理</a>
           <a href="property-maintenance/" data-i18n="nav_prop_maint">保養</a>
           <a href="other-services/" data-i18n="nav_other_services">其他服務</a>
         </div>
       </div>
 
-      <div class="nav-group">
-        <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-build"><span data-i18n="nav_group_build">建屋服務</span></button>
-        <div class="nav-menu" id="menu-build">
-          <a href="custom-homes/" data-i18n="nav_custom_homes">度身訂造住宅</a>
-          <a href="knockdown-rebuild/" data-i18n="nav_knockdown">拆卸重建</a>
-          <a href="house-and-land/" data-i18n="nav_house_land">房屋土地</a>
-          <a href="multi-unit-development/" data-i18n="nav_multi_unit">多單位發展</a>
-        </div>
-      </div>
+      <a href="projects/" data-i18n="nav_projects">項目案例</a>
 
       <div class="nav-group">
         <button class="nav-group-toggle" type="button" aria-expanded="false" aria-controls="menu-connect"><span data-i18n="nav_group_connect">與我們聯繫</span></button>
@@ -144,9 +152,9 @@
   <section class="hero" id="top">
         <div class="hero-inner">
       <div class="hero-copy">
-        <h1 class="heading heading-on-dark" data-i18n="hero_h1">墨爾本房屋裝修、翻新及加建。</h1>
-        <p class="hero-sub" data-i18n="hero_sub">改善您現有的家。讓您安心的項目管理。</p>
-        <p class="lede lede-on-dark" data-i18n="hero_lede">由廚房及浴室裝修，到地下加建及第二層加建，世代建築管理以清晰的溝通、實用的建議及專業的監督，協助您規劃及管理裝修及翻新工程。我們亦提供定製住宅、推倒重建及房屋土地套餐服務。</p>
+        <p class="heading heading-on-dark hero-slogan" data-i18n="hero_slogan">建得更好，管得更精。</p>
+        <h1 class="hero-sub" data-i18n="hero_h1">墨爾本房屋翻新、加建及建築管理。</h1>
+        <p class="lede lede-on-dark" data-i18n="hero_lede">由房屋翻新、定製住宅，到獨立的工程監督，世代建築管理助您更有信心地作出物業決定。</p>
         <div class="hero-actions">
           <a href="contact/" class="pill pill-light" data-i18n="hero_btn_start">開始您的項目</a>
           <a href="#services" class="pill pill-outline" data-i18n="hero_btn_services">了解我們的服務</a>
@@ -195,38 +203,38 @@
   <section class="content-block content-block-follow reveal" id="services">
     <div class="wrap">
       <p class="eyebrow" data-i18n="home_services_eyebrow">我們的服務</p>
-      <h2 class="heading" style="font-size:1.4rem;" data-i18n="home_services_h2">一個團隊，多種建屋方式。</h2>
-      <div class="service-cards">
-        <a class="service-card" href="renovations-extensions/">
-          <h3 data-i18n="home_svc_reno_h">裝修、翻新及加建</h3>
-          <p data-i18n="home_svc_reno_p">以清晰的範圍及預算，裝修、翻新或加建您現有的家。</p>
-          <span class="service-card-link" data-i18n="home_svc_reno_link">了解翻新及加建 →</span>
-        </a>
-        <a class="service-card" href="custom-homes/">
-          <h3 data-i18n="home_svc_custom_h">度身訂造住宅</h3>
-          <p data-i18n="home_svc_custom_p">打造貼合您生活方式、土地及個人需要的家。</p>
-          <span class="service-card-link" data-i18n="home_svc_custom_link">了解度身訂造住宅 →</span>
-        </a>
-        <a class="service-card" href="knockdown-rebuild/">
-          <h3 data-i18n="home_svc_knockdown_h">拆卸重建</h3>
-          <p data-i18n="home_svc_knockdown_p">以專為地塊及您生活方式而設計的新屋，取代現有物業。</p>
-          <span class="service-card-link" data-i18n="home_svc_knockdown_link">了解拆卸重建 →</span>
-        </a>
-        <a class="service-card" href="house-and-land/">
-          <h3 data-i18n="home_svc_hal_h">屋地套餐</h3>
-          <p data-i18n="home_svc_hal_p">以更確定的成本購買土地並興建新屋的實用方案。</p>
-          <span class="service-card-link" data-i18n="home_svc_hal_link">了解屋地套餐 →</span>
-        </a>
-        <a class="service-card" href="project-management/">
-          <h3 data-i18n="home_svc_mgmt_h">施工管理</h3>
-          <p data-i18n="home_svc_mgmt_p">為希望在整個項目中更清楚掌握進度及具主導權的業主，提供專業統籌及監督。</p>
-          <span class="service-card-link" data-i18n="home_svc_mgmt_link">了解施工管理 →</span>
-        </a>
-        <a class="service-card" href="building-inspections/">
-          <h3 data-i18n="home_svc_insp_h">樓宇檢驗</h3>
-          <p data-i18n="home_svc_insp_p">提供施工階段及竣工檢驗，協助在問題擴大之前及早發現。</p>
-          <span class="service-card-link" data-i18n="home_svc_insp_link">了解樓宇檢驗 →</span>
-        </a>
+      <h2 class="heading" style="font-size:1.4rem;" data-i18n="home_services_h2">一個團隊，負責建造、管理及照顧您的物業。</h2>
+      <div class="division-cards">
+        <div class="division-card">
+          <p class="division-tag" data-i18n="nav_group_build">建造</p>
+          <h3 data-i18n="home_div_build_h">翻新及建造</h3>
+          <p data-i18n="home_div_build_p">翻新、加建或興建新居，由同一團隊規劃及管理整個工程。</p>
+          <ul class="division-links">
+            <li><a href="renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a></li>
+            <li><a href="custom-homes/" data-i18n="nav_custom_homes">度身訂造住宅</a></li>
+            <li><a href="knockdown-rebuild/" data-i18n="nav_knockdown">拆卸重建</a></li>
+          </ul>
+        </div>
+        <div class="division-card">
+          <p class="division-tag" data-i18n="nav_group_mgmt">管理</p>
+          <h3 data-i18n="home_div_mgmt_h">建築管理</h3>
+          <p data-i18n="home_div_mgmt_p">獨立監督，保障您的預算、工期及建築質素。</p>
+          <ul class="division-links">
+            <li><a href="project-management/" data-i18n="nav_project_mgmt">項目管理</a></li>
+            <li><a href="building-inspections/" data-i18n="nav_inspections">檢驗</a></li>
+          </ul>
+        </div>
+        <div class="division-card">
+          <p class="division-tag" data-i18n="nav_group_property">物業</p>
+          <h3 data-i18n="home_div_prop_h">物業及發展</h3>
+          <p data-i18n="home_div_prop_p">土地、發展項目，以及您物業的日常護理。</p>
+          <ul class="division-links">
+            <li><a href="house-and-land/" data-i18n="nav_house_land">房屋土地</a></li>
+            <li><a href="multi-unit-development/" data-i18n="nav_multi_unit">多單位發展</a></li>
+            <li><a href="property-management/" data-i18n="nav_prop_mgmt">物業管理</a></li>
+            <li><a href="property-maintenance/" data-i18n="nav_prop_maint">保養</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -284,6 +292,7 @@
         <blockquote class="testimonial-quote" data-i18n="home_testi_quote" data-i18n-html>「我們請世代建築管理協助翻新家居。團隊準時到場，清楚說明工程安排，並<strong>把工程安排得井井有條，讓我們隨時知道下一步</strong>。整個過程少了很多壓力。」</blockquote>
         <figcaption class="testimonial-by"><strong data-i18n="home_testi_name">Ryan，Wantirna</strong> <span data-i18n="home_testi_service">房屋翻新</span></figcaption>
       </figure>
+      <p style="margin-top:1.2rem;"><a href="https://www.google.com/maps?cid=336079578799620430" class="text-link" target="_blank" rel="noopener" data-i18n="home_testi_google">查看我們的 Google 評價 →</a></p>
     </div>
   </section>
 
@@ -313,25 +322,42 @@
           <a href="https://wa.me/61411330962" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
             <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
           </a>
-          <a href="https://u.wechat.com/kDn9S7OqDILlV5n3NZaWfPo?s=2" target="_blank" rel="noopener">
+          <button type="button" class="footer-wechat" aria-expanded="false" aria-controls="wechatPanel">
             <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" focusable="false"><path fill="currentColor" d="M8.691 2.188C3.891 2.188 0 5.476 0 9.53c0 2.212 1.17 4.203 3.002 5.55a.59.59 0 0 1 .213.665l-.39 1.48c-.019.07-.048.141-.048.213 0 .163.13.295.29.295a.326.326 0 0 0 .167-.054l1.903-1.114a.864.864 0 0 1 .717-.098 10.16 10.16 0 0 0 2.837.403c.276 0 .543-.027.811-.05-.857-2.578.157-4.972 1.932-6.446 1.703-1.415 3.882-1.98 5.853-1.838-.576-3.583-4.196-6.348-8.596-6.348zM5.785 5.991c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178A1.17 1.17 0 0 1 4.623 7.17c0-.651.52-1.18 1.162-1.18zm5.813 0c.642 0 1.162.529 1.162 1.18a1.17 1.17 0 0 1-1.162 1.178 1.17 1.17 0 0 1-1.162-1.178c0-.651.52-1.18 1.162-1.18zm5.34 2.867c-1.797-.052-3.746.512-5.28 1.786-1.72 1.428-2.687 3.72-1.78 6.22.942 2.453 3.666 4.229 6.884 4.229.826 0 1.622-.12 2.361-.336a.722.722 0 0 1 .598.082l1.584.926a.272.272 0 0 0 .14.047c.134 0 .24-.111.24-.247 0-.06-.023-.12-.038-.177l-.327-1.233a.582.582 0 0 1-.023-.156.49.49 0 0 1 .201-.398C23.024 18.48 24 16.82 24 14.98c0-3.21-2.931-5.837-6.656-6.088V8.89c-.135-.01-.27-.027-.407-.03zm-2.53 3.274c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.97-.982zm4.844 0c.535 0 .969.44.969.982a.976.976 0 0 1-.969.983.976.976 0 0 1-.969-.983c0-.542.434-.982.969-.982z"/></svg>
             <span class="visually-hidden" data-i18n="footer_wechat_sr">在微信加我們為好友</span>
-          </a>
+          </button>
+        </div>
+        <div class="wechat-panel" id="wechatPanel" hidden>
+          <button type="button" class="wechat-panel-close" aria-label="Close">&times;</button>
+          <img src="../wechat-qr-kevin.png" alt="Kevin Chan's WeChat QR code" width="480" height="480" loading="lazy">
+          <p class="wechat-panel-scan" data-i18n="footer_wechat_scan">用微信掃一掃，加 Kevin 為好友</p>
+          <p class="wechat-panel-id"><span data-i18n="footer_wechat_id_label">微信號</span>: <strong>Kevin40338</strong></p>
+          <button type="button" class="wechat-panel-copy"><span class="wechat-copy-label" data-i18n="footer_wechat_copy">複製微信號</span><span class="wechat-copied-label" data-i18n="footer_wechat_copied">已複製</span></button>
         </div>
       </div>
       <div class="footer-cols">
         <div class="footer-col footer-col-services">
           <h2 data-i18n="footer_services_label">服務</h2>
-          <div class="footer-links-2col">
-            <a href="renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a>
-            <a href="project-management/" data-i18n="nav_project_mgmt">項目管理</a>
-            <a href="building-inspections/" data-i18n="nav_inspections">檢驗</a>
-            <a href="property-management/" data-i18n="nav_prop_mgmt">物業管理</a>
-            <a href="property-maintenance/" data-i18n="nav_prop_maint">保養</a>
-            <a href="custom-homes/" data-i18n="nav_custom_homes">度身訂造住宅</a>
-            <a href="knockdown-rebuild/" data-i18n="nav_knockdown">拆卸重建</a>
-            <a href="house-and-land/" data-i18n="nav_house_land">房屋土地</a>
-            <a href="other-services/" data-i18n="nav_other_services">其他服務</a>
+          <div class="footer-divisions">
+            <div>
+              <p class="footer-division-label" data-i18n="nav_group_build">建造</p>
+              <a href="renovations-extensions/" data-i18n="nav_prop_reno">翻新及加建</a>
+              <a href="custom-homes/" data-i18n="nav_custom_homes">度身訂造住宅</a>
+              <a href="knockdown-rebuild/" data-i18n="nav_knockdown">拆卸重建</a>
+            </div>
+            <div>
+              <p class="footer-division-label" data-i18n="nav_group_mgmt">管理</p>
+              <a href="project-management/" data-i18n="nav_project_mgmt">項目管理</a>
+              <a href="building-inspections/" data-i18n="nav_inspections">檢驗</a>
+            </div>
+            <div>
+              <p class="footer-division-label" data-i18n="nav_group_property">物業</p>
+              <a href="house-and-land/" data-i18n="nav_house_land">房屋土地</a>
+              <a href="multi-unit-development/" data-i18n="nav_multi_unit">多單位發展</a>
+              <a href="property-management/" data-i18n="nav_prop_mgmt">物業管理</a>
+              <a href="property-maintenance/" data-i18n="nav_prop_maint">保養</a>
+              <a href="other-services/" data-i18n="nav_other_services">其他服務</a>
+            </div>
           </div>
         </div>
         <div class="footer-col">
@@ -356,9 +382,15 @@
   </div>
 </footer>
 
+<nav class="mobile-contact-bar" aria-label="Quick contact">
+  <a href="tel:+61411330962"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1l-2.2 2.2z"/></svg><span data-i18n="mbar_call">致電</span></a>
+  <a href="https://wa.me/61411330962" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg><span>WhatsApp</span></a>
+  <a href="contact/" class="mobile-contact-bar-primary"><span data-i18n="mbar_enquire">查詢</span></a>
+</nav>
+
 <script src="../translations.js"></script>
 <script src="../i18n.js?v=4"></script>
-<script src="../site.js?v=3"></script>
+<script src="../site.js?v=4"></script>
 <script src="../analytics.js?v=1"></script>
 <script src="../search.js?v=2"></script>
 <!-- FOOTER:END -->

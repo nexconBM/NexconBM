@@ -22,10 +22,10 @@ Tokens used inside the partials:
   {{NAV_HOUSE_LAND_ACTIVE}}, {{NAV_MULTI_UNIT_ACTIVE}},
   {{NAV_PROJECT_MGMT_ACTIVE}}, {{NAV_INSPECTIONS_ACTIVE}}, {{NAV_PROP_MGMT_ACTIVE}}, {{NAV_PROP_MAINT_ACTIVE}},
   {{NAV_PROP_RENO_ACTIVE}}, {{NAV_OTHER_SERVICES_ACTIVE}}, {{NAV_ABOUT_ACTIVE}},
-  {{NAV_FAQ_ACTIVE}}, {{NAV_CONTACT_ACTIVE}}
+  {{NAV_FAQ_ACTIVE}}, {{NAV_CONTACT_ACTIVE}}, {{NAV_PROJECTS_ACTIVE}}
              become ' class="is-active"' on the nav link of the page being
              built (chosen per page in PAGES below) and "" everywhere else.
-  {{NAV_GROUP_BUILD_ACTIVE}}, {{NAV_GROUP_MGMT_ACTIVE}}, {{NAV_GROUP_CONNECT_ACTIVE}}
+  {{NAV_GROUP_BUILD_ACTIVE}}, {{NAV_GROUP_MGMT_ACTIVE}}, {{NAV_GROUP_PROPERTY_ACTIVE}}, {{NAV_GROUP_CONNECT_ACTIVE}}
              become " is-active" on a dropdown's button when the current page
              is one of that dropdown's pages (see NAV_GROUPS below).
 
@@ -145,13 +145,14 @@ HANS_WORDS = [
 NAV_KEYS = [
     "home", "custom_homes", "knockdown", "house_land", "multi_unit",
     "project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno", "other_services",
-    "about", "faq", "contact",
+    "projects", "about", "faq", "contact",
 ]
 
 # Which pages live under each dropdown in the nav (so its button is highlighted).
 NAV_GROUPS = {
-    "BUILD": {"custom_homes", "knockdown", "house_land", "multi_unit"},
-    "MGMT": {"project_mgmt", "inspections", "prop_mgmt", "prop_maint", "prop_reno", "other_services", "projects"},
+    "BUILD": {"prop_reno", "custom_homes", "knockdown"},
+    "MGMT": {"project_mgmt", "inspections"},
+    "PROPERTY": {"house_land", "multi_unit", "prop_mgmt", "prop_maint", "other_services"},
     "CONNECT": {"about", "faq", "contact"},
 }
 

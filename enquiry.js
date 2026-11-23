@@ -146,6 +146,14 @@
         if (input && b.checked) input.focus();
       });
     });
+    // Service pages link here as contact/?service=<slug> (e.g. ?service=renovation-extension), so the
+    // matching project type starts ticked. The slug is the checkbox value, lower-cased with dashes.
+    var wanted = new URLSearchParams(window.location.search).get('service');
+    if (wanted) {
+      typeBoxes.forEach(function (b) {
+        if (b.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') === wanted) b.checked = true;
+      });
+    }
     syncTypes();
 
     form.addEventListener('submit', function (e) {

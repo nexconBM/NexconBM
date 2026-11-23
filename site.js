@@ -52,6 +52,32 @@ document.addEventListener('keydown', e => {
 
 document.getElementById('year').textContent = new Date().getFullYear();
 
+// WeChat links can't add a contact from a browser (they only work when scanned in WeChat),
+// so the footer WeChat icon opens a panel with Kevin's QR code and WeChat ID instead.
+const wechatBtn = document.querySelector('.footer-wechat');
+const wechatPanel = document.getElementById('wechatPanel');
+if (wechatBtn && wechatPanel) {
+  const copyBtn = wechatPanel.querySelector('.wechat-panel-copy');
+  const setWechat = open => {
+    wechatPanel.hidden = !open;
+    wechatBtn.setAttribute('aria-expanded', String(open));
+    if (!open) copyBtn.classList.remove('is-copied');
+  };
+  wechatBtn.addEventListener('click', () => setWechat(wechatPanel.hidden));
+  wechatPanel.querySelector('.wechat-panel-close').addEventListener('click', () => {
+    setWechat(false);
+    wechatBtn.focus();
+  });
+  copyBtn.addEventListener('click', () => {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText('Kevin40338').then(() => copyBtn.classList.add('is-copied')).catch(() => {});
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !wechatPanel.hidden) setWechat(false); });
+  document.addEventListener('click', e => {
+    if (!wechatPanel.hidden && !wechatPanel.contains(e.target) && !wechatBtn.contains(e.target)) setWechat(false);
+  });
+}
+
 const revealEls = document.querySelectorAll('.reveal');
 if ('IntersectionObserver' in window && revealEls.length) {
   const revealObserver = new IntersectionObserver((entries) => {

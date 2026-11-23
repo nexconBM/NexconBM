@@ -7,6 +7,9 @@
           title | title_zh | project | project_zh | location | location_zh | type |
           type_zh | overview | overview_zh | features | features_zh | role | role_zh |
           challenges | challenges_zh | result | result_zh | images | published
+        Optional extra column: before_images (photos of the property BEFORE the work, one
+        link per line, same as "images"). When it has photos, they show first marked
+        "Before" and the "images" photos are marked "After".
         (Every English column has a matching "_zh" column right after it for the
         Chinese translation of that same field. "images" has no "_zh" version, since a
         photo doesn't need translating.)
@@ -63,7 +66,9 @@
     features: "proj_features_label",
     role: "proj_role_label",
     challenges: "proj_challenges_label",
-    result: "proj_result_label"
+    result: "proj_result_label",
+    before: "proj_before_label",
+    after: "proj_after_label"
   };
 
   var publishedRows = []; // filled in once the sheet has loaded
@@ -129,7 +134,9 @@
 
   function renderCaseStudy(row, lang) {
     var features = parseLines(field(row, "features", lang));
-    var images = parseLines(row.images).filter(isSafeImageUrl).map(normalizeImageUrl);
+    var afterImages = parseLines(row.images).filter(isSafeImageUrl).map(normalizeImageUrl);
+    var beforeImages = parseLines(row.before_images).filter(isSafeImageUrl).map(normalizeImageUrl);
+    var images = beforeImages.concat(afterImages); // before photos first, so the lightbox steps through in order
     var project = field(row, "project", lang);
     var location = field(row, "location", lang);
     var type = field(row, "type", lang);
@@ -186,6 +193,7 @@
       var gallery = document.createElement("div");
       gallery.className = "case-gallery";
       images.forEach(function (src, i) {
+        var stage = !beforeImages.length ? "" : i < beforeImages.length ? "before" : "after";
         var img = document.createElement("img");
         img.className = "case-gallery-img";
         img.src = src;
@@ -196,7 +204,20 @@
         img.addEventListener("keydown", function (e) {
           if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(images, i, title); }
         });
-        gallery.appendChild(img);
+        if (stage) {
+          var fig = document.createElement("figure");
+          fig.className = "case-gallery-item";
+          var tag = document.createElement("span");
+          tag.className = "case-stage case-stage-" + stage;
+          tag.setAttribute("data-i18n", LABELS[stage]);
+          tag.textContent = label(stage);
+          img.alt = (title ? title + " – " : "") + label(stage) + " " + (i + 1);
+          fig.appendChild(img);
+          fig.appendChild(tag);
+          gallery.appendChild(fig);
+        } else {
+          gallery.appendChild(img);
+        }
       });
       media.appendChild(gallery);
       layout.appendChild(media);
