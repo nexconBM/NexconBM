@@ -151,8 +151,8 @@ NAV_KEYS = [
 # Which pages live under each dropdown in the nav (so its button is highlighted).
 NAV_GROUPS = {
     "BUILD": {"prop_reno", "custom_homes", "knockdown"},
-    "MGMT": {"project_mgmt", "inspections"},
-    "PROPERTY": {"house_land", "multi_unit", "prop_mgmt", "prop_maint", "other_services"},
+    "PROPERTY": {"house_land", "multi_unit"},
+    "MGMT": {"project_mgmt", "inspections", "prop_mgmt", "prop_maint", "other_services"},
     "CONNECT": {"about", "faq", "contact"},
 }
 

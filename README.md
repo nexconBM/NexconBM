@@ -124,13 +124,13 @@ A magnifier button opens a search box (`.search-toggle` buttons and `#searchPane
 
 ## Site structure: three divisions
 
-The services are grouped into three divisions, used consistently in the menu (`partial/header.html`), the footer's Services column (`partial/footer.html`), the homepage cards (`.division-cards` in `index.html`) and the homepage's `GeneralContractor` structured data (`hasOfferCatalog`):
+The services are grouped into three divisions, shown in the order Build, Property, Manage/Services, used consistently in the menu (`partial/header.html`), the footer's Services column (`partial/footer.html`), the homepage cards (`.division-cards` in `index.html`) and the homepage's `GeneralContractor` structured data (`hasOfferCatalog`):
 
 | Division | Menu key / label | Pages |
 | --- | --- | --- |
 | Renovation & construction | `BUILD` / "Build" | `renovations-extensions`, `custom-homes`, `knockdown-rebuild` |
-| Building management | `MGMT` / "Services" in the menu, "Manage" in the footer and homepage card | `project-management`, `building-inspections` |
-| Property & development | `PROPERTY` / "Property" | `house-and-land`, `multi-unit-development`, `property-management`, `property-maintenance`, `other-services` |
+| Property & development | `PROPERTY` / "Property" | `house-and-land`, `multi-unit-development` |
+| Building management | `MGMT` / "Services" in the menu, "Manage" in the footer and homepage card | `project-management`, `building-inspections`, `property-management`, `property-maintenance`, `other-services` (Other services is left off the homepage card) |
 
 Projects is a plain menu link (`NAV_KEYS` entry `projects`); About, FAQ and Contact sit under "Connect with us" (`CONNECT`). The group membership in `NAV_GROUPS` (`build.py`) only decides which dropdown button is highlighted, so moving a page means changing `NAV_GROUPS`, the header dropdown, the footer list and the homepage card together. Group labels are the `nav_group_*` keys in `translations.js`, reused as the footer and card headings; the one exception is the menu button for `MGMT`, which uses its own key `nav_group_services` ("Services") so the footer and card can keep "Manage".
 
